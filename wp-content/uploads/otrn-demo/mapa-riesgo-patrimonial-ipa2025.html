@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mapa de Riesgo Patrimonial IPA-2025 · Rapa Nui</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+html,body{height:100%;margin:0;font-family:Arial,Helvetica,sans-serif;background:#f4f7f8;color:#24313a}
+header{padding:15px 20px;background:#0c395c;color:white}
+header h1{margin:0 0 4px;font-size:22px} header p{margin:0;font-size:13px;opacity:.92}
+main{display:grid;grid-template-columns:minmax(0,1fr) 370px;height:calc(100vh - 75px)}
+#map{height:100%;width:100%}
+aside{background:#fff;border-left:1px solid #d8e0e5;padding:14px;overflow:auto}
+.card{border:1px solid #d8e0e5;border-radius:10px;padding:12px;margin-bottom:12px;background:#fff}
+.card h3{margin:0 0 8px;font-size:15px;color:#0c395c}
+.small{font-size:12px;color:#66757f;line-height:1.45}
+.legend-row{display:flex;gap:8px;align-items:center;margin:7px 0;font-size:13px}
+.dot{width:14px;height:14px;border-radius:50%;display:inline-block}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{border-bottom:1px solid #e8ecef;padding:6px 4px;text-align:left}
+th{background:#f3f6f8;position:sticky;top:0}
+.badge{display:inline-block;padding:2px 7px;border-radius:999px;font-size:11px;font-weight:bold}
+.sat{background:#fde2df;color:#8a1c13}.lat{background:#fff0bf;color:#7a5a00}.norm{background:#dff3e5;color:#1f6b3d}
+select{width:100%;padding:8px;border:1px solid #d8e0e5;border-radius:8px;margin-top:4px}
+button{width:100%;padding:5px 6px;border:1px solid #d8e0e5;border-radius:7px;background:#e9f1f3;color:#0c395c;cursor:pointer}
+@media(max-width:900px){main{grid-template-columns:1fr;grid-template-rows:58vh auto;height:auto}aside{border-left:0;border-top:1px solid #d8e0e5}}
+</style>
+</head>
+<body>
+<header>
+<h1>Mapa de riesgo patrimonial · Rapa Nui</h1>
+<p>IPA-2025 · tamaño del polígono = severidad del índice · color = estado IPA</p>
+</header>
+<main>
+<div id="map"></div>
+<aside>
+<div class="card"><h3>Cómo leer el mapa</h3><div class="small">
+El radio aumenta con la severidad del índice IPA: los valores más negativos generan polígonos mayores.
+El color sigue la regla del Índice Pascua: Saturación &lt; -0,2; Latencia desde -0,2 hasta &lt;0; Normalidad ≥ 0.
+</div></div>
+
+<div class="card"><h3>Leyenda</h3>
+<div class="legend-row"><span class="dot" style="background:#c0392b"></span>Saturación</div>
+<div class="legend-row"><span class="dot" style="background:#e0a800"></span>Latencia</div>
+<div class="legend-row"><span class="dot" style="background:#2e8b57"></span>Normalidad</div>
+</div>
+
+<div class="card"><h3>Filtro por estado</h3>
+<select id="filter"><option value="all">Todos</option><option>Saturación</option><option>Latencia</option><option>Normalidad</option></select>
+</div>
+
+<div class="card"><h3>Sitios arqueológicos</h3>
+<table><thead><tr><th>Sitio</th><th>IPA</th><th>Estado</th></tr></thead><tbody id="siteRows"></tbody></table>
+</div>
+
+<div class="card"><h3>Fuente y precisión</h3><div class="small">
+Índices: Dashboard Rapa Nui IPA-2025.<br><br>
+Coordenadas de esta versión: posicionamiento preliminar para visualización. Para uso técnico definitivo deben reemplazarse por coordenadas oficiales de IDE Rapa Nui / Consejo de Monumentos Nacionales.
+</div></div>
+</aside>
+</main>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const sites = [{"name": "Ana Kai Tangata", "risk": -0.39, "mapval": 0.8, "lat": -27.17, "lon": -109.444}, {"name": "Vinapu", "risk": -0.05, "mapval": 0.46, "lat": -27.1767, "lon": -109.4056}, {"name": "Ovahe", "risk": -0.02, "mapval": 0.43, "lat": -27.0740, "lon": -109.3142}, {"name": "Tongariki", "risk": -0.02, "mapval": 0.43, "lat": -27.1254, "lon": -109.2768}, {"name": "Akahanga", "risk": -0.01, "mapval": 0.42, "lat": -27.1356, "lon": -109.3442}, {"name": "Rano Raraku", "risk": -0.02, "mapval": 0.43, "lat": -27.121, "lon": -109.288}, {"name": "Orongo", "risk": -0.01, "mapval": 0.42, "lat": -27.1889, "lon": -109.4423}, {"name": "Tahai", "risk": -0.02, "mapval": 0.43, "lat": -27.1395, "lon": -109.4269}, {"name": "Pu Ohiro", "risk": -0.03, "mapval": 0.44, "lat": -27.1054, "lon": -109.3076}, {"name": "Anakena", "risk": 0.01, "mapval": 0.4, "lat": -27.0735, "lon": -109.3236}, {"name": "Vaihu", "risk": -0.02, "mapval": 0.43, "lat": -27.1416, "lon": -109.3683}, {"name": "Ahu Akapu", "risk": -0.1, "mapval": 0.51, "lat": -27.1338, "lon": -109.4271}, {"name": "Ana Te Pora", "risk": -0.05, "mapval": 0.46, "lat": -27.1056, "lon": -109.4185}, {"name": "Ahu Akivi", "risk": 0.02, "mapval": 0.39, "lat": -27.116, "lon": -109.3951}, {"name": "Ahu Huri Aurenga", "risk": -0.1, "mapval": 0.51, "lat": -27.1505, "lon": -109.3627}, {"name": "Ana Kakenga", "risk": 0.01, "mapval": 0.4, "lat": -27.1112, "lon": -109.4204}, {"name": "Puna Pau", "risk": 0.03, "mapval": 0.38, "lat": -27.1286, "lon": -109.3995}, {"name": "Ana Te Pahu", "risk": 0.01, "mapval": 0.4, "lat": -27.1115, "lon": -109.4041}, {"name": "Papa Vaka", "risk": 0.05, "mapval": 0.36, "lat": -27.0902, "lon": -109.316}];
+
+function stateFor(v){
+  if(v < -0.2) return "Saturación";
+  if(v < 0) return "Latencia";
+  return "Normalidad";
+}
+function colorFor(state){
+  return state==="Saturación" ? "#c0392b" : state==="Latencia" ? "#e0a800" : "#2e8b57";
+}
+function radiusFor(v){
+  const sev=Math.max(0,-v);
+  return 120 + Math.min(650,sev*1400);
+}
+
+const map=L.map("map").setView([-27.1127,-109.3497],12);
+const osm=L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap contributors"}).addTo(map);
+const topo=L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",{maxZoom:17,attribution:"Map data © OpenStreetMap contributors, SRTM | Map style © OpenTopoMap"});
+L.control.layers({"Mapa base":osm,"Relieve":topo},null,{collapsed:false}).addTo(map);
+L.control.scale({imperial:false}).addTo(map);
+
+const layer=L.layerGroup().addTo(map);
+const markers=new Map();
+
+function draw(filter="all"){
+  layer.clearLayers(); markers.clear();
+  const bounds=[];
+  sites.forEach(s=>{
+    const state=stateFor(s.risk);
+    if(filter!=="all" && state!==filter) return;
+    const circle=L.circle([s.lat,s.lon],{
+      radius:radiusFor(s.risk),color:colorFor(state),fillColor:colorFor(state),fillOpacity:.38,weight:2
+    }).bindPopup("<b>"+s.name+"</b><br>IPA 2025: <b>"+s.risk.toFixed(2)+"</b><br>Estado: <b>"+state+
+      "</b><br>Valor mapa: "+s.mapval.toFixed(2)+"<br>Radio visual: "+Math.round(radiusFor(s.risk))+" m");
+    circle.addTo(layer);
+    const label=L.marker([s.lat,s.lon],{
+      icon:L.divIcon({className:"",html:'<div style="font-size:11px;font-weight:bold;color:#17324d;background:rgba(255,255,255,.82);padding:2px 4px;border-radius:4px;white-space:nowrap">'+s.name+'</div>',iconSize:null})
+    }).addTo(layer);
+    markers.set(s.name,circle);
+    bounds.push([s.lat,s.lon]);
+  });
+  if(bounds.length) map.fitBounds(bounds,{padding:[60,60]});
+}
+
+function populateTable(){
+  const tbody=document.getElementById("siteRows");
+  tbody.innerHTML="";
+  [...sites].sort((a,b)=>a.risk-b.risk).forEach(s=>{
+    const state=stateFor(s.risk);
+    const cls=state==="Saturación"?"sat":state==="Latencia"?"lat":"norm";
+    const tr=document.createElement("tr");
+    tr.innerHTML='<td><button data-site="'+s.name+'">'+s.name+'</button></td><td>'+s.risk.toFixed(2)+'</td><td><span class="badge '+cls+'">'+state+'</span></td>';
+    tbody.appendChild(tr);
+  });
+  tbody.querySelectorAll("button[data-site]").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const s=sites.find(x=>x.name===btn.dataset.site);
+      map.setView([s.lat,s.lon],15);
+      const m=markers.get(s.name);
+      if(m) m.openPopup();
+    });
+  });
+}
+let currentFilter="all";
+document.getElementById("filter").addEventListener("change",e=>{currentFilter=e.target.value;draw(currentFilter);});
+populateTable(); draw();
+
+// El mapa puede inicializarse antes de que el contenedor (p.ej. dentro de un
+// <iframe> embebido) tenga su tamaño final, dejando el fitBounds inicial mal
+// calculado y puntos fuera del área visible. Se reajusta al cargar, al
+// redimensionar y una vez más con retardo por si el layout se estabiliza tarde.
+function refit(){ map.invalidateSize(); draw(currentFilter); }
+window.addEventListener("load", refit);
+window.addEventListener("resize", refit);
+setTimeout(refit, 300);
+</script>
+</body>
+</html>

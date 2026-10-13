@@ -1,0 +1,105 @@
+# ================================================================
+#  .gitignore — observatorio-arauco
+#  Proyecto WordPress gestionado con WordPress Studio · tema hijo "otrn"
+#  Alcance del repositorio: SOLO EL PROYECTO (Opción A)
+#
+#  SE VERSIONA:
+#    - Tema otrn (vistas, style.css, template-parts, assets optimizados)
+#    - mu-plugins necesarios (studio-loader, otrn-*, sqlite-database-integration)
+#    - Plugin ACF (dependencia de contenido del tema)
+#    - wp-content/uploads (media / contenido demo del sitio)
+#    - Recursos optimizados: references/web/ + READMEs de assets
+#    - Documentación: README.md, STUDIO.md, AGENTS.md, CLAUDE.md
+#    - Plantilla wp-config-sample.php
+#
+#  NO SE VERSIONA:
+#    - Núcleo de WordPress (wp-admin, wp-includes, wp-*.php) → lo provee Studio/composer
+#    - Temas y plugins por defecto (twentytwenty*, akismet, hello)
+#    - Base de datos / SQLite (wp-content/database, *.sqlite, *.db)
+#    - Credenciales y configuración privada (wp-config.php, .env)
+#    - Originals con metadatos sensibles (EXIF/GPS): references/*.jpeg
+#    - Cachés, logs, temporales, artefactos de SO/IDE
+#
+#  Regla base: ignorar TODO en la raíz y des-ignorar solo el proyecto.
+# ================================================================
+
+# --- 1. Ignorar todo en la raíz, excepto lo que se des-ignora a continuación ---
+/*
+!.gitignore
+!README.md
+!AGENTS.md
+!CLAUDE.md
+!STUDIO.md
+!wp-config-sample.php
+!wp-content/
+!references/
+
+# --- 2. Núcleo de WordPress: NO se versiona (lo aporta Studio / composer) ---
+#    (ya quedan cubiertos por "/*"; se listan para documentar la intención)
+wp-admin/
+wp-includes/
+wp-load.php
+wp-settings.php
+wp-login.php
+wp-activate.php
+wp-blog-header.php
+wp-comments-post.php
+wp-cron.php
+wp-links-opml.php
+wp-mail.php
+wp-signup.php
+wp-trackback.php
+xmlrpc.php
+index.php
+license.txt
+readme.html
+
+# --- 3. Credenciales y configuración privada ---
+#    Se conserva wp-config-sample.php como plantilla; wp-config.php NO se versiona.
+wp-config.php
+wp-config.php.*
+.env
+.env.*
+*.env
+*.pem
+*.key
+
+# --- 4. Base de datos / SQLite / temporales ---
+wp-content/database/
+*.sqlite
+*.sqlite3
+*.db
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+/tmp/
+wp-content/cache/
+wp-content/debug.log
+wp-content/upgrade/
+
+# --- 5. Originals con metadatos sensibles (EXIF/GPS): se descartan ---
+#    Solo se conservan los recursos optimizados de references/web/ y su README.
+references/*.jpeg
+references/*.jpg
+references/*.png
+references/*.JPG
+references/*.PNG
+
+# --- 6. Temas y plugins por defecto de WordPress (no son el proyecto) ---
+wp-content/themes/twentytwenty*/
+wp-content/plugins/akismet/
+wp-content/plugins/hello.php
+
+# --- 7. Sistemas operativos, dependencias y editor ---
+.DS_Store
+**/.DS_Store
+Thumbs.db
+*.log
+node_modules/
+vendor/
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
