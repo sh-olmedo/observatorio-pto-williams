@@ -1,0 +1,176 @@
+/*
+ * Portada inmersiva (scrollytelling) del Observatorio Turístico de Arauco.
+ *
+ * Contiene el LAYOUT de las 5 secciones y las reglas de accesibilidad; las
+ * ANIMACIONES (Ken Burns, pin, crossfade, reveals) viven en
+ * assets/otrn-landing.js (GSAP + ScrollTrigger). Cuando el sistema pide
+ * `prefers-reduced-motion: reduce`, ese script NO se arma y el CSS de esta
+ * hoja deja todo visible y estático (ver bloque final de este archivo).
+ *
+ * Encolado SOLO en la portada. Todo se ancla a `.otrn.home`.
+ */
+
+.otrn.home .otrn-landing{position:relative;background:var(--aru-papel);}
+/* El header fijo tapa 72px: empujamos el primer contenido por debajo. */
+.otrn.home #primary,.otrn.home .otrn-landing{scroll-margin-top:80px;}
+
+/* ---- 1 · Hero fotográfico a sangre ----------------------------------- */
+.otrn-landing-hero{
+  position:relative; min-height:100svh; min-height:100vh;
+  display:flex; align-items:flex-end; overflow:hidden; color:#fff; isolation:isolate;
+}
+.otrn-landing-hero__media{position:absolute;inset:0;z-index:-2;overflow:hidden;}
+.otrn-landing-hero__media img{
+  width:100%;height:100%;object-fit:cover;object-position:center 38%;
+  transform:scale(1.08); will-change:transform; /* base para el Ken Burns */
+}
+.otrn-landing-hero__velo{
+  position:absolute;inset:0;z-index:-1;
+  background:linear-gradient(180deg,
+    rgba(10,46,60,.34) 0%, rgba(10,46,60,.08) 34%, rgba(10,46,60,.74) 100%);
+}
+.otrn-landing-hero__contenido{
+  width:100%; max-width:1440px; margin:0 auto;
+  padding:140px 32px clamp(72px,10vw,150px);
+}
+.otrn-landing-hero__eyebrow{
+  font-family:'IBM Plex Mono',monospace; font-size:13px; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--aru-teal-soft); margin:0 0 18px;
+  text-shadow:0 1px 12px rgba(10,46,60,.6);
+}
+.otrn-landing-hero h1{
+  font-size:clamp(40px,7vw,92px); line-height:1.02; letter-spacing:-.02em;
+  margin:0 0 22px; max-width:15ch; color:#fff; text-shadow:0 2px 32px rgba(10,46,60,.55);
+}
+.otrn-landing-hero__lead{
+  font-size:clamp(16px,1.5vw,20px); line-height:1.6; max-width:54ch;
+  color:rgba(255,255,255,.94); margin:0 0 36px; text-shadow:0 1px 12px rgba(10,46,60,.5);
+}
+.otrn-landing-hero__cue{
+  display:inline-flex; align-items:center; gap:12px;
+  font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.14em;
+  text-transform:uppercase; color:rgba(255,255,255,.92);
+  background:none; border:0; cursor:pointer; padding:0;
+}
+.otrn-landing-hero__cue .otrn-landing-hero__cue-line{
+  position:relative; width:46px; height:1px; background:rgba(255,255,255,.6); overflow:hidden;
+}
+.otrn-landing-hero__cue .otrn-landing-hero__cue-line::after{
+  content:""; position:absolute; left:-46px; top:0; width:46px; height:1px;
+  background:#fff; animation:otrn-cue 2.4s ease-in-out infinite;
+}
+@keyframes otrn-cue{ 0%{left:-46px} 60%{left:46px} 100%{left:46px} }
+
+/* ---- Sección genérica ------------------------------------------------ */
+.otrn-landing-seccion{padding-block:var(--aru-gap);}
+.otrn-landing-seccion .wrap{padding:0 32px;}
+.otrn-landing-eyebrow{
+  font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--aru-terra-deep); background:var(--aru-terra-soft);
+  display:inline-block; padding:5px 14px; border-radius:999px; margin:0 0 18px;
+}
+.otrn-landing-titulo{
+  font-size:clamp(28px,3.4vw,46px); line-height:1.08; letter-spacing:-.02em;
+  color:var(--aru-ink); margin:0 0 16px; max-width:20ch;
+}
+.otrn-landing-lead{
+  font-size:clamp(16px,1.4vw,19px); line-height:1.7; color:var(--aru-texto-2);
+  max-width:66ch; margin:0;
+}
+
+/* ---- 2 · Narrativa territorial (columna visual fija + texto) -------- */
+.otrn-landing-narrativa{padding-block:var(--aru-gap);}
+.otrn-landing-narrativa__grid{
+  display:grid; grid-template-columns:1fr 1fr; gap:clamp(28px,5vw,72px);
+  align-items:start; max-width:1440px; margin:0 auto; padding:0 32px;
+}
+.otrn-landing-narrativa__visual{position:sticky; top:96px; height:min(78vh,760px);}
+.otrn-landing-foto{
+  position:absolute; inset:0; border-radius:var(--aru-radio); overflow:hidden;
+  box-shadow:0 18px 50px rgba(10,46,60,.18);
+  opacity:0; transition:opacity .8s ease;
+}
+.otrn-landing-foto.is-activa{opacity:1;}
+.otrn-landing-foto img{width:100%;height:100%;object-fit:cover;display:block;}
+.otrn-landing-foto figcaption{
+  position:absolute; left:0; right:0; bottom:0; padding:16px 18px;
+  font-family:'IBM Plex Mono',monospace; font-size:11.5px; letter-spacing:.04em;
+  color:rgba(255,255,255,.92); background:linear-gradient(0deg,rgba(10,46,60,.72),transparent);
+}
+.otrn-landing-pasos{display:flex; flex-direction:column; gap:clamp(60px,14vh,140px); padding-block:6vh;}
+.otrn-landing-paso{min-height:60vh; display:flex; flex-direction:column; justify-content:center;}
+.otrn-landing-paso p{font-size:clamp(16px,1.5vw,21px); line-height:1.7; color:var(--aru-texto); max-width:42ch; margin:14px 0 0;}
+.otrn-landing-paso .otrn-landing-eyebrow{color:var(--aru-teal-deep); background:var(--aru-teal-soft);}
+
+/* ---- Aviso de datos provisionales ------------------------------------ */
+.otrn-provisional{
+  display:flex; gap:12px; align-items:flex-start;
+  background:var(--aru-terra-soft); border:1px solid var(--aru-terra-tint);
+  border-radius:var(--aru-radio-sm); padding:14px 16px; margin:0 0 26px;
+  font-size:13.5px; line-height:1.55; color:var(--aru-terra-deep); max-width:66ch;
+}
+.otrn-provisional svg{flex:0 0 auto; margin-top:2px;}
+.otrn-provisional strong{color:var(--aru-terra-deep);}
+
+/* ---- Reveal (respaldo cuando no hay JS / reduced-motion) ------------ */
+.otrn-reveal{opacity:0; transform:translateY(26px);}
+.otrn-reveal.is-visible{opacity:1; transform:none; transition:opacity .7s ease, transform .7s ease;}
+
+/* ---- Menú móvil (hamburguesa + panel) --------------------------------
+   En escritorio el nav ya está a la vista (style.css) y la hamburguesa se
+   oculta. En móvil el nav se convierte en panel deslizante; el estado lo
+   controla assets/otrn-menu.js (aria + focus trap). */
+.otrn-burger{
+  display:none; flex:0 0 auto; width:46px; height:46px; margin-left:14px;
+  background:none; border:0; cursor:pointer; padding:0; position:relative; z-index:61;
+}
+.otrn-burger__box{position:absolute; inset:0; display:flex; flex-direction:column; justify-content:center; gap:6px; padding:0 11px;}
+.otrn-burger__line{display:block; height:2px; width:100%; background:var(--aru-ink); border-radius:2px; transition:transform .28s ease, opacity .2s ease;}
+.otrn-burger.is-active .otrn-burger__line:nth-child(1){transform:translateY(8px) rotate(45deg);}
+.otrn-burger.is-active .otrn-burger__line:nth-child(2){opacity:0;}
+.otrn-burger.is-active .otrn-burger__line:nth-child(3){transform:translateY(-8px) rotate(-45deg);}
+
+/* ---- Responsive ------------------------------------------------------ */
+@media (max-width:1280px){
+  .otrn-landing-hero__contenido{padding-left:24px; padding-right:24px;}
+}
+@media (max-width:768px){
+  .otrn-home-menu{display:none;}
+  .otrn-burger{display:flex;}
+  .otrn-nav{
+    position:fixed; inset:0 0 0 auto; width:min(84vw,360px);
+    flex-direction:column; gap:4px; margin:0;
+    background:var(--aru-papel); border-left:1px solid rgba(14,80,109,.12);
+    padding:96px 28px 32px; box-shadow:-20px 0 60px rgba(10,46,60,.16);
+    transform:translateX(100%); transition:transform .34s ease; z-index:60;
+  }
+  .otrn-menu-abierto .otrn-nav{transform:translateX(0);}
+  .otrn-nav a{font-size:16px; font-weight:600; padding:12px 0; border-bottom:1px solid var(--aru-terra-soft);}
+  .otrn-landing-narrativa__grid{grid-template-columns:1fr; gap:8px;}
+  .otrn-landing-narrativa__visual{position:static; height:56vh; margin-bottom:24px;}
+  .otrn-landing-paso{min-height:auto; padding-block:8px;}
+  .otrn-landing-paso p{max-width:none;}
+  /* Datos e indicadores pasan a 2 columnas. */
+  .otrn-landing .otrn-datos,.otrn-landing .otrn-newsgrid{grid-template-columns:repeat(2,1fr);}
+  .otrn-landing .otrn-indexpanel{grid-template-columns:repeat(2,1fr);}
+}
+@media (max-width:375px){
+  .otrn-landing-hero__contenido{padding-left:18px; padding-right:18px;}
+  .otrn-landing .wrap,.otrn-landing-narrativa__grid{padding-left:18px; padding-right:18px;}
+  .otrn-landing .otrn-datos,.otrn-landing .otrn-newsgrid,.otrn-landing .otrn-indexpanel{grid-template-columns:1fr;}
+  .otrn-landing-hero h1{font-size:clamp(34px,10vw,44px);}
+}
+
+/* ---- Accesibilidad: movimiento reducido ------------------------------
+   El script no se arma con esta preferencia; aquí neutralizamos el CSS de
+   respaldo para que todo quede visible y sin animación de entrada. */
+@media (prefers-reduced-motion:reduce){
+  .otrn-landing-hero__media img{transform:none;}
+  .otrn-landing-hero__cue .otrn-landing-hero__cue-line::after{animation:none; left:46px;}
+  .otrn-landing-foto{transition:none;}
+  .otrn-reveal{opacity:1; transform:none; transition:none;}
+  .otrn-burger__line{transition:none;}
+  .otrn-nav{transition:none;}
+  html{scroll-behavior:auto;}
+}
+

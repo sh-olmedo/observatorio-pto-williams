@@ -1,0 +1,76 @@
+/*
+ * Sistema de diseño «Arauco» — Observatorio Turístico.
+ *
+ * Tokens --aru-* derivados de las fotografías aprobadas (references/web/):
+ * océano teal + tierra tibia + arena. Se alinean a propósito con los tokens
+ * globales del tema (--secondary teal, --primary terracota, --blue-dark) para
+ * que la portada no rompa la identidad del resto del sitio.
+ *
+ * INTERPRETACIÓN: no existe un `design-tokens.md` formal para Arauco; esta
+ * paleta es una lectura de las imágenes aprobadas y se documenta aquí como
+ * tal, para confirmación del cliente.
+ *
+ * Encolado SOLO en la portada (ver `otrn_enqueue_assets()` en functions.php),
+ * por eso todos los selectores se anclan a `.otrn.home`.
+ */
+
+.otrn.home{
+  /* Océano -------------------------------------------------------- */
+  --aru-teal:#2F6F79;        /* = --secondary: azul del mar */
+  --aru-teal-deep:#145E6B;   /* = --teal-dark            */
+  --aru-teal-soft:#E3ECED;   /* = --secondary-soft       */
+  --aru-ink:#0E506D;         /* = --blue-dark: azul profundo */
+  --aru-ink-deep:#0A2E3C;    /* azul aún más hondo para velos de hero */
+  /* Tierra tibia -------------------------------------------------- */
+  --aru-terra:#DF8056;       /* = --primary: terracota   */
+  --aru-terra-deep:#A05C3D;  /* = --primary-dark         */
+  --aru-terra-soft:#FAEEE9;  /* = --primary-soft         */
+  --aru-terra-tint:#F0C5B2;  /* = --primary-tint         */
+  /* Arena y neutros ----------------------------------------------- */
+  --aru-arena:#F6F3E0;       /* = --cream                */
+  --aru-papel:#FFFFFF;
+  --aru-texto:#2B2B2B;
+  --aru-texto-2:#5A5A5A;
+  --aru-texto-3:#8A8A8A;
+  /* Neutro del pie (decisión del cliente) ------------------------- */
+  --aru-footer:#F7F7F7;
+  /* Ritmo vertical y radios --------------------------------------- */
+  --aru-gap:clamp(48px, 8vw, 120px);
+  --aru-radio:14px;
+  --aru-radio-sm:10px;
+}
+
+/* ---- Cabecera: marca Arauco y barra fija sobre el hero --------------
+   La portada es inmersiva, así que el header flota transparente/fijo y el
+   hero ocupa todo el alto de pantalla por debajo. En el resto de páginas
+   este bloque no se encola y la cabecera sigue siendo estática. */
+.otrn.home .otrn-header{
+  position:fixed; left:0; right:0; top:0; z-index:60;
+  background:rgba(255,255,255,.84);
+  -webkit-backdrop-filter:saturate(1.2) blur(10px);
+  backdrop-filter:saturate(1.2) blur(10px);
+  border-bottom:1px solid rgba(14,80,109,.12);
+}
+.otrn.home .otrn-header .otrn-brand-logo{height:56px;}
+.otrn.home .otrn-header .otrn-nav a{color:var(--aru-texto);}
+.otrn.home .otrn-header .otrn-nav a.active{color:var(--aru-terra-deep);}
+.otrn.home .otrn-header .otrn-login{border-color:rgba(14,80,109,.25);}
+
+/* ---- Pie: 3 logos Arauco sobre neutro #F7F7F7 -----------------------
+   Los logos de Municipalidad y Oficina de Turismo traen un fondo gris
+   interior opaco (~#ECECEC, ver assets/logos/README.md). Sobre un neutro
+   casi blanco ese recorte se vería como un rectángulo gris pegado, así que
+   cada logo va sobre una «chapa» blanca con sombra sutil: se lee a
+   propósito como sello institucional. El emblema del GORE (fondo casi
+   blanco) también entra en la chapa para uniformar la fila. */
+.otrn.home .otrn-footer{
+  margin-top:0; padding:48px 0; background:var(--aru-footer);
+  border-top:1px solid rgba(14,80,109,.12);
+}
+.otrn.home .otrn-footer-logo{
+  background:var(--aru-papel); border-radius:12px; padding:14px 20px;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 1px 3px rgba(10,46,60,.07);
+}
+.otrn.home .otrn-footer-logo img{display:block;width:auto;height:48px;object-fit:contain;}
+.otrn.home .otrn-footer-copy{color:var(--aru-texto-2);font-weight:600;}

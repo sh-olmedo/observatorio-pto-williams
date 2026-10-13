@@ -342,11 +342,16 @@ function otrn_noticia_fuente( $post_id ) {
  * Encola estilos y tipografías del tema.
  */
 function otrn_enqueue_assets() {
+	// Tipografías autoalojadas (assets/css/fonts.css) en vez de
+	// fonts.googleapis.com: sin dependencia externa ni render bloqueante.
+	// La versión = mtime del archivo, así cada cambio rompe la caché solo.
+	$otrn_fonts = get_stylesheet_directory() . '/assets/css/fonts.css';
+	$otrn_fonts_ver = file_exists( $otrn_fonts ) ? (string) filemtime( $otrn_fonts ) : '0.1.0';
 	wp_enqueue_style(
 		'otrn-fonts',
-		'https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap',
+		get_stylesheet_directory_uri() . '/assets/css/fonts.css',
 		array(),
-		null
+		$otrn_fonts_ver
 	);
 	// Versión = fecha del archivo: cada cambio de CSS rompe la caché por sí solo.
 	// Con una versión fija, el `Expires` de 1 mes de los estáticos dejaba a los
@@ -382,6 +387,70 @@ function otrn_enqueue_assets() {
 			get_stylesheet_directory_uri() . '/assets/indicador.js',
 			$indicador_deps,
 			'0.2.0',
+			true
+		);
+	}
+
+	// Menú accesible (hamburguesa + captura de foco). La cabecera la pinta
+	// siempre, así que el script va en todas las vistas.
+	$otrn_menu = get_stylesheet_directory() . '/assets/otrn-menu.js';
+	$otrn_menu_ver = file_exists( $otrn_menu ) ? (string) filemtime( $otrn_menu ) : '0.1.0';
+	wp_enqueue_script(
+		'otrn-menu',
+		get_stylesheet_directory_uri() . '/assets/otrn-menu.js',
+		array(),
+		$otrn_menu_ver,
+		true
+	);
+
+	// Portada inmersiva: GSAP + ScrollTrigger + estilos/scripts locales.
+	// Solo en la portada para no cargar ~115 KB de animación en las páginas
+	// internas, donde no hay scrollytelling.
+	if ( is_front_page() ) {
+		$otrn_arauo = get_stylesheet_directory() . '/assets/css/otrn-arauco.css';
+		$otrn_land_css = get_stylesheet_directory() . '/assets/css/otrn-landing.css';
+		$otrn_arauo_ver = file_exists( $otrn_arauo ) ? (string) filemtime( $otrn_arauo ) : '0.1.0';
+		$otrn_land_css_ver = file_exists( $otrn_land_css ) ? (string) filemtime( $otrn_land_css ) : '0.1.0';
+		wp_enqueue_style(
+			'otrn-arauco',
+			get_stylesheet_directory_uri() . '/assets/css/otrn-arauco.css',
+			array( 'otrn-style' ),
+			$otrn_arauo_ver
+		);
+		wp_enqueue_style(
+			'otrn-landing',
+			get_stylesheet_directory_uri() . '/assets/css/otrn-landing.css',
+			array( 'otrn-arauco' ),
+			$otrn_land_css_ver
+		);
+
+		// GSAP y ScrollTrigger vendoreados en assets/vendor/ (licencia permite
+		// autoalojamiento; ver docs del proyecto).
+		$otrn_gsap = get_stylesheet_directory() . '/assets/vendor/gsap.min.js';
+		$otrn_st   = get_stylesheet_directory() . '/assets/vendor/ScrollTrigger.min.js';
+		$otrn_land = get_stylesheet_directory() . '/assets/otrn-landing.js';
+		$otrn_gsap_ver = file_exists( $otrn_gsap ) ? (string) filemtime( $otrn_gsap ) : '3.12.5';
+		$otrn_st_ver   = file_exists( $otrn_st ) ? (string) filemtime( $otrn_st ) : '3.12.5';
+		$otrn_land_ver = file_exists( $otrn_land ) ? (string) filemtime( $otrn_land ) : '0.1.0';
+		wp_enqueue_script(
+			'gsap',
+			get_stylesheet_directory_uri() . '/assets/vendor/gsap.min.js',
+			array(),
+			$otrn_gsap_ver,
+			true
+		);
+		wp_enqueue_script(
+			'otrn-scrolltrigger',
+			get_stylesheet_directory_uri() . '/assets/vendor/ScrollTrigger.min.js',
+			array( 'gsap' ),
+			$otrn_st_ver,
+			true
+		);
+		wp_enqueue_script(
+			'otrn-landing',
+			get_stylesheet_directory_uri() . '/assets/otrn-landing.js',
+			array( 'gsap', 'otrn-scrolltrigger' ),
+			$otrn_land_ver,
 			true
 		);
 	}

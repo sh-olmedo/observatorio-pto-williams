@@ -18,13 +18,13 @@
 		<a class="otrn-brand" href="<?php echo esc_url( home_url( '/' ) ); ?>">
 			<img
 				class="otrn-brand-logo"
-				src="<?php echo esc_url( get_theme_file_uri( 'assets/logo.png' ) ); ?>"
-				width="1290"
-				height="722"
-				alt="Rapa Nui, el Misterio Vive — Isla de Pascua, Chile"
+				src="<?php echo esc_url( get_theme_file_uri( 'assets/logos/oficina-turismo-arauco.webp' ) ); ?>"
+				width="1289"
+				height="456"
+				alt="Observatorio Turístico de Arauco — Oficina de Turismo, Municipalidad de Arauco"
 			>
 		</a>
-		<nav class="otrn-nav">
+		<nav id="otrn-nav" class="otrn-nav" aria-label="Principal">
 			<a href="<?php echo esc_url( home_url( '/' ) ); ?>">Inicio</a>
 			<a href="<?php echo esc_url( otrn_acerca_url() ); ?>">Acerca de</a>
 			<a href="<?php echo esc_url( get_post_type_archive_link( 'indicador' ) ); ?>">Indicadores</a>
@@ -59,6 +59,17 @@
 		<?php else : ?>
 			<a class="otrn-login" href="<?php echo esc_url( wp_login_url( $otrn_aqui ) ); ?>">Iniciar sesión</a>
 		<?php endif; ?>
+		<?php
+		// Botón de menú móvil: siempre presente en el DOM; el CSS lo oculta en
+		// escritorio y el script (assets/otrn-menu.js) gestiona aria + foco.
+		?>
+		<button class="otrn-burger" type="button" aria-expanded="false" aria-controls="otrn-nav" aria-label="Abrir menú de navegación">
+			<span class="otrn-burger__box" aria-hidden="true">
+				<span class="otrn-burger__line"></span>
+				<span class="otrn-burger__line"></span>
+				<span class="otrn-burger__line"></span>
+			</span>
+		</button>
 	</div>
 </header>
 <main>
