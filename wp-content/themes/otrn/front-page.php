@@ -2,17 +2,26 @@
 /**
  * Portada del Observatorio Turístico de Arauco — experiencia inmersiva.
  *
- * Estructura de scrollytelling en 5 secciones semánticas:
- *   1. Hero fotográfico a sangre (fotografía aprobada de la bahía).
- *   2. Narrativa territorial: columna visual fija + pasos de texto (crossfade).
- *   3. Cifras destacadas (con aviso de datos provisionales).
- *   4. Últimos indicadores.
- *   5. Últimas noticias.
+ * Scrollytelling en 5 escenas (storyboard aprobado · segunda propuesta, ETAPA B):
+ *   1. Hero editorial asimétrico (fondo claro + fotografía aérea vertical del
+ *      estuario, 22.08.51) que se expande a sangre al hacer scroll.
+ *   2. Territorio «Mar, ríos y comunidades» (bahía 22.09.17): de lo aéreo a lo
+ *      costero; el texto forma parte de la escena.
+ *   3. Costa viva «Una costa viva que proyecta su historia» (lanchas 22.17.07):
+ *      escena panorámica con pin temporal.
+ *   4. Datos «Un territorio con oportunidades» sobre superficie clara.
+ *   5. Exploración: indicadores + noticias funcionales.
  *
- * Cada bloque se omite si no trae contenido, para no pintar secciones vacías
- * (misma lógica de la portada original). Los datos de `dato_portada` son la
- * herencia del Observatorio de Rapa Nui y se etiquetan como provisionales
- * mientras se migran a la comuna de Arauco.
+ * Arquitectura (ver assets/otrn-landing.js y assets/css/otrn-landing.css):
+ *   - MODO ESTÁTICO (defecto: sin JS, prefers-reduced-motion y móvil): las
+ *     escenas se apilan a sangre, cada una con su foto y su texto legible.
+ *   - MODO INMERSIVO (.is-immersiva, escritorio + GSAP): un nivel fotográfico
+ *     compartido se pinnea y hace crossfade entre las 3 escenas con scrub
+ *     reversible; el hero arranca como panel vertical que crece a sangre.
+ *
+ * Los datos funcionales (cifras, indicadores y noticias) salen del CMS. Las
+ * cifras son herencia del Observatorio de Rapa Nui y se etiquetan como
+ * provisionales mientras se migran a la comuna de Arauco.
  *
  * @package otrn
  */
@@ -21,104 +30,132 @@ defined( 'ABSPATH' ) || exit;
 
 get_header();
 
-// Datos editoriales. Cada bloque se omite si no hay contenido.
-$mision      = otrn_mision_portada();
+// --- Datos funcionales (no se inventan; salen del CMS) -------------------
 $datos       = otrn_datos_portada();
 $indicadores = get_posts( array( 'post_type' => 'indicador', 'post_status' => 'publish', 'numberposts' => 6 ) );
 $noticias    = get_posts( array( 'post_type' => 'post', 'post_status' => 'publish', 'numberposts' => 6 ) );
 
-// Fotos aprobadas: references/web → assets/img/arauco/ (nombres semánticos).
-$otrn_img = get_stylesheet_directory_uri() . '/assets/img/arauco/';
+// --- Fotografías aprobadas (references/web → assets/img/arauco) ----------
+$otrn_img     = get_stylesheet_directory_uri() . '/assets/img/arauco/';
+$img_estuario = $otrn_img . 'estuario.webp';            // 22.08.51 · hero vertical
+$img_bahia    = $otrn_img . 'hero-bahia.webp';         // 22.09.17 · territorio
+$img_costa    = $otrn_img . 'lanchas-atardecer.webp';  // 22.17.07 · costa viva
+
+// Enlaces funcionales (mismos que la cabecera / portada original).
+$otrn_url_indicadores = get_post_type_archive_link( 'indicador' );
+$otrn_url_noticias    = otrn_noticias_url();
+$otrn_url_acerca      = otrn_acerca_url();
+
+// Íconos decorativos de las tarjetas de datos (HTML estático, sin entrada de
+// usuario: se inyectan tal cual con un phpcs:ignore documentado).
+$otrn_ico = array(
+	'people' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-5 6-5s6 1.7 6 5"/><circle cx="17.5" cy="9" r="2.1"/><path d="M15.5 20c0-2.1 1-3.5 3-3.5"/></svg>',
+	'bed'    => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 7v11M3 12h18v6M21 12v-1a3 3 0 0 0-3-3h-8v4"/><circle cx="6.5" cy="10.5" r="1.4"/></svg>',
+	'chart'  => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 20V11M10 20V4M16 20v-7M22 20H2"/></svg>',
+);
+$otrn_icos = array( $otrn_ico['people'], $otrn_ico['bed'], $otrn_ico['chart'] );
 ?>
 
 <div id="otrn-landing" class="otrn-landing" data-otrn-landing>
+	<!-- Riel de escenas (indicador vertical 01–05). Decorativo; el estado lo
+	     marca JS. Encaja con la composición del storyboard. -->
+	<nav class="otrn-rail" aria-label="Escenas de la portada">
+		<ol class="otrn-rail__lista">
+			<li class="otrn-rail__item is-active"><a href="#otrn-hero"><span class="otrn-rail__n">01</span><span class="otrn-rail__d" aria-hidden="true"></span></a></li>
+			<li class="otrn-rail__item"><a href="#otrn-territorio"><span class="otrn-rail__n">02</span><span class="otrn-rail__d" aria-hidden="true"></span></a></li>
+			<li class="otrn-rail__item"><a href="#otrn-costa"><span class="otrn-rail__n">03</span><span class="otrn-rail__d" aria-hidden="true"></span></a></li>
+			<li class="otrn-rail__item"><a href="#otrn-datos"><span class="otrn-rail__n">04</span><span class="otrn-rail__d" aria-hidden="true"></span></a></li>
+			<li class="otrn-rail__item"><a href="#otrn-explora"><span class="otrn-rail__n">05</span><span class="otrn-rail__d" aria-hidden="true"></span></a></li>
+		</ol>
+	</nav>
 
-	<!-- 1 · HERO: fotografía aérea de la bahía, a sangre completa. -->
-	<section class="otrn-landing-hero" aria-labelledby="otrn-hero-titulo">
-		<div class="otrn-landing-hero__media" aria-hidden="true">
-			<picture>
-				<source type="image/webp" srcset="<?php echo esc_url( $otrn_img . 'hero-bahia.webp' ); ?>">
-				<img
-					src="<?php echo esc_url( $otrn_img . 'hero-bahia.jpg' ); ?>"
-					alt="Vista aérea de la bahía y el pueblo costero de Arauco al atardecer"
-					fetchpriority="high"
-					decoding="async"
-				>
-			</picture>
-			<div class="otrn-landing-hero__velo"></div>
-		</div>
-		<div class="otrn-landing-hero__contenido">
-			<p class="otrn-landing-hero__eyebrow">Región del Bío-Bío · Costa de Arauco</p>
-			<h1 id="otrn-hero-titulo"><?php echo esc_html( get_bloginfo( 'name' ) ); ?></h1>
-			<p class="otrn-landing-hero__lead">
-				Plataforma pública de indicadores, autodiagnóstico de sostenibilidad,
-				buenas prácticas y seguimiento del Plan de Desarrollo Turístico de la comuna de Arauco.
-			</p>
-			<a class="otrn-landing-hero__cue" href="#otrn-narrativa">
-				<span class="otrn-landing-hero__cue-line" aria-hidden="true"></span>
-				<span>Explora el territorio</span>
-			</a>
-		</div>
-	</section>
+	<!-- ESCENAS 1–3 · Escenario inmersivo (estuario → bahía → lanchas).
+	     En modo estático las tres <article class="otrn-act"> se apilan a sangre;
+	     en modo inmersivo se convierten en capas de texto sobre el nivel
+	     fotográfico compartido que pinnea y crossfade. -->
+	<section class="otrn-stage" data-otrn-stage aria-label="Narrativa territorial de Arauco">
+		<div class="otrn-stage__viewport">
 
-	<!-- 2 · NARRATIVA TERRITORIAL: columna visual fija + pasos de texto. -->
-	<section id="otrn-narrativa" class="otrn-landing-narrativa" aria-labelledby="otrn-narrativa-titulo">
-		<div class="otrn-landing-narrativa__grid">
-			<div class="otrn-landing-narrativa__visual" aria-hidden="true">
-				<figure class="otrn-landing-foto is-activa" data-idx="0">
-					<img src="<?php echo esc_url( $otrn_img . 'estuario.webp' ); ?>" alt="" loading="lazy" decoding="async">
-					<figcaption>Estuario y boca de río</figcaption>
+			<!-- Nivel fotográfico compartido (solo modo inmersivo). -->
+			<div class="otrn-stage__media" aria-hidden="true">
+				<figure class="otrn-layer is-active" data-layer="0">
+					<img src="<?php echo esc_url( $img_estuario ); ?>" alt="Vista aérea del estuario y la boca de río de Arauco" fetchpriority="high" decoding="async">
 				</figure>
-				<figure class="otrn-landing-foto" data-idx="1">
-					<img src="<?php echo esc_url( $otrn_img . 'pesca-artesanal.webp' ); ?>" alt="" loading="lazy" decoding="async">
-					<figcaption>Pesca artesanal en la costa</figcaption>
+				<figure class="otrn-layer" data-layer="1">
+					<img src="<?php echo esc_url( $img_bahia ); ?>" alt="Bahía y pueblo costero de Arauco" loading="lazy" decoding="async">
 				</figure>
+				<figure class="otrn-layer" data-layer="2">
+					<img src="<?php echo esc_url( $img_costa ); ?>" alt="Lanchas de pesca en el muelle al atardecer" loading="lazy" decoding="async">
+				</figure>
+				<div class="otrn-stage__grad"></div>
 			</div>
-			<div class="otrn-landing-pasos">
-				<?php if ( $mision ) : ?>
-					<div class="otrn-landing-paso" data-foto="0">
-						<p class="otrn-landing-eyebrow"><?php echo esc_html( get_the_title( $mision ) ); ?></p>
-						<?php echo wp_kses_post( apply_filters( 'the_content', $mision->post_content ) ); ?>
-					</div>
-				<?php else : ?>
-					<div class="otrn-landing-paso" data-foto="0">
-						<p class="otrn-landing-eyebrow">Un territorio que se mira</p>
-						<p>Arauco se entiende desde su costa: estuarios, muelles y una tradición pesquera que define su identidad. Este observatorio reúne las señales que la comunidad y las instituciones miden para decidir.</p>
-					</div>
-				<?php endif; ?>
-				<div class="otrn-landing-paso otrn-reveal" data-foto="1">
-					<p class="otrn-landing-eyebrow">Medir para cuidar</p>
-					<p>Cada indicador es una pregunta con respuesta: cuánta gente llega, cómo llega, qué consume y qué deja. Los datos permiten ver el turismo de Arauco a lo largo del tiempo y compararlo con el plan.</p>
+			<!-- Acto 1 · Hero editorial asimétrico. -->
+			<article class="otrn-act otrn-act--hero" id="otrn-hero" data-scene="1" style="--scene:url('<?php echo esc_url( $img_estuario ); ?>')">
+				<div class="otrn-act__grad"></div>
+				<div class="wrap otrn-act__inner">
+					<p class="otrn-act__eyebrow">Observatorio Turístico</p>
+					<h1 class="otrn-act__titulo">Arauco, territorio que inspira</h1>
+					<p class="otrn-act__lead">Conectamos datos, territorio y personas para un turismo más sostenible en la costa y los valles de Arauco.</p>
+					<a class="otrn-act__cta" href="<?php echo esc_url( $otrn_url_indicadores ); ?>">Explorar indicadores <span class="otrn-act__arrow" aria-hidden="true">→</span></a>
 				</div>
-			</div>
+				<p class="otrn-stage__cue"><span class="otrn-stage__cue-ico" aria-hidden="true"></span>Desliza para descubrir</p>
+			</article>
+
+			<!-- Acto 2 · Territorio. -->
+			<article class="otrn-act otrn-act--territorio" id="otrn-territorio" data-scene="2" style="--scene:url('<?php echo esc_url( $img_bahia ); ?>')">
+				<div class="otrn-act__grad"></div>
+				<div class="wrap otrn-act__inner">
+					<p class="otrn-act__eyebrow">Nuestro territorio</p>
+					<h2 class="otrn-act__titulo">Mar, ríos y comunidades</h2>
+					<p class="otrn-act__lead">Arauco es un territorio costero y rural, donde el mar, los ríos, los bosques y sus comunidades dan forma a una rica identidad cultural, gastronómica y natural.</p>
+					<a class="otrn-act__cta otrn-act__cta--outline" href="<?php echo esc_url( $otrn_url_acerca ); ?>">Conoce más sobre Arauco <span class="otrn-act__arrow" aria-hidden="true">→</span></a>
+				</div>
+			</article>
+
+			<!-- Acto 3 · Costa viva. -->
+			<article class="otrn-act otrn-act--costa" id="otrn-costa" data-scene="3" style="--scene:url('<?php echo esc_url( $img_costa ); ?>')">
+				<div class="otrn-act__grad"></div>
+				<div class="wrap otrn-act__inner">
+					<p class="otrn-act__eyebrow">Tradición y futuro</p>
+					<h2 class="otrn-act__titulo">Una costa viva que proyecta su historia</h2>
+					<p class="otrn-act__lead">La pesca artesanal, la gastronomía local y sus paisajes costeros son parte de un territorio que mira al futuro con sus raíces en la comunidad.</p>
+					<a class="otrn-act__cta otrn-act__cta--link" href="<?php echo esc_url( $otrn_url_noticias ); ?>">Explorar historias <span class="otrn-act__arrow" aria-hidden="true">→</span></a>
+				</div>
+			</article>
+
 		</div>
 	</section>
-
 	<?php if ( $datos ) : ?>
-	<!-- 3 · CIFRAS DESTACADAS (provisionales: herencia de Rapa Nui). -->
-	<section class="otrn-landing-seccion" aria-labelledby="otrn-datos-titulo">
+	<!-- 4 · DATOS «Un territorio con oportunidades» (superficie clara).
+	     Cifras provisionales: herencia de Rapa Nui, migrando a Arauco. -->
+	<section class="otrn-landing-seccion otrn-landing-datos" id="otrn-datos" data-scene="4" aria-labelledby="otrn-datos-titulo">
 		<div class="wrap">
+			<div class="otrn-datos-head">
+				<div class="otrn-datos-head__izq">
+					<p class="otrn-act__eyebrow">En cifras</p>
+					<h2 class="otrn-act__titulo" id="otrn-datos-titulo">Un territorio con oportunidades</h2>
+				</div>
+				<p class="otrn-datos-head__der">El turismo es un motor de desarrollo para las comunidades de Arauco. Conoce las principales cifras del territorio y su evolución en los últimos años.</p>
+			</div>
 			<div class="otrn-provisional" role="note">
-				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-					<circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/>
-					<path d="M12 11v5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-					<circle cx="12" cy="7.5" r="1.1" fill="currentColor"/>
-				</svg>
+				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 11v5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="7.5" r="1.1" fill="currentColor"/></svg>
 				<p><strong>Datos provisionales.</strong> Las cifras actuales corresponden a la herencia del Observatorio de Rapa Nui y se están migrando a la comuna de Arauco. Se actualizarán con la base local.</p>
 			</div>
-			<p class="otrn-landing-eyebrow">Panel</p>
-			<h2 class="otrn-landing-titulo" id="otrn-datos-titulo">Cifras que importan</h2>
 			<div class="otrn-datos">
 				<?php
-				foreach ( $datos as $dato ) :
-					$img  = get_the_post_thumbnail_url( $dato, 'large' );
-					$anio = get_post_meta( $dato->ID, 'anio', true );
-					?>
-					<article class="otrn-dato otrn-reveal"<?php echo $img ? ' style="--dato-img:url(\'' . esc_url( $img ) . '\');"' : ''; ?>>
-						<span class="cifra"><?php echo esc_html( get_post_meta( $dato->ID, 'cifra', true ) ); ?></span>
-						<h3><?php echo esc_html( get_the_title( $dato ) ); ?></h3>
-						<?php if ( $anio ) : ?><span class="anio"><?php echo esc_html( $anio ); ?></span><?php endif; ?>
-					</article>
+				foreach ( $datos as $otn_i => $dato ) :
+					$otn_anio = get_post_meta( $dato->ID, 'anio', true );
+					$otn_ico  = isset( $otrn_icos[ $otn_i % count( $otrn_icos ) ] ) ? $otrn_icos[ $otn_i % count( $otrn_icos ) ] : $otrn_ico['chart'];
+				?>
+				<article class="otrn-dato-lite otrn-reveal">
+					<span class="otrn-dato-lite__ico" aria-hidden="true"><?php echo $otn_ico; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML estático de tema ?>
+					</span>
+					<span class="otrn-dato-lite__n"><?php echo esc_html( get_post_meta( $dato->ID, 'cifra', true ) ); ?></span>
+					<h3 class="otrn-dato-lite__label"><?php echo esc_html( get_the_title( $dato ) ); ?></h3>
+					<?php if ( $otn_anio ) : ?>
+						<span class="otrn-dato-lite__anio"><?php echo esc_html( $otn_anio ); ?></span>
+					<?php endif; ?>
+				</article>
 				<?php endforeach; ?>
 			</div>
 		</div>
@@ -126,46 +163,53 @@ $otrn_img = get_stylesheet_directory_uri() . '/assets/img/arauco/';
 	<?php endif; ?>
 
 	<?php if ( $indicadores ) : ?>
-	<!-- 4 · ÚLTIMOS INDICADORES. -->
-	<section class="otrn-landing-seccion" aria-labelledby="otrn-ind-titulo">
+	<!-- 5 · EXPLORACIÓN «Datos para un turismo más sostenible» (funcional). -->
+	<section class="otrn-landing-seccion otrn-landing-explora" id="otrn-explora" data-scene="5" aria-labelledby="otrn-explora-titulo">
 		<div class="wrap">
-			<div class="otrn-sectionhead grande coral">
-				<h2 id="otrn-ind-titulo">Últimos indicadores</h2>
-				<a class="otrn-btn" href="<?php echo esc_url( get_post_type_archive_link( 'indicador' ) ); ?>">Ver todos</a>
-			</div>
-			<div class="otrn-indexpanel">
-				<?php
-				foreach ( $indicadores as $ind ) :
-					$cat = otrn_primer_termino( $ind, 'categoria_indicador' );
-					$amb = otrn_primer_termino( $ind, 'ambito' );
+			<div class="otrn-explora-head">
+				<div class="otrn-explora-head__izq">
+					<p class="otrn-act__eyebrow">Explora el observatorio</p>
+					<h2 class="otrn-act__titulo" id="otrn-explora-titulo">Datos para un turismo más sostenible</h2>
+					<p class="otrn-act__lead">Accede a indicadores, análisis y recursos sobre el turismo en Arauco.</p>
+					<a class="otrn-act__cta otrn-act__cta--outline" href="<?php echo esc_url( $otrn_url_indicadores ); ?>">Ver todos los indicadores <span class="otrn-act__arrow" aria-hidden="true">→</span></a>
+				</div>
+				<div class="otrn-indexpanel">
+					<?php
 					// La etiqueta a color es la categoría; si falta, el ámbito la
-					// reemplaza para no dejar el pie de la tarjeta vacío (docs/02 §2.1).
-					$destacado  = $cat ? $cat : $amb;
-					$secundario = get_post_meta( $ind->ID, 'nivel_territorial', true );
-					if ( ! $secundario && $cat && $amb ) {
-						$secundario = $amb->name;
-					}
+					// reemplaza para no dejar el pie de la tarjeta vacío.
+					foreach ( $indicadores as $ind ) :
+						$cat = otrn_primer_termino( $ind, 'categoria_indicador' );
+						$amb = otrn_primer_termino( $ind, 'ambito' );
+						$destacado  = $cat ? $cat : $amb;
+						$secundario = get_post_meta( $ind->ID, 'nivel_territorial', true );
+						if ( ! $secundario && $cat && $amb ) {
+							$secundario = $amb->name;
+						}
 					?>
-					<a class="otrn-indexcard otrn-reveal" href="<?php echo esc_url( get_permalink( $ind ) ); ?>">
-						<h3><?php echo esc_html( get_the_title( $ind ) ); ?></h3>
-						<div class="foot">
-							<span class="dest <?php echo esc_attr( otrn_clase_secuencia( $destacado ) ); ?>"><?php echo $destacado ? esc_html( $destacado->name ) : ''; ?></span>
-							<span class="sec"><?php echo esc_html( $secundario ); ?></span>
-						</div>
-					</a>
-				<?php endforeach; ?>
+						<a class="otrn-indexcard otrn-reveal" href="<?php echo esc_url( get_permalink( $ind ) ); ?>">
+							<h3><?php echo esc_html( get_the_title( $ind ) ); ?></h3>
+							<div class="foot">
+								<span class="dest <?php echo esc_attr( otrn_clase_secuencia( $destacado ) ); ?>"><?php echo $destacado ? esc_html( $destacado->name ) : ''; ?></span>
+								<span class="sec"><?php echo esc_html( $secundario ); ?></span>
+							</div>
+						</a>
+					<?php endforeach; ?>
+				</div>
 			</div>
 		</div>
 	</section>
 	<?php endif; ?>
 
 	<?php if ( $noticias ) : ?>
-	<!-- 5 · ÚLTIMAS NOTICIAS. -->
+	<!-- 6 · NOTICIAS funcionales. -->
 	<section class="otrn-landing-seccion" aria-labelledby="otrn-not-titulo">
 		<div class="wrap">
 			<div class="otrn-sectionhead grande teal">
-				<h2 id="otrn-not-titulo">Últimas noticias</h2>
-				<a class="otrn-btn teal" href="<?php echo esc_url( otrn_noticias_url() ); ?>">Ver todas</a>
+				<div>
+					<p class="otrn-act__eyebrow">Últimas noticias</p>
+					<h2 class="otrn-act__titulo" id="otrn-not-titulo">Actualidad turística en Arauco</h2>
+				</div>
+				<a class="otrn-btn teal" href="<?php echo esc_url( $otrn_url_noticias ); ?>">Ver todas las noticias →</a>
 			</div>
 			<div class="otrn-newsgrid">
 				<?php
@@ -182,4 +226,6 @@ $otrn_img = get_stylesheet_directory_uri() . '/assets/img/arauco/';
 
 <?php
 get_footer();
+
+
 
