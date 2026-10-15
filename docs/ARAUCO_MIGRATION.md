@@ -61,6 +61,12 @@ notice), `single-evaluacion.php:36` until real data replaces the demo.
 | Criteria/evaluations/`dato_portada` content | DB (`wp-content/database/.ht.sqlite`, gitignored) | **Runtime counts: 74 criteria, 6 evaluations (3 published), 3 cards**; Rapa Nui references confirmed in slugs |
 | Pages required by templates (`/acerca/`, `/evaluar/`, `/geoportal/`, `/noticias/`, `/mapa/`, `/mision/` option, `page_on_front`) | DB only; e.g. `functions.php:232,492` | **Runtime: all slugs exist**; still not reproducible from the repo (F18); no menus registered |
 
+**F19 (registered 2026-10-16 — documentation only, not approved):** the Arauco version must
+not carry over this geographically restricted selection; the location input is to be
+replaced by an OpenStreetMap-based search picker with an adjustable marker. Decide together
+with F8 whether the curated sector list survives as a quick-pick/fallback or is retired —
+see §8.
+
 ## 5. 🧭 Decision pending — external content & assets
 
 | Item | Evidence | Decision needed |
@@ -97,9 +103,94 @@ titles; indicator/Pladetur data quality.
    as "Observatorio Turístico de Arauco / Región del Bío-Bío".
 3. **Geography**: create Arauco `sector` entries in wp-admin (coordinates), then remove or
    replace the Rapa Nui fallback (`otrn-autodiagnostico.php:213-236`). Do not edit the DB
-   without a backup/export decision (F18).
+   without a backup/export decision (F18). **F19** (§8) may replace the fixed-selector
+   mechanism itself — decide both together.
 4. **Data**: audit seeded criteria/evaluations for Rapa Nui references before publish;
    export/seed procedure documented so environments are reproducible.
 5. **Verify** every change in a browser (F17 checklist in [ROADMAP.md](ROADMAP.md)).
 
-Related: [ISSUES.md](ISSUES.md) (F7–F13, F18), [HANDOFF.md](HANDOFF.md) (pending decisions).
+## 8. New Arauco requirement — self-assessment location search (F19)
+
+Registered **2026-10-16** — **documentation only: not implemented, not approved**. It must
+not carry over the geographically restricted location selection of §4. Issue:
+[ISSUES.md](ISSUES.md) F19; proposed work: [ROADMAP.md](ROADMAP.md) Phase 6.
+
+### 8.1 Existing behavior (Rapa Nui, static evidence)
+
+| Aspect | Current implementation | Evidence |
+| --- | --- | --- |
+| Location input | Required `<select name="sector">` with fixed entries; choosing it is the only location step | `page-evaluar.php:103-111` |
+| Data source | `sector` CPT (seeded with 10 Rapa Nui entries) with a hardcoded Rapa Nui fallback | `otrn-autodiagnostico.php:239-261`, `:213-226` |
+| Coordinates | Assigned server-side from the selected entry; the user never sees or edits them | `otrn-autodiagnostico.php:394-401` |
+| Persistence | Meta `sector` (slug), `destino` (name), `destino_lat`, `destino_lng`; a draft may have no sector/coordinates | `otrn-autodiagnostico.php:468-477`; draft preload `page-evaluar.php:29` |
+| Map | Leaflet + OSM for **display only** (archive / `/mapa/`); none in the form | `functions.php:363-368`, `template-parts/mapa-evaluaciones.php` |
+| Search / marker / confirmation | None | — |
+
+### 8.2 Requirement — expected behavior (as registered 2026-10-16)
+
+1. Users can search for an address, locality, business, or geographic place.
+2. Search must use an OpenStreetMap-based geocoding provider.
+3. Display at least five matching suggestions when the provider returns enough results.
+4. Each suggestion must show a human-readable address or place description.
+5. Selecting a result must center the map on that location and display a visible marker.
+6. Allow the user to adjust the marker manually to support rural locations and incomplete addresses.
+7. Show the selected location and coordinates before proceeding.
+8. Require explicit location confirmation before continuing the self-assessment.
+9. Preserve the confirmed location when saving drafts and resuming an evaluation.
+10. Store the selected coordinates and address consistently with the existing evaluation data model.
+11. Provide loading, no-results, geocoding-error, and keyboard-accessible states.
+12. Ensure responsive behavior on mobile devices.
+13. Respect OpenStreetMap attribution and the selected geocoding provider's usage policy, including rate limits and caching restrictions.
+
+### 8.3 Acceptance criteria (proposed — verify in a browser)
+
+- A search the provider answers with ≥5 matches lists ≥5 selectable suggestions, each with
+  a readable address/place description (req. 1–4).
+- Selecting a suggestion centers the map and shows a visible marker; the marker can be
+  repositioned manually, including for rural locations and incomplete addresses (req. 5–6).
+- The form displays the chosen location and its coordinates before continuing, and
+  submission stays blocked until the user confirms the location explicitly (req. 7–8).
+- Saving a draft and resuming it via the token link restores the confirmed location (map,
+  marker and fields) (req. 9).
+- The saved evaluation keeps the address and coordinates in the evaluation data model so
+  the existing readers still work: the archive map (`otrn_evaluaciones_geo()` in
+  `functions.php:843-865`, `template-parts/mapa-evaluaciones.php`), the `destino` filter
+  (`archive-evaluacion.php:41-57`) and the single view (`single-evaluacion.php:20,41`);
+  the exact meta mapping is an open decision (§8.4) (req. 10).
+- Loading, empty-result and provider-error states are visible; the full flow (search →
+  suggest → select → adjust → confirm) is operable with the keyboard alone (req. 11).
+- The picker is usable at mobile widths (map does not trap page scroll; touch marker
+  adjustment) (req. 12).
+- OSM attribution is visible where tiles/geocoder results are shown, and requests comply
+  with the chosen provider's policy (rate limits, caching, identifying headers or API
+  key) (req. 13).
+
+### 8.4 Dependencies & unresolved decisions (at registration)
+
+| # | Decision | Options / notes | Owner |
+| --- | --- | --- | --- |
+| D1 | Geocoding provider | Public Nominatim vs self-hosted OSM geocoder vs a third-party OSM-based service (API key/quota); each has its own usage policy, rate limits and caching rules — verify the provider's current policy before implementing | Client/team |
+| D2 | Request path | Browser-direct calls vs a server-side proxy (the proxy must sit behind the private-section gate — F3/F11) | Team (after D1) |
+| D3 | Fate of the curated sector list (F8) | Keep the select as a quick-pick/fallback for known Arauco sectors, or retire it in favor of search-only | Client/team |
+| D4 | Evaluation meta model | How the confirmed address maps to `sector`/`destino`/`destino_lat`/`destino_lng`; whether a new meta (formatted address, provider place id) is added | Team |
+| D5 | Reverse geocoding after manual marker adjustment | Needed to keep the displayed address truthful; costs extra requests against the provider's limits | Team |
+| D6 | DB backup/export policy (F18) | Precondition for any evaluation-data change; the private-section gate for the form must also cover the new endpoint | Client/team |
+
+### 8.5 Technical risks (at registration — not verified)
+
+- **Provider policy**: a public OSM geocoder expects low request rates, identifying
+  requests and result caching; a client-side autocomplete pattern may violate its policy.
+  Confirm the chosen provider's current rules before implementing.
+- **Rural coverage**: OSM addresses in Arauco may be missing or coarse → rely on marker
+  adjustment + clearly labeled approximate locations; "no results" must be a normal state.
+- **Draft round-trip**: the local autosave stores only `sector` + answers
+  (`page-evaluar.php:216-224`); the confirmed location must be added or restored drafts can
+  lose it.
+- **Reader compatibility**: archive map, `destino` filter and single view read the current
+  metas (`single-evaluacion.php:20,41`); storage changes must not break them.
+- **Accessibility**: Leaflet is pointer-first; a keyboard path for search/select/adjust
+  (e.g. numeric coordinate inputs or keyboard marker controls) needs explicit design.
+- **Privacy**: user-typed addresses would be sent to a third-party service; the site has
+  no consent/privacy layer today.
+
+Related: [ISSUES.md](ISSUES.md) (F7–F13, F18, F19), [HANDOFF.md](HANDOFF.md) (pending decisions).

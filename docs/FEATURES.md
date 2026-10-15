@@ -1,14 +1,15 @@
 # Features
 
 Inventory of functional modules as of commit `5f43933` (+ working-tree deltas), updated after
-the **read-only runtime pass of 2026-10-15** ([VERIFICATION.md](VERIFICATION.md)). Status
-vocabulary:
+the **read-only runtime pass of 2026-10-15** ([VERIFICATION.md](VERIFICATION.md)) and after
+the F19 requirement registration (2026-10-16; documentation only). Status vocabulary:
 
 - **Implemented (static)** — code present and coherent on read; runtime unverified.
 - **Implemented, defective (F#)** — code present with a known static defect.
 - **Provisional** — works but inherits Rapa Nui data/copy; migration pending.
 - **Decision pending** — asset/feature exists but its fate is a client decision.
 - **Unverified** — depends on data or runtime behavior that could not be inspected.
+- **Not implemented (F#)** — registered requirement or requested scope with no code yet.
 
 ## Summary
 
@@ -16,7 +17,7 @@ vocabulary:
 | --- | --- | --- | --- |
 | 1 | Immersive landing (scrollytelling) | `/` (`front-page.php`) | Implemented; data provisional; **F5 confirmed at runtime**; pin/scrub + CLS unverified |
 | 2 | Site chrome (header/footer/nav/login/burger) | all classic templates | Implemented, **defective — F1 confirmed at runtime (≤600 px, internal *and* front page)** |
-| 3 | Autodiagnóstico: form + drafts | `/evaluar/` (private) | Implemented, defective (F3: no capability check) — 1 account today; sectors: CPT seeded with Rapa Nui data (F8) |
+| 3 | Autodiagnóstico: form + drafts | `/evaluar/` (private) | Implemented, defective (F3: no capability check) — 1 account today; sectors: CPT seeded with Rapa Nui data (F8); location search **not implemented (F19)** |
 | 4 | Autodiagnóstico: archive/map + results | `/autoevaluacion/`, single (private) | Implemented; **HTML gate PASS at runtime**; 6 evaluations (3 published) |
 | 5 | Indicators + Excel drawer | `/indicadores/` | Implemented (static); Excel path unverified |
 | 6 | Good practices | `/buenas-practicas/` | Implemented, provisional copy (F7) |
@@ -67,6 +68,16 @@ vocabulary:
 - "Guardar borrador" creates a `draft` + token link; localStorage autosave as backup
   (`page-evaluar.php:92-95, 179-256`).
 - Sector list comes from the `sector` CPT with Rapa Nui fallback (F8).
+- Location input today: fixed sector `<select>`; coordinates are assigned server-side and
+  stored in `destino_lat`/`destino_lng` (`page-evaluar.php:103-111`,
+  `otrn-autodiagnostico.php:394-401, 468-477`; existing behavior summarized in
+  [ARAUCO_MIGRATION.md](ARAUCO_MIGRATION.md) §8.1). **Not implemented (F19, registered
+  2026-10-16):** replace it with an OpenStreetMap-based location search
+  (address/locality/business), suggestion list, map centering + adjustable marker,
+  coordinates + explicit confirmation, draft round-trip, and storage compatible with the
+  existing metas. Requirement and acceptance criteria:
+  [ARAUCO_MIGRATION.md](ARAUCO_MIGRATION.md#8-new-arauco-requirement--self-assessment-location-search-f19)
+  §8.2–8.3; proposed phase: [ROADMAP.md](ROADMAP.md) Phase 6.
 - Security gap: nonce-only handler, no capability check (F3).
 
 ## 4. Autodiagnóstico archive + results — `archive-evaluacion.php`, `single-evaluacion.php`

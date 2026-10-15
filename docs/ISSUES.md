@@ -1,9 +1,10 @@
-# Issue Register (F1–F18)
+# Issue Register (F1–F19)
 
 Persistent register of every finding from the static audit (commit `5f43933` + working
 tree), **preserving the original finding IDs** (including the F11b sub-finding). Keep these
-IDs in branches, commits, PRs and future updates. Severities: **P0** critical,
-**P1** high, **P2** medium, **P3** low. No P0 was found statically.
+IDs in branches, commits, PRs and future updates. **F19** was registered later (2026-10-16)
+as a new Arauco functional requirement — documentation only, not implemented. Severities:
+**P0** critical, **P1** high, **P2** medium, **P3** low. No P0 was found statically.
 
 Status values: *Open* (needs work), *Open — verify at runtime* (needs a runtime/browser/DB
 check first), *Open — decision pending* (blocked on a client/team decision).
@@ -37,6 +38,7 @@ Runtime status (first pass, **2026-10-15**): measured results are in
 | F16 | Hybrid theme architecture (fallback routes) | P3 | Architecture | 5 |
 | F17 | No runtime verification performed yet | P1 | Verification gap | 0 |
 | F18 | Site content/bootstrap not reproducible from repo | P2 | Reproducibility | 5 |
+| F19 | Self-assessment location search (OSM geocoding) | P2 | Migration | 6 |
 
 ---
 
@@ -298,3 +300,35 @@ Runtime status (first pass, **2026-10-15**): measured results are in
 - **Runtime (2026-10-15)**: all template-required page slugs exist (`acerca`, `evaluar`,
   `geoportal`, `noticias`, `mapa`, `mision`, `estadisticas`); **no menus are registered**;
   content counts in [VERIFICATION.md](VERIFICATION.md) §V3 — everything remains DB-only.
+
+### F19 — Self-assessment location search (OSM geocoding)
+
+- **Severity**: P2 · **Status**: Open — **new Arauco requirement registered 2026-10-16**
+  (documentation only; **not implemented, not approved**) · **Category**: Migration
+  (new scope).
+- **Requirement**: the form must let users search an address, locality, business or place
+  with an OpenStreetMap-based geocoder, and select, adjust and confirm the location on a
+  map — instead of the fixed, geographically restricted sector selector inherited from Rapa
+  Nui. Full requirement, acceptance criteria, dependencies and risks:
+  [ARAUCO_MIGRATION.md](ARAUCO_MIGRATION.md#8-new-arauco-requirement--self-assessment-location-search-f19)
+  §8. Proposed phase: [ROADMAP.md](ROADMAP.md) Phase 6.
+- **Current behavior (evidence, static)**:
+  - The only location input is a required `<select name="sector">` with fixed entries
+    (`page-evaluar.php:103-111`), fed by `otrn_sectores_rapanui()`
+    (`otrn-autodiagnostico.php:239-261`; hardcoded Rapa Nui fallback `:213-226`).
+  - Coordinates are assigned server-side from the selected entry
+    (`otrn-autodiagnostico.php:394-401`) and stored as `destino_lat`/`destino_lng`, with
+    `sector` (slug) and `destino` (name) (`:468-477`). The user cannot search, move a
+    marker or visually confirm a location.
+  - Leaflet + OSM exist for **display only** (evaluations archive/`/mapa/`):
+    `functions.php:363-368`, `template-parts/mapa-evaluaciones.php`.
+- **Impact**: without this requirement the Arauco form inherits a geographically wrong
+  selector (F8) and cannot locate rural destinations or addresses outside a fixed list.
+- **Dependencies / open decisions**: geocoding provider + usage policy; fate of the curated
+  sector list (F8 ↔ F19); evaluation location meta model; DB backup/export policy (F18)
+  before data changes; private-section gating for any server-side proxy. Details in §8.4–8.5
+  of the migration doc.
+- **Verification (future)**: acceptance criteria in
+  [ARAUCO_MIGRATION.md](ARAUCO_MIGRATION.md#8-new-arauco-requirement--self-assessment-location-search-f19)
+  §8.3 + a browser pass on the private form (needs an authorized session, cf.
+  [VERIFICATION.md](VERIFICATION.md) §V13).

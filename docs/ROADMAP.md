@@ -85,9 +85,29 @@ pass); the form/map show Arauco sectors; every decision above is recorded in
 **Acceptance criteria (proposed):** a fresh Studio environment can reproduce the key routes
 from the repo + documented procedure; search/404/generic pages render as decided.
 
+## Phase 6 — Arauco location search (F19 — new requirement, registered 2026-10-16)
+
+| Item | Related | Dependencies |
+| --- | --- | --- |
+| Location picker in the self-assessment form: OSM-geocoding search → suggestions → map centering + visible marker → manual adjustment → explicit confirmation; draft round-trip; storage consistent with the evaluation model | F19 | Geocoding-provider decision + usage policy; F8 sector-list fate; evaluation meta model; DB backup/export policy (F18); private-section gate for any server-side proxy (F3/F11) |
+
+**Acceptance criteria (proposed):** the criteria in
+[ARAUCO_MIGRATION.md](ARAUCO_MIGRATION.md#8-new-arauco-requirement--self-assessment-location-search-f19)
+§8.3 — ≥5 readable suggestions when the provider has them; map centering + visible
+draggable marker; coordinates shown and explicit confirmation before continuing; draft
+save/resume keeps the confirmed location; storage compatible with the existing readers
+(archive map, `destino` filter); loading/no-results/error/keyboard states; mobile
+behavior; OSM attribution + provider policy respected.
+
+**Sequencing note (proposed):** F19 is not part of the original migration scope and does
+**not** reorder Phases 1–2 (security and the confirmed UX defects come first). It interacts
+with F8 in Phase 4 — decide together whether the curated Arauco sector list survives as a
+quick-pick/fallback or is retired in favor of search-only.
+
 ## Explicitly not proposed here
 
-- No redesign beyond the approved identity decision; no new features.
+- No redesign beyond the approved identity decision, and no new features beyond the ones
+  explicitly registered as Arauco requirements (currently F19, Phase 6 — documentation only).
 - No deployment, no touching the original Rapa Nui project, no database edits without a
   backup/export decision.
 
@@ -99,5 +119,8 @@ from the repo + documented procedure; search/404/generic pages render as decided
 - After the runtime pass (2026-10-15): F1, F5, F6, F11b and F16 are runtime-confirmed; the
   recommended Phase 1 scope is the security pair **F3 + F11b** (F11b is a confirmed
   anonymous read exposure), followed by Phase 2 (F1 + F5).
+- **2026-10-16:** F19 (self-assessment location search — OSM geocoding) registered as a new
+  Arauco requirement: **documentation only, not approved**; proposed as Phase 6, pending
+  the geocoding-provider decision and coordinated with F8 (Phase 4).
 - Every completed item must update [ISSUES.md](ISSUES.md), [FEATURES.md](FEATURES.md) and
   [HANDOFF.md](HANDOFF.md).
