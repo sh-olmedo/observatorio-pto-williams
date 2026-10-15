@@ -13,6 +13,9 @@ implementation** ([ROADMAP.md](ROADMAP.md)), because unverified behavior (F17) c
 priorities. After Phase 0 is recorded, the recommended implementation order is
 **F3 → F1 → F2/F6 → content/data migration**, verifying each change as it lands.
 
+Runtime status (first pass, **2026-10-15**): measured results are in
+[VERIFICATION.md](VERIFICATION.md); findings below marked *runtime confirmed* carry evidence.
+
 | ID | Title | Sev | Category | Phase |
 | --- | --- | --- | --- | --- |
 | F1 | Mobile navigation unusable on internal pages | P1 | Accessibility/UX | 2 |
@@ -39,7 +42,7 @@ priorities. After Phase 0 is recorded, the recommended implementation order is
 
 ### F1 — Mobile navigation unusable on internal pages
 
-- **Severity**: P1 · **Status**: Open · **Evidence**:
+- **Severity**: P1 · **Status**: Open — **runtime confirmed (FAIL)** · **Evidence**:
   - `style.css:508-509` hides `.otrn-nav` under 600 px with no replacement rule elsewhere.
   - Burger and mobile-panel CSS exist only in `assets/css/otrn-landing.css:194, 213-224`,
     enqueued only on the front page (`functions.php:409-457`).
@@ -48,6 +51,11 @@ priorities. After Phase 0 is recorded, the recommended implementation order is
 - **Impact**: phones (≤600 px) lose all navigation on internal pages (indicators, news,
   geoportal…). Between 601–768 px the nav renders as a cramped flex row with an unstyled
   button (static inference).
+- **Runtime (2026-10-15)**: at 390 px the nav stays `display:none` on `/noticias/` **and**
+  `/`; the burger click toggles `otrn-menu-abierto` + `aria-expanded` but the nav is 0×0.
+  At 700 px internal pages keep a visible (cramped) row while the front-page panel works.
+  Burger on internal pages is unstyled (16×6 px) vs styled on the landing (46×46 px)
+  ([VERIFICATION.md](VERIFICATION.md) §V6).
 - **Proposed fix (not approved)**: give the burger + panel styles a global scope (base
   stylesheet or globally enqueued menu stylesheet) so the existing JS works site-wide.
 - **Verification**: browser at ≤600 px on `/`, `/indicadores/`, `/geoportal/`; open/close,
@@ -74,6 +82,9 @@ priorities. After Phase 0 is recorded, the recommended implementation order is
   inline note admits production should require the "Operador" role (docs/01 §6).
 - **Impact**: any logged-in account can create/publish evaluations → bogus data in the
   private archive/map; content-integrity and authorization defect.
+- **Runtime context (2026-10-15)**: only 1 account and the six default roles exist today —
+  the gap matters for future operator accounts (subscriber negative test not executed,
+  [VERIFICATION.md](VERIFICATION.md) §V13).
 - **Proposed fix (not approved)**: enforce a capability for submit; define the operator
   role; keep nonce.
 - **Verification**: subscriber-level negative test + code review (details in
@@ -84,6 +95,9 @@ priorities. After Phase 0 is recorded, the recommended implementation order is
 - **Severity**: P2 · **Status**: Open · **Evidence**: load path `ABSPATH . 'docs/acf-json'`
   (`otrn-contenido.php:160-167`); directory does not exist; ACF 6.8.0 installed; no
   `acf/settings/save_json` filter found. Field groups live in the DB (not inspected).
+  **Runtime (2026-10-15)**: `acf_get_field_groups()` returns 0; no `acf-field-group`/`acf-field`
+  posts; no PHP-registered groups; custom fields exist as raw post meta
+  ([VERIFICATION.md](VERIFICATION.md) §V11) — the schema exists only implicitly in DB values.
 - **Impact**: schema drift/loss; environments not reproducible; risk of invented fields.
 - **Proposed fix (not approved)**: enable local JSON save, export the **real** groups after
   review, commit; never fabricate schemas.
@@ -91,12 +105,16 @@ priorities. After Phase 0 is recorded, the recommended implementation order is
 
 ### F5 — `.otrn-reveal` invisible without JavaScript
 
-- **Severity**: P2 · **Status**: Open · **Evidence**: `otrn-landing.css:187-188`
+- **Severity**: P2 · **Status**: Open — **runtime confirmed (FAIL)** · **Evidence**: `otrn-landing.css:187-188`
   pre-hides reveal elements; `front-page.php:150, 189` uses the class; only the
   IntersectionObserver (`otrn-landing.js:37-44`) or the reduced-motion override
   (`otrn-landing.css:241-245`) makes them visible.
 - **Impact**: with JS blocked and no reduced-motion preference, data cards and index cards
   never appear (content loss for no-JS users/crawlers).
+- **Runtime (2026-10-15)**: with scripts blocked (sandbox iframe, console-confirmed) all 9
+  `.otrn-reveal` elements stay at `opacity:0` after scrolling past the data section; the
+  same iframe with JS shows 3/9 revealing. No `<noscript>` fallback exists
+  ([VERIFICATION.md](VERIFICATION.md) §V7).
 - **Proposed fix (not approved)**: progressive enhancement — visible by default, hidden
   only when a JS flag is present.
 - **Verification**: disable JavaScript, load `/`, confirm all reveal content visible.
@@ -110,6 +128,8 @@ priorities. After Phase 0 is recorded, the recommended implementation order is
   identical; load order + specificity decide per element.
 - **Impact**: inconsistent colors if markup scope changes; misleading comments; fragile
   theming. Ties into the F2 decision.
+- **Runtime (2026-10-15)**: on `/`, `--aru-terra` resolves simultaneously to `#C0392B`
+  (`:root` fallback) and `#DF8056` (`.otrn.home` scope) ([VERIFICATION.md](VERIFICATION.md) §V8).
 - **Proposed fix (not approved)**: one source of truth; align or delete the fallback.
 - **Verification**: computed-style audit + token diff; re-check after F2 decision.
 
@@ -122,6 +142,9 @@ priorities. After Phase 0 is recorded, the recommended implementation order is
   `archive-material_apoyo.php:25`, `single-evaluacion.php:36`, theme header
   `style.css:2-5`, mu-plugin author headers.
 - **Impact**: public pages still describe the Rapa Nui observatory.
+- **Runtime (2026-10-15)**: "rapa" still present in rendered HTML — `/` 8, `/noticias/` 6,
+  `/geoportal/` 3, `/acerca/` 5, `/mision/` 6, `/estadisticas/` 6, `/indicadores/` 6; site
+  title still "Observatorio Turístico de Rapa Nui" ([VERIFICATION.md](VERIFICATION.md) §V10).
 - **Proposed fix (not approved)**: replace with client-approved Arauco copy; keep the
   intended provisional notes (`front-page.php:140-142`).
 - **Verification**: grep for `Rapa` after the change + browser pass over the affected pages.
@@ -133,6 +156,9 @@ priorities. After Phase 0 is recorded, the recommended implementation order is
   `otrn_sectores_rapanui()` falls back to it when the `sector` CPT is empty (`:239-250`);
   the form consumes it (`page-evaluar.php:106`).
 - **Impact**: evaluations and map pin Rapa Nui geography; coordinates are wrong for Arauco.
+- **Runtime (2026-10-15)**: the `sector` CPT is seeded with 10 entries (Rapa Nui geography),
+  so the fallback list is not the active path today — the data itself is still the pending
+  migration ([VERIFICATION.md](VERIFICATION.md) §V10).
 - **Proposed fix (not approved)**: seed Arauco sectors (wp-admin) and replace the fallback;
   coordinate with the data migration (F18).
 - **Verification**: form sector options, saved coordinates, map pins after seeding.
@@ -141,7 +167,8 @@ priorities. After Phase 0 is recorded, the recommended implementation order is
 
 - **Severity**: P2 · **Status**: Open — decision pending · **Evidence**:
   `page-geoportal.php:15` (story id `d414dbcd4d3743de835b15745f5bd060`); rendered as an
-  external embed. Territorial scope of the story **unverified**.
+  external embed. Territorial scope of the story **unverified** (page reachable at runtime,
+  HTTP 200, 2026-10-15).
 - **Impact**: if the story depicts Rapa Nui, the page violates the rebrand; any change
   requires code edit (hardcoded).
 - **Proposed fix (not approved)**: client decision (replace/keep/remove); make the URL
@@ -159,7 +186,8 @@ priorities. After Phase 0 is recorded, the recommended implementation order is
 
 ### F11 — Private section enforced only at HTML render
 
-- **Severity**: P1 · **Status**: Open — verify at runtime · **Evidence**: gating in
+- **Severity**: P1 · **Status**: Open — **HTML gate runtime-verified (PASS, 2026-10-15)**;
+  REST side confirmed via F11b · **Evidence**: gating in
   `functions.php:250-265` (`template_redirect`) covers HTML routes only; handlers live in
   `admin-post.php` (see F3) and REST is untouched; no custom REST routes exist (grep);
   CPTs register `show_in_rest => true` (list in [SECURITY_AUDIT.md](SECURITY_AUDIT.md)).
@@ -169,15 +197,18 @@ priorities. After Phase 0 is recorded, the recommended implementation order is
   `criterio_autodiag`, `sector`; restrict or disable as needed.
 - **Verification**: see F11b.
 
-### F11b — REST exposure of private content (unverified)
+### F11b — REST exposure of private content (confirmed at runtime)
 
-- **Severity**: P1 · **Status**: Open — verify at runtime · **Evidence**: registrations as
-  above; `template_redirect` does not run for REST requests.
-- **Impact if exposed**: published evaluation titles/IDs, criterion text and sector data
-  readable without login (drafts normally status-protected). **Not confirmed.**
-- **Verification (not executed)**: anonymous and low-privilege
-  `curl /wp-json/wp/v2/evaluacion`, `/wp-json/wp/v2/criterio`, `/wp-json/wp/v2/sector`,
-  plus `/wp-json/wp/v2/` index listing. Do not claim exposure until this passes.
+- **Severity**: P1 · **Status**: Open — **runtime confirmed (FAIL, 2026-10-15)** · **Evidence**:
+  registrations as above; `template_redirect` does not run for REST requests; anonymous
+  `GET /wp-json/wp/v2/evaluacion` returns the 3 published evaluations with readable
+  titles/slugs/IDs/dates, `criterio_autodiag` returns 74 items and `sector` 10; drafts are
+  rejected (`?status=draft` → 400); no content/answers observed in the payloads
+  ([VERIFICATION.md](VERIFICATION.md) §V5).
+- **Impact**: the private section's published items are anonymously readable via REST
+  (identifying metadata), despite the login-gated HTML section; drafts are safe.
+- **Verification (executed, read-only)**: anonymous enumerations of every project REST route
+  plus the `wp/v2` index — counts and field names only, no titles recorded.
 
 ### F12 — Orphaned Rapa Nui brand assets
 
@@ -211,6 +242,8 @@ priorities. After Phase 0 is recorded, the recommended implementation order is
 - **Proposed fix (not approved)**: review and commit intentionally, separating the
   machine-specific loader change from the theme fixes (details in
   [HANDOFF.md](HANDOFF.md)). **Do not revert.**
+- **Update (2026-10-15)**: the `docs/` baseline was committed (`f506104`); the 3 files remain
+  uncommitted — the commit-strategy decision is still open.
 - **Verification**: `git diff` before/after the decision.
 
 ### F15 — Documentation artifacts referenced but absent
@@ -226,7 +259,7 @@ priorities. After Phase 0 is recorded, the recommended implementation order is
 
 ### F16 — Hybrid theme architecture (fallback routes)
 
-- **Severity**: P3 · **Status**: Open — verify at runtime · **Evidence**: classic child of
+- **Severity**: P3 · **Status**: Open — **runtime confirmed (2026-10-15)** · **Evidence**: classic child of
   `twentytwentyfive` (`style.css:6`), no `theme.json` and no `index.php`/`page.php`/
   `search.php`/`404.php` in the child; parent theme installed.
 - **Impact**: routes without a PHP template (search, 404, generic pages) presumably render
@@ -234,17 +267,21 @@ priorities. After Phase 0 is recorded, the recommended implementation order is
 - **Proposed fix (not approved)**: decide target architecture (add PHP fallback templates vs
   block-based), then align.
 - **Verification**: load `/?s=test`, a non-existent URL, and a generic page in a browser.
+- **Runtime (2026-10-15)**: search, a lost URL and `/mision/` (a live standalone page) all
+  render the parent block theme **without** otrn chrome; classic templates keep it
+  ([VERIFICATION.md](VERIFICATION.md) §V9).
 
 ### F17 — No runtime verification performed yet
 
-- **Severity**: P1 · **Status**: Open (verification gap) · **Evidence**: the entire audit
-  and this baseline are static; nothing was checked in a browser, with WP-CLI, or against
-  the DB. Unverified list: landing pin/scrub + dual mode, CLS/performance, no-JS rendering,
-  mobile menu (F1), redirects (`/mapa/`, drafts), login-gate redirects, REST (F11b),
-  Leaflet CDN map, form submission end-to-end.
+- **Severity**: P1 · **Status**: Partially executed — **first pass 2026-10-15** · **Evidence**:
+  executed: environment/data inventory, page slugs, private-HTTP gate, REST (F11b), mobile
+  nav (F1), no-JS (F5), fallback routes (F16), token divergence (F6) — results in
+  [VERIFICATION.md](VERIFICATION.md). Remaining: landing pin/scrub motion + CLS, draft
+  save/resume, form submission end-to-end, subscriber negative test (F3), Leaflet/StoryMap,
+  keyboard/focus-trap, real-device behavior.
 - **Impact**: hidden defects may invalidate part of the documentation.
-- **Proposed fix (not approved)**: execute the Phase 0 verification checklist
-  ([ROADMAP.md](ROADMAP.md)) and record results here/HANDOFF.
+- **Proposed fix (not approved)**: execute the remaining Phase 0 verification items
+  ([ROADMAP.md](ROADMAP.md)) and record results in [VERIFICATION.md](VERIFICATION.md) §V13.
 - **Verification**: the checklist itself.
 
 ### F18 — Site content/bootstrap not reproducible from the repository
@@ -258,3 +295,6 @@ priorities. After Phase 0 is recorded, the recommended implementation order is
 - **Proposed fix (not approved)**: document and script a bootstrap procedure (pages, menus,
   options) + a content export policy (with the studio loader and privacy in mind).
 - **Verification**: clone into a new Studio site and load the key routes.
+- **Runtime (2026-10-15)**: all template-required page slugs exist (`acerca`, `evaluar`,
+  `geoportal`, `noticias`, `mapa`, `mision`, `estadisticas`); **no menus are registered**;
+  content counts in [VERIFICATION.md](VERIFICATION.md) §V3 — everything remains DB-only.

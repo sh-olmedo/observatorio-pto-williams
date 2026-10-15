@@ -3,8 +3,9 @@
 This directory is the documentation baseline for the Arauco Tourism Observatory WordPress
 site. It was produced on **2026-10-15** from a read-only, **static** audit of the repository
 at commit `5f43933` (branch `main`) plus the three pre-existing uncommitted files described in
-[HANDOFF.md](HANDOFF.md). No runtime, database, or browser verification has been performed:
-statements are marked accordingly (verified static / unverified / provisional / pending).
+[HANDOFF.md](HANDOFF.md), and updated after the **first runtime pass** (2026-10-15,
+[VERIFICATION.md](VERIFICATION.md)). Statements are marked accordingly (verified static /
+verified at runtime / unverified / provisional / pending).
 
 The site's UI copy and database content are Spanish; **all documentation here is English**.
 Proposed work is marked as proposed, never as implemented.
@@ -29,6 +30,7 @@ status of every Rapa Nui element still present here is inventoried in
 | [ISSUES.md](ISSUES.md) | The persistent register of findings F1–F18 (including F11b) with priorities | Everyone |
 | [ROADMAP.md](ROADMAP.md) | Proposed implementation phases, dependencies, acceptance criteria (not approved) | PM, client, developers |
 | [HANDOFF.md](HANDOFF.md) | Git baseline, uncommitted changes, blockers, pending decisions, recommended next task | Everyone |
+| [VERIFICATION.md](VERIFICATION.md) | Phase 0 runtime pass: environment, counts, gates, REST, browser checks — PASS/FAIL/NOT VERIFIED per finding | Developers, PM |
 
 ## Recommended reading order
 
@@ -39,9 +41,11 @@ status of every Rapa Nui element still present here is inventoried in
 5. [ARAUCO_MIGRATION.md](ARAUCO_MIGRATION.md) + [ISSUES.md](ISSUES.md) — what still needs work.
 6. [SECURITY_AUDIT.md](SECURITY_AUDIT.md) — security constraints before touching handlers.
 7. [ROADMAP.md](ROADMAP.md) + [HANDOFF.md](HANDOFF.md) — what to do next.
+8. [VERIFICATION.md](VERIFICATION.md) — what was actually tested at runtime and what remains.
 
 For a quick start as an agent: read [HANDOFF.md](HANDOFF.md) first, then `ISSUES.md`
-findings F1, F3, F11, F14, F17 (the current high-priority set).
+findings F1, F3, F11, F14, F17 (the current high-priority set) with their runtime status in
+[VERIFICATION.md](VERIFICATION.md).
 
 ## Conventions used in these documents
 
@@ -65,6 +69,7 @@ When you change the site, update the documents that are affected:
 - Any commit that changes repo state → update [HANDOFF.md](HANDOFF.md).
 - Token/component changes → update [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md).
 - Security-relevant changes → update [SECURITY_AUDIT.md](SECURITY_AUDIT.md).
+- Runtime verification results → update [VERIFICATION.md](VERIFICATION.md).
 
 ## Related documents (outside `docs/`)
 

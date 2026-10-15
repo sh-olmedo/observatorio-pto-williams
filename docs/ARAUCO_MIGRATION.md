@@ -1,8 +1,9 @@
 # Arauco Migration — Rapa Nui → Arauco Inventory
 
 Status of the rebrand/re-scope of the original **Observatorio Turístico de Rapa Nui** project
-into the **Observatorio Turístico de Arauco**. Static analysis only (commit `5f43933` +
-working tree). The original Rapa Nui project is a separate deliverable: **do not modify it
+into the **Observatorio Turístico de Arauco**. Static analysis (commit `5f43933` + working
+tree) plus the read-only runtime pass of 2026-10-15 ([VERIFICATION.md](VERIFICATION.md)).
+The original Rapa Nui project is a separate deliverable: **do not modify it
 from this repository**.
 
 Legend: ✅ Completed (static) · 🟡 Provisional · ⏳ Pending · ❓ Unverified · 🧭 Decision pending.
@@ -14,8 +15,9 @@ Legend: ✅ Completed (static) · 🟡 Provisional · ⏳ Pending · ❓ Unverif
 - Recent commits (messages) show the intended migration order:
   `99092d1` repo init → `70b22a7` "portada scrollytelling inmersiva + branding Arauco
   (ETAPA A+B+C)" → `5f43933` "modo dual estático/inmersivo en la portada".
-- The site still mixes Arauco branding with Rapa Nui copy/data; nothing below was verified
-  in a browser or against the database.
+- The site still mixes Arauco branding with Rapa Nui copy/data. The 2026-10-15 runtime pass
+  confirmed the remaining Rapa Nui elements listed below (site title, sector data, rendered
+  copy counts, evaluation slugs).
 
 ## 2. ✅ Completed (static)
 
@@ -54,10 +56,10 @@ notice), `single-evaluacion.php:36` until real data replaces the demo.
 | Element | Evidence | Notes |
 | --- | --- | --- |
 | Sector fallback list (10 Rapa Nui sectors with lat/lng) | `otrn-autodiagnostico.php:213-236` | Used when the `sector` CPT is empty |
-| `otrn_sectores_rapanui()` reads the `sector` CPT | `otrn-autodiagnostico.php:239-250` | If seeded in DB, data migration is required (DB not inspected) |
+| `otrn_sectores_rapanui()` reads the `sector` CPT | `otrn-autodiagnostico.php:239-250` | **Runtime: CPT seeded with 10 Rapa Nui entries** → this is the active path; data migration required |
 | Seed comment: "Sectores por defecto de Rapa Nui (semilla del CPT `sector`)" | `otrn-autodiagnostico.php:209` | New Arauco sectors + coordinates needed |
-| Criteria/evaluations/`dato_portada` content | DB (`wp-content/database/.ht.sqlite`, gitignored) | Counts/content unverified; may embed Rapa Nui references |
-| Pages required by templates (`/acerca/`, `/evaluar/`, `/geoportal/`, `/noticias/`, `/mapa/`, `/mision/` option, `page_on_front`) | DB only; e.g. `functions.php:232,492` | Not reproducible from the repo (F18) |
+| Criteria/evaluations/`dato_portada` content | DB (`wp-content/database/.ht.sqlite`, gitignored) | **Runtime counts: 74 criteria, 6 evaluations (3 published), 3 cards**; Rapa Nui references confirmed in slugs |
+| Pages required by templates (`/acerca/`, `/evaluar/`, `/geoportal/`, `/noticias/`, `/mapa/`, `/mision/` option, `page_on_front`) | DB only; e.g. `functions.php:232,492` | **Runtime: all slugs exist**; still not reproducible from the repo (F18); no menus registered |
 
 ## 5. 🧭 Decision pending — external content & assets
 
@@ -71,14 +73,21 @@ notice), `single-evaluacion.php:36` until real data replaces the demo.
 | Proposed municipal palette (`#0070FF`, `#41BCFF`, `#DE232B`, `#0C1434`, `#0C0D0E`, `#D6D5D5`) | Absent from code (grep) | Formal approval + implementation plan (F2) |
 | `--aru-*` palette interpretation | `otrn-arauco.css:1-17` ("para confirmación del cliente") | Confirm or replace with approved tokens (F6) |
 
-## 6. ❓ Unverified items (require runtime/DB checks)
+## 6. Runtime status (2026-10-15) — [VERIFICATION.md](VERIFICATION.md)
 
-- Whether the `sector` CPT is already seeded in the local DB (and with what).
-- Actual content of evaluations, indicators, `dato_portada` figures, pages and menus.
-- Whether the Geoportal story contains Rapa Nui content.
-- Whether REST endpoints (`/wp-json/wp/v2/evaluacion`, `/criterio`, …) expose private data
-  (see [SECURITY_AUDIT.md](SECURITY_AUDIT.md), F11b).
-- Landing immersive behavior, mobile menu, no-JS rendering (F5, F17).
+Confirmed:
+- `sector` CPT seeded with 10 Rapa Nui entries; evaluation data lives in the DB (6; 3
+  published) and criteria (74) were inspected at count level; all template-required page
+  slugs exist; **no menus are registered**.
+- Site title still "Observatorio Turístico de Rapa Nui"; rendered copy still mentions Rapa
+  Nui on `/`, `/noticias/`, `/geoportal/`, `/acerca/`, `/mision/`, `/estadisticas/`,
+  `/indicadores/` (8/6/3/5/6/6/6 occurrences).
+- REST exposes the private section's published items anonymously (F11b).
+- Mobile menu (F1) and no-JS reveals (F5) are broken; `/mision/`, search and 404 render
+  without otrn chrome (F16).
+
+Still unverified: the Geoportal story's territorial scope (F9); evaluation contents beyond
+titles; indicator/Pladetur data quality.
 
 ## 7. Suggested migration approach (proposed — not approved)
 

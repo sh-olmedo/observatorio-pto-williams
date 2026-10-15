@@ -17,7 +17,8 @@ project is out of scope: never modify it from here.
 
 - Site UI copy, code comments and database content are **Spanish**; docs under `docs/` are **English**.
 - WordPress core, `wp-config.php`, the SQLite database and non-project themes/plugins are **not versioned**.
-- Static audit baseline: commit `5f43933`, documented 2026-10-15. Runtime behavior is **not yet verified**.
+- Baseline: static audit at `5f43933` + docs commit `f506104`; first runtime pass 2026-10-15
+  (`docs/VERIFICATION.md`). Device/keyboard/CLS behavior still requires manual verification.
 
 ## Read before changing anything
 
@@ -25,7 +26,8 @@ project is out of scope: never modify it from here.
 2. `docs/ARCHITECTURE.md` — theme, mu-plugins, CPTs, templates, data flows.
 3. `docs/ISSUES.md` — open findings F1–F18; preserve the IDs in commits, branches and PRs.
 4. `docs/HANDOFF.md` — current repo state, uncommitted changes, recommended next task.
-5. `docs/ROADMAP.md` — proposed phases; **nothing there is approved**.
+5. `docs/VERIFICATION.md` — Phase 0 runtime results (what is verified, what is not).
+6. `docs/ROADMAP.md` — proposed phases; **nothing there is approved**.
 
 ## Ground rules
 
@@ -33,7 +35,8 @@ project is out of scope: never modify it from here.
   (e.g. the Studio temp dir inside `wp-content/mu-plugins/99-studio-loader.php`).
 - Run WP-CLI through Studio: `studio wp …` (never a bare `wp`; see @STUDIO.md).
 - Do not claim visual/runtime behavior as verified unless tested in a real browser.
-  The documentation baseline is static-only; runtime verification is pending (ROADMAP Phase 0).
+  The 2026-10-15 runtime record is in `docs/VERIFICATION.md`; keyboard/device/CLS checks
+  are still pending.
 - The private section must stay private: `/evaluar/`, `/mapa/`, `/autoevaluacion/`, `/criterio/`
   are gated in `functions.php`; do not weaken that gating (see `docs/SECURITY_AUDIT.md`).
 - Proposed fixes are **not approved**. Confirm client decisions before implementing: palette,

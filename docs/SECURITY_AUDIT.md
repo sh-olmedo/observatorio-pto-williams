@@ -1,10 +1,11 @@
 # Security & Privacy Audit
 
-Static review of the repository at commit `5f43933` (+ working-tree deltas). **No runtime
-probes were executed**: no HTTP requests, no WP-CLI, no database reads, no browser tests.
-Everything below is a *potential* issue confirmed only at source-code level unless marked
-verified. Severity scale: **P0** critical, **P1** high, **P2** medium, **P3** low/informational.
-No P0 was identified statically; the pending runtime checks (F11b, F17) could change that.
+Static review of the repository at commit `5f43933` (+ working-tree deltas), extended with the
+first **read-only runtime probes on 2026-10-15** (anonymous HTTP; no mutations — see
+[VERIFICATION.md](VERIFICATION.md)). Items are source-confirmed unless marked
+runtime-verified. Severity scale: **P0** critical, **P1** high, **P2** medium,
+**P3** low/informational. No P0 was identified statically, and the runtime pass surfaced none
+either.
 
 Related: [ISSUES.md](ISSUES.md), [ARCHITECTURE.md](ARCHITECTURE.md) §4, §8.
 
@@ -13,7 +14,7 @@ Related: [ISSUES.md](ISSUES.md), [ARCHITECTURE.md](ARCHITECTURE.md) §4, §8.
 | ID | Area | Severity | Status |
 | --- | --- | --- | --- |
 | [F3](#f3--evaluation-submission-without-capability-check) | Write endpoint authorization | P1 | Open |
-| [F11b](#f11b--rest-exposure-of-private-content-unverified) | Private section vs REST | P1 | Open (verify at runtime) |
+| [F11b](#f11b--rest-exposure-of-private-content-confirmed-at-runtime) | Private section vs REST | P1 | **Confirmed at runtime** (fix pending) |
 | [F4](#f4--acf-schemas-not-versioned) | Configuration integrity | P2 | Open |
 | [S-dep-1](#s-dep-1--third-party-cdn-without-sri) | Supply chain | P3 | Open |
 | [S-priv-1](#s-priv-1--form-answers-in-localstorage) | Privacy (device-local) | P3 | Informational |
@@ -43,13 +44,16 @@ of the whole private section (`functions.php:250-265`).
     is not created anywhere in the repository (see FEATURES §15).
 - **Impact**: content integrity (bogus published evaluations appear in the private
   archive/map), unauthorized resource creation; no evidence of data disclosure.
+- **Runtime context (2026-10-15)**: the DB has 1 account and only the six default roles —
+  today's blast radius is limited to whoever holds it; the gap remains for any future
+  operator accounts ([VERIFICATION.md](VERIFICATION.md) §V1, §V13).
 - **Proposed fix (not approved)**: require a dedicated capability (e.g.
   `edit_evaluaciones`) for submit; keep nonce; define the operator role; test with the
   lowest role available.
 - **Verification**: create a subscriber-level user in a scratch environment, submit the
   form, confirm the handler rejects it after the fix; negative-test anonymous POST.
 
-## F11b — REST exposure of private content (unverified)
+## F11b — REST exposure of private content (confirmed at runtime)
 
 *Severity P1 · category: privacy/authorization · mirrors ISSUES F11/F11b*
 
@@ -65,15 +69,17 @@ of the whole private section (`functions.php:250-265`).
     (`indicador` :39, `buena_practica` :52, `dato_portada` :69, `material_apoyo` :80,
     taxonomies :101/:113/:126), `otrn-guias.php:19`, `otrn-iniciativa-pladetur.php:58, 99`.
   - No `register_rest_route` and no `rest_*` hooks found (grep).
-- **Impact if exposed**: published evaluation titles/IDs, criterion text and sector data
-  could be listed without logging in; drafts are normally protected by post status, but the
-  privacy expectation of the section ("privada") would be broken. **Not confirmed** —
-  WordPress REST behavior for custom post types depends on settings and status.
-- **Required verification (not executed)**:
-  1. `curl -s https://<site>/wp-json/wp/v2/evaluacion` — inspect as anonymous.
-  2. Same for `/wp-json/wp/v2/criterio`, `/wp-json/wp/v2/sector`, `/wp-json/wp/v2/indicador`.
-  3. Repeat while authenticated as a low-privilege user.
-  4. Check the `wp/v2` index route listing (`/wp-json/wp/v2/`).
+- **Impact (confirmed 2026-10-15)**: published evaluation **titles/slugs/IDs/dates**,
+  criterion text availability and sector data are readable without logging in; drafts are
+  protected by post status. No answer content was observed in the payloads. The privacy
+  expectation of the section ("privada") is broken for published items.
+- **Verification (executed 2026-10-15, read-only)**:
+  1. `curl -s https://<site>/wp-json/wp/v2/evaluacion` — anonymous → 200, 3 published items
+     (titles readable); used with `/wp-json/wp/v2/criterio_autodiag` (74), `sector` (10).
+  2. `/wp-json/wp/v2/evaluacion?status=draft` — anonymous → 400 (drafts not exposed).
+  3. `wp/v2` index lists the routes. Counts/field names only; no titles recorded.
+  Details and commands: [VERIFICATION.md](VERIFICATION.md) §V5, §V12.
+- **Low-privilege repeat**: not executed (single account exists; see §F3 context).
 - **Proposed fix (not approved)**: set `show_in_rest => false` (or restrict via
   `rest_*` filters) for the private types (`evaluacion`, `criterio_autodiag`, `sector`),
   after confirming no block-editor workflow depends on REST.
@@ -133,12 +139,16 @@ of the whole private section (`functions.php:250-265`).
 - Akismet is installed but its integration with project forms was not reviewed (the only
   public write path is a logged-in form).
 
-## Verification appendix (commands — not executed here)
+## Verification appendix (commands)
 
 ```bash
 # Execution note: prefix WP-CLI with `studio` (see STUDIO.md).
+# Executed 2026-10-15 (read-only) — see VERIFICATION.md §V12:
+curl -s -o /dev/null -w '%{http_code} -> %{redirect_url}\n' http://localhost:8895/evaluar/
+curl -s 'http://localhost:8895/wp-json/wp/v2/evaluacion' | \
+  python3 -c 'import json,sys; print(len(json.load(sys.stdin)))'
+
+# Pending (needs a scratch user / disposable data — do not run against the working DB):
 studio wp user list --role=subscriber           # who can log in today
 studio wp post list --post_type=evaluacion --post_status=publish   # published evals count
-curl -s https://<site>/wp-json/wp/v2/evaluacion | head            # F11b check (anonymous)
-curl -s https://<site>/wp-json/wp/v2/criterio | head              # F11b check (anonymous)
 ```

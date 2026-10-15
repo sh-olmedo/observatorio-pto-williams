@@ -3,7 +3,8 @@
 Description of the **implemented** visual system as of commit `5f43933`, plus the
 **uncommitted** working-tree deltas (clearly marked). The proposed municipal identity is
 described only to compare against; **it has not been approved and is not implemented**.
-Runtime rendering was not verified (no browser session).
+Runtime pass 2026-10-15: the F6 token divergence and the F1/F5 defects are confirmed
+([VERIFICATION.md](VERIFICATION.md)); the full visual review is still pending.
 
 ## 1. Sources of truth — and their gaps
 
@@ -57,6 +58,8 @@ Unscoped `:root` fallback with **different values** from §2.2 — e.g. `--aru-t
 and smaller radii (`10px`/`6px`). For elements inside `.otrn.home` the scoped §2.2 values
 win; for anything outside that subtree the fallback applies. The comment claims the values
 are identical to the system, which is not the case — this is issue F6.
+**Runtime (2026-10-15)**: on `/`, `:root` resolves `--aru-terra:#C0392B` while `.otrn.home`
+resolves `#DF8056` — both live simultaneously (confirmed).
 
 ### 2.4 Proposed municipal palette — **not implemented**
 
@@ -101,12 +104,14 @@ Breakpoints present in the CSS: 1440 (wrap), 1280, 980, 768, 600, 480, plus a
 - **≤600 px**: `.otrn-nav{display:none}` (`style.css:508-509`). The intended replacement
   (burger + sliding panel) is defined **only** in `otrn-landing.css` (`:194, :213-224`),
   which loads only on the front page → internal pages lose navigation on phones (F1).
+  **Runtime (2026-10-15)**: confirmed on internal *and* front pages (nav 0×0, `display:none`;
+  the burger toggles state only).
 - **≤768 px**: landing switches to static mode (scenes stack full-bleed); rail hidden.
 - Grids collapse (data/news grids to 2 columns at 768, 1 at 480); head layouts stack at 980.
 - `prefers-reduced-motion`: animations neutralized, reveals forced visible, nav transition
   off (`otrn-landing.css:241-248`).
-- Unverified: real-device behavior, the 601–768 px range on internal pages, and no-JS
-  rendering of `.otrn-reveal` (F5, F17).
+- Unverified: real-device behavior and touch/keyboard interaction; the 601–768 px internal
+  range was measured as visible-but-cramped (runtime 2026-10-15).
 
 ## 6. Scrollytelling architecture
 
@@ -117,7 +122,8 @@ Breakpoints present in the CSS: 1440 (wrap), 1280, 980, 768, 600, 480, plus a
   progress (`assets/otrn-landing.js:75-160`).
 - Reveal system: IntersectionObserver adds `.is-visible`; CSS pre-hides with
   `.otrn-reveal{opacity:0}` (`otrn-landing.css:187-188`). **With JS fully disabled and no
-  reduced-motion preference, revealed content stays invisible** (F5).
+  reduced-motion preference, revealed content stays invisible** (F5). Runtime (2026-10-15):
+  confirmed — 9/9 hidden with scripts blocked; 3/9 reveal with JS in the control.
 - Vendor: GSAP + ScrollTrigger self-hosted (`assets/vendor/`), loaded only on the front
   page (~115 KB noted in code comments); version fallback strings "3.12.5".
 

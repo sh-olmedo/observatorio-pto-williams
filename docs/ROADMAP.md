@@ -13,7 +13,14 @@ and documentation updates. Do not start a phase that depends on a pending decisi
 | Run the runtime verification checklist | F17 | Results recorded in HANDOFF/ISSUES; discrepancies filed as new IDs |
 | Decide ACF local-JSON workflow | F4 | Decision recorded; if enabled, real exports committed (never fabricated) |
 
-**Verification checklist (proposed, to run in a browser + `studio wp`):** landing
+**Phase 0 status (2026-10-15):** the runtime checklist was executed and recorded in
+[VERIFICATION.md](VERIFICATION.md) (F1, F5, F6, F11b and F16 confirmed; F17 partially
+executed). Still open: the working-tree decision (F14) and the ACF workflow (F4 — runtime
+shows **0 field groups**; fields exist only as raw post meta, so "export" is not currently
+possible and the decision is define-or-document).
+
+**Verification checklist (executed 2026-10-15 — results in
+[VERIFICATION.md](VERIFICATION.md); remaining items listed there as NOT VERIFIED):** landing
 immersive/static modes at desktop and ≤768 px; no-JS landing (F5); mobile nav ≤600 px on
 internal pages (F1); `/mapa/` redirect; login gate for `/evaluar/`, `/autoevaluacion/`,
 `/criterio/`; draft save/resume; eval submit end-to-end; Leaflet map; geportal embed;
@@ -89,5 +96,8 @@ from the repo + documented procedure; search/404/generic pages render as decided
 - Execution policy: **Phase 0 (including the runtime verification of F17) precedes
   implementation decisions** — unverified behavior can change priorities. The default order
   for Phase 1 onward is **F3 → F1 → F2/F6 → content/data**, with per-change verification.
+- After the runtime pass (2026-10-15): F1, F5, F6, F11b and F16 are runtime-confirmed; the
+  recommended Phase 1 scope is the security pair **F3 + F11b** (F11b is a confirmed
+  anonymous read exposure), followed by Phase 2 (F1 + F5).
 - Every completed item must update [ISSUES.md](ISSUES.md), [FEATURES.md](FEATURES.md) and
   [HANDOFF.md](HANDOFF.md).

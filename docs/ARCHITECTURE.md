@@ -53,7 +53,7 @@ Tracked files at audit: **792**.
    (seed hooks run at priority 20).
 4. The `otrn` child theme provides PHP templates; routes without a matching PHP template
    fall back to the parent block theme's templates (architectural nuance, see
-   [ISSUES.md](ISSUES.md) F16 — unverified at runtime).
+   [ISSUES.md](ISSUES.md) F16 — runtime-confirmed 2026-10-15, [VERIFICATION.md](VERIFICATION.md) §V9).
 
 ## 4. Theme & templates
 
@@ -188,10 +188,13 @@ when the CPT is empty (`otrn-autodiagnostico.php:239-250`).
 
 ## 10. Known architectural constraints
 
-- Landing-only mobile menu CSS (F1) and landing-only token fallback (F6).
-- `.otrn-reveal` invisible without JavaScript (F5).
-- Private HTML gating does not extend to REST (F11/F11b).
-- Classic child of a block theme without `theme.json`; fallback routes are unverified (F16).
+- Landing-only mobile menu CSS (F1) and landing-only token fallback (F6) — both
+  runtime-confirmed 2026-10-15.
+- `.otrn-reveal` invisible without JavaScript (F5) — runtime-confirmed 2026-10-15.
+- Private HTML gating does not extend to REST (F11/F11b) — the anonymous REST exposure is
+  confirmed.
+- Classic child of a block theme without `theme.json`; fallback routes (search, 404,
+  `/mision/`) confirmed without otrn chrome (F16).
 - Documentation artifacts referenced by code (`docs/01`–`docs/07`, `docs/design-tokens.md`,
   `scripts/crear-pagina-acerca.php`) are absent (F15); this `docs/` baseline replaces part
   of that gap but not the ACF exports.

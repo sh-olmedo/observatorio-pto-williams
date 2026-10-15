@@ -1,8 +1,8 @@
 # Features
 
-Inventory of functional modules as of commit `5f43933` (+ working-tree deltas). All statuses
-are based on **static** review only; nothing was verified in a browser, against the database,
-or with WP-CLI. Status vocabulary:
+Inventory of functional modules as of commit `5f43933` (+ working-tree deltas), updated after
+the **read-only runtime pass of 2026-10-15** ([VERIFICATION.md](VERIFICATION.md)). Status
+vocabulary:
 
 - **Implemented (static)** — code present and coherent on read; runtime unverified.
 - **Implemented, defective (F#)** — code present with a known static defect.
@@ -14,10 +14,10 @@ or with WP-CLI. Status vocabulary:
 
 | # | Module | Entry points | Status |
 | --- | --- | --- | --- |
-| 1 | Immersive landing (scrollytelling) | `/` (`front-page.php`) | Implemented (static); data provisional; some runtime unverified |
-| 2 | Site chrome (header/footer/nav/login/burger) | all classic templates | Implemented, defective (F1: mobile nav on internal pages) |
-| 3 | Autodiagnóstico: form + drafts | `/evaluar/` (private) | Implemented, defective (F3: no capability check); sectors provisional (F8) |
-| 4 | Autodiagnóstico: archive/map + results | `/autoevaluacion/`, single (private) | Implemented (static); data unverified |
+| 1 | Immersive landing (scrollytelling) | `/` (`front-page.php`) | Implemented; data provisional; **F5 confirmed at runtime**; pin/scrub + CLS unverified |
+| 2 | Site chrome (header/footer/nav/login/burger) | all classic templates | Implemented, **defective — F1 confirmed at runtime (≤600 px, internal *and* front page)** |
+| 3 | Autodiagnóstico: form + drafts | `/evaluar/` (private) | Implemented, defective (F3: no capability check) — 1 account today; sectors: CPT seeded with Rapa Nui data (F8) |
+| 4 | Autodiagnóstico: archive/map + results | `/autoevaluacion/`, single (private) | Implemented; **HTML gate PASS at runtime**; 6 evaluations (3 published) |
 | 5 | Indicators + Excel drawer | `/indicadores/` | Implemented (static); Excel path unverified |
 | 6 | Good practices | `/buenas-practicas/` | Implemented, provisional copy (F7) |
 | 7 | Support material | `/material-de-apoyo/`, `/material/<term>/` | Implemented, provisional copy (F7) |
@@ -28,8 +28,8 @@ or with WP-CLI. Status vocabulary:
 | 12 | About page | `/acerca/` | Implemented (static) |
 | 13 | Front-page data cards | `/` via `dato_portada` CPT | Implemented; data provisional |
 | 14 | Survey dashboard embed | none (orphan file) | Decision pending (F10) |
-| 15 | Admin capabilities seeding | wp-admin | Implemented (static) |
-| 16 | Private-section gating | `template_redirect` | Implemented, incomplete for REST (F11) |
+| 15 | Admin capabilities seeding | wp-admin | Implemented; runtime roles = WP defaults only (no "Operador") |
+| 16 | Private-section gating | `template_redirect` | HTML gate PASS; **REST exposure confirmed (F11b)** |
 
 ## 1. Immersive landing — `front-page.php`
 
@@ -44,9 +44,9 @@ or with WP-CLI. Status vocabulary:
   (`front-page.php:33-36`); approved photos from `assets/img/arauco/`.
 - Provisional banner: figures inherited from Rapa Nui are explicitly labeled
   (`front-page.php:140-142`).
-- Verification status: static-verified structure; pin/scrub behavior, CLS, no-JS rendering
-  and mobile behavior are **unverified** (F17). Known static defect: reveals stay invisible
-  with JS fully disabled and no reduced-motion preference (F5).
+- Verification status: runtime pass 2026-10-15 confirmed the no-JS defect (9/9 reveals stay
+  hidden; 3/9 appear with JS in the control) and the mobile-menu behavior (see §2); the
+  GSAP pin/scrub motion itself and CLS remain **NOT VERIFIED** (F17).
 
 ## 2. Site chrome — `header.php` / `footer.php` / `assets/otrn-menu.js`
 
@@ -54,8 +54,11 @@ or with WP-CLI. Status vocabulary:
   [Evaluación de sostenibilidad — logged-in only], Planificación, Geoportal, Noticias,
   Guía de usuario, dynamic Material links), login/logout button, burger button.
 - Menu JS: aria state, Escape/click-outside close, focus trap (`assets/otrn-menu.js:1-28`).
-- Defect (F1): burger/panel CSS exists only in the front-page-only landing stylesheet;
-  on internal pages ≤600 px the nav is hidden with no working replacement.
+- Defect (F1, **runtime-confirmed 2026-10-15**): at ≤600 px the nav stays `display:none` on
+  internal pages **and** on the front page; burger clicks toggle state (`aria-expanded`,
+  `otrn-menu-abierto`) but the nav is 0×0. At 601–768 px the internal nav stays visible
+  (cramped) and the front-page panel works. Static cause: burger/panel CSS exists only in
+  the front-page-only landing stylesheet.
 
 ## 3. Autodiagnóstico form — `page-evaluar.php` + `otrn-autodiagnostico.php`
 
@@ -73,7 +76,8 @@ or with WP-CLI. Status vocabulary:
 - Results page shows computed % by ámbito (`otrn_calcular_desempeno`) and per-criterion
   answers; a demo banner marks sample content (`single-evaluacion.php:36`, provisional).
 - Private: login required (`functions.php:250-265`); draft results redirect to continuation.
-- Data (seeded evaluations, exact counts) unverified — DB not inspected (F17/F18).
+- Data (2026-10-15): 6 evaluations (3 published, 3 draft); anonymous HTML routes redirect to
+  login (PASS); **REST exposes the published items** (F11b — [VERIFICATION.md](VERIFICATION.md) §V5).
 
 ## 5. Indicators — archives/single + `assets/indicador.js`
 
@@ -131,10 +135,13 @@ or with WP-CLI. Status vocabulary:
   `otrn-iniciativa-pladetur.php:169`, `otrn-autodiagnostico.php:559`).
   Specialized roles mentioned in comments (e.g. "Operador", "Editor de Seguimiento
   Pladetur") are referenced but **not created in code** — role setup lives outside the repo.
+  Runtime (2026-10-15): only the six WordPress default roles exist; 1 user account.
 
 ## 16. Private-section gating
 
 - `otrn_seccion_autoevaluacion_privada()` redirects anonymous users for the evaluation
   archive/single, criterion single, `/evaluar/` and `/mapa/` (`functions.php:250-265`).
 - Scope limitation: it is a `template_redirect` gate only — it does not cover
-  `admin-post.php` handlers or REST requests (F11/F11b).
+  `admin-post.php` handlers or REST requests (F11/F11b). Runtime 2026-10-15: every gated
+  HTML route redirects to login (PASS); the REST exposure is **confirmed**
+  ([VERIFICATION.md](VERIFICATION.md) §V5).
