@@ -2,17 +2,20 @@
  * Menú de navegación accesible: botón tipo «hamburguesa» con captura de foco.
  *
  * La cabecera (header.php) dibuja siempre un <button class="otrn-burger"> y un
- * <nav id="otrn-nav">. En escritorio el nav está a la vista; en móvil el nav se
- * oculta y el botón lo abre como panel. Este script es el único que maneja el
- * estado para que el comportamiento sea idéntico con y sin JavaScript:
+ * <nav id="otrn-nav">. En escritorio el nav está a la vista; en móvil (≤1280 px,
+ * punto de corte de assets/css/otrn-menu.css) se abre como panel lateral. Este
+ * script es el único que maneja el estado, de modo que el comportamiento es
+ * idéntico en la portada y en las páginas internas:
  *
- *   - aria-expanded / aria-controls mantienen el estado expuesto a los lectores
- *     de pantalla; el CSS (no el JS) decide si el nav es visible.
- *   - Escape cierra; un clic fuera del panel cierra.
+ *   - aria-expanded / aria-controls / aria-label mantienen el estado expuesto a
+ *     los lectores de pantalla; el CSS (no el JS) decide si el nav es visible.
+ *   - Escape cierra; un clic fuera del panel cierra; un enlace cierra.
  *   - Mientras está abierto, Tab queda atrapado dentro del nav (focus trap) y el
  *     foco regresa al botón al cerrar.
+ *   - Al cruzar el punto de corte (redimensionar la ventana) se resincroniza el
+ *     estado para no dejar el nav oculto ni inaccesible.
  *
- * Ver header.php y assets/css/otrn-landing.css (media queries de móvil).
+ * Ver header.php y assets/css/otrn-menu.css (media queries de móvil).
  */
 document.addEventListener( 'DOMContentLoaded', function () {
 	var burger = document.querySelector( '.otrn-burger' );
@@ -22,6 +25,13 @@ document.addEventListener( 'DOMContentLoaded', function () {
 	if ( ! burger || ! nav ) {
 		return;
 	}
+
+	var movil = window.matchMedia( '(max-width: 1280px)' );
+
+	// Etiquetas del botón: header.php trae la de «abrir»; el estado cerrado
+	// también debe restaurarla si el usuario redimensiona.
+	var etiquetaAbrir  = burger.getAttribute( 'aria-label' ) || 'Abrir menú de navegación';
+	var etiquetaCerrar = 'Cerrar menú de navegación';
 
 	var ultimoFoco = null;
 
@@ -44,6 +54,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
 		ultimoFoco = document.activeElement;
 		nav.setAttribute( 'aria-hidden', 'false' );
 		burger.setAttribute( 'aria-expanded', 'true' );
+		burger.setAttribute( 'aria-label', etiquetaCerrar );
 		burger.classList.add( 'is-active' );
 		document.body.classList.add( 'otrn-menu-abierto' );
 		var lista = focables();
@@ -55,10 +66,18 @@ document.addEventListener( 'DOMContentLoaded', function () {
 	}
 
 	function cerrar() {
-		nav.setAttribute( 'aria-hidden', 'true' );
 		burger.setAttribute( 'aria-expanded', 'false' );
+		burger.setAttribute( 'aria-label', etiquetaAbrir );
 		burger.classList.remove( 'is-active' );
 		document.body.classList.remove( 'otrn-menu-abierto' );
+		// En móvil el panel queda fuera de pantalla: se oculta a lectores de
+		// pantalla. En escritorio el nav vuelve a estar a la vista, así que nunca
+		// debe quedar `aria-hidden`.
+		if ( movil.matches ) {
+			nav.setAttribute( 'aria-hidden', 'true' );
+		} else {
+			nav.removeAttribute( 'aria-hidden' );
+		}
 		document.removeEventListener( 'keydown', tecla );
 		document.removeEventListener( 'click', fuera, true );
 		// Devolver el foco al botón para que el lector de pantalla no quede
@@ -70,6 +89,25 @@ document.addEventListener( 'DOMContentLoaded', function () {
 
 	function estaAbierto() {
 		return burger.getAttribute( 'aria-expanded' ) === 'true';
+	}
+
+	/**
+	 * Resincroniza el estado tras cargar o al cruzar el punto de corte: en
+	 * escritorio limpia cualquier resto móvil; en móvil cerrado deja el panel
+	 * oculto (CSS `visibility`) y `aria-hidden`.
+	 */
+	function sincronizar() {
+		if ( ! movil.matches ) {
+			burger.setAttribute( 'aria-expanded', 'false' );
+			burger.setAttribute( 'aria-label', etiquetaAbrir );
+			burger.classList.remove( 'is-active' );
+			document.body.classList.remove( 'otrn-menu-abierto' );
+			nav.removeAttribute( 'aria-hidden' );
+			document.removeEventListener( 'keydown', tecla );
+			document.removeEventListener( 'click', fuera, true );
+		} else if ( ! estaAbierto() ) {
+			nav.setAttribute( 'aria-hidden', 'true' );
+		}
 	}
 
 	function tecla( e ) {
@@ -116,4 +154,13 @@ document.addEventListener( 'DOMContentLoaded', function () {
 			cerrar();
 		}
 	} );
+
+	// Estado inicial (móvil cerrado / escritorio visible) y resincronización al
+	// cruzar el punto de corte con un redimensionado (F1).
+	if ( typeof movil.addEventListener === 'function' ) {
+		movil.addEventListener( 'change', sincronizar );
+	} else if ( typeof movil.addListener === 'function' ) {
+		movil.addListener( sincronizar ); // Safari < 14.
+	}
+	sincronizar();
 } );

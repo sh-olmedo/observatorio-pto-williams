@@ -1,0 +1,79 @@
+/**
+ * Navegación responsive (F1) — un solo sistema para la portada y las páginas
+ * internas.
+ *
+ * La cabecera (`header.php`) pinta siempre `.otrn-brand`, `#otrn-nav` y
+ * `.otrn-burger`, y `assets/otrn-menu.js` gestiona el estado (aria + foco).
+ * Los estilos de la hamburguesa y del panel vivían solo en `otrn-landing.css`,
+ * que se encola únicamente en la portada; en el resto de páginas el menú móvil
+ * no existía porque `style.css` oculta `.otrn-nav` a ≤600 px sin reemplazo.
+ *
+ * Esta hoja se encola en todas las vistas, al final, y sus selectores incluyen
+ * `.otrn-header` para ganar por especificidad a `style.css` y a
+ * `otrn-landing.css` sin depender del orden de carga.
+ *
+ * Punto de corte único: ≤1280 px. Medición real en navegador: el nav en línea
+ * necesita ≥1233 px para no desbordar (10 enlaces; a 1440 px entra en una sola
+ * línea). Por debajo de 1280 px se usa el panel en vez de comprimir enlaces.
+ *
+ * Tokens: solo los globales de `style.css` (`--paper`, `--grey`, `--blue-dark`,
+ * `--primary`, `--primary-soft`, `--dark`). No se usan `--aru-*` (existen solo
+ * en la portada; F6 sigue pendiente) ni se definen tokens nuevos.
+ */
+
+/* ---- Botón de menú (hamburguesa) ------------------------------------- */
+.otrn-header .otrn-burger{
+  display:none; flex:0 0 auto; width:46px; height:46px; margin-left:14px;
+  background:none; border:0; cursor:pointer; padding:0; position:relative; z-index:61;
+}
+.otrn-header .otrn-burger__box{position:absolute; inset:0; display:flex; flex-direction:column; justify-content:center; gap:6px; padding:0 11px;}
+.otrn-header .otrn-burger__line{display:block; height:2px; width:100%; background:var(--blue-dark); border-radius:2px; transition:transform .28s ease, opacity .2s ease;}
+.otrn-header .otrn-burger.is-active .otrn-burger__line:nth-child(1){transform:translateY(8px) rotate(45deg);}
+.otrn-header .otrn-burger.is-active .otrn-burger__line:nth-child(2){opacity:0;}
+.otrn-header .otrn-burger.is-active .otrn-burger__line:nth-child(3){transform:translateY(-8px) rotate(-45deg);}
+.otrn-header .otrn-burger:focus-visible{outline:2px solid var(--primary); outline-offset:3px;}
+
+/* ---- Móvil: panel lateral -------------------------------------------- */
+@media (max-width:1280px){
+  .otrn-header .otrn-burger{display:flex;}
+
+  /* El acceso queda junto al botón (no centrado): a 390 px entran logo
+     (38 px de alto), «Iniciar sesión» y la hamburguesa en una sola fila. */
+  .otrn-header .otrn-login{margin-left:auto;}
+
+  /* `display:flex` es necesario aquí: anula el `display:none` que `style.css`
+     aplica a `.otrn-nav` a ≤600 px (causa del fallo de F1 en la portada). */
+  .otrn-header .otrn-nav{
+    display:flex;
+    position:fixed; top:0; right:0;
+    height:100vh; max-height:100vh;
+    width:min(84vw,360px);
+    flex-direction:column; gap:4px; margin:0;
+    background:var(--paper);
+    border-left:1px solid var(--grey);
+    padding:96px 28px 32px;
+    box-shadow:-20px 0 60px rgba(16,28,40,.18);
+    overflow-y:auto;
+    transform:translateX(100%);
+    visibility:hidden;
+    transition:transform .34s ease, visibility 0s linear .34s;
+    z-index:60;
+  }
+  /* Abierto: el panel entra y pasa a ser enfocable. */
+  body.otrn-menu-abierto .otrn-header .otrn-nav{
+    transform:translateX(0);
+    visibility:visible;
+    transition:transform .34s ease, visibility 0s linear 0s;
+  }
+  .otrn-header .otrn-nav a{
+    font-size:16px; font-weight:600; padding:12px 0;
+    border-bottom:1px solid var(--primary-soft);
+  }
+  .otrn-header .otrn-nav a:focus-visible{outline:2px solid var(--primary); outline-offset:2px;}
+}
+
+/* ---- Accesibilidad: movimiento reducido ------------------------------ */
+@media (prefers-reduced-motion:reduce){
+  .otrn-header .otrn-burger__line{transition:none;}
+  .otrn-header .otrn-nav{transition:none;}
+}

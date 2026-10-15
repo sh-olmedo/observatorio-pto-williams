@@ -454,6 +454,19 @@ function otrn_enqueue_assets() {
 			true
 		);
 	}
+
+	// Navegación responsive (F1). La hamburguesa y el panel móvil vivían solo en
+	// `otrn-landing.css`, que se encola únicamente en la portada; esta hoja va en
+	// todas las vistas. Se encola al final del todo para que sus reglas ganen
+	// sobre `style.css` y, en la portada, sobre `otrn-landing.css`.
+	$otrn_menu_css     = get_stylesheet_directory() . '/assets/css/otrn-menu.css';
+	$otrn_menu_css_ver = file_exists( $otrn_menu_css ) ? (string) filemtime( $otrn_menu_css ) : '0.1.0';
+	wp_enqueue_style(
+		'otrn-menu-css',
+		get_stylesheet_directory_uri() . '/assets/css/otrn-menu.css',
+		array( 'otrn-style' ),
+		$otrn_menu_css_ver
+	);
 }
 add_action( 'wp_enqueue_scripts', 'otrn_enqueue_assets' );
 
