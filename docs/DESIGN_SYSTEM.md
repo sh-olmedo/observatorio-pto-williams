@@ -188,17 +188,21 @@ These must not be adopted as brand tokens without explicit approval. The brief's
   (`.otrn-dato-lite`) are flat data blocks (no background, border, radius or shadow; a 2 px
   `--primary` top rule) — an affordance rule, kept after the client's home review
   ([VERIFICATION.md](VERIFICATION.md) §V19.1, F20).
-- **Glass on the lead (`05d2ecb`)**: on mobile the scene's lead paragraph is read on a translucent
-  frosted plate — `rgba(48,74,131,.65)` + `backdrop-filter:blur(16px) saturate(1.15)`, `--radius`,
-  tint 0.82 where `backdrop-filter` is unsupported (the hero's scroll cue keeps the same film as a
-  pill). It is a **legibility device, not an affordance surface**: it is translucent, it sits on
-  photography and it carries no border, shadow or hover, so it does not compete with the rule above.
-  The plate covers the lead **only** (the client's fourth-round instruction); the eyebrow, the title
-  and the CTAs of scenes 2-3 sit on the photograph and are separated from it by a **text-shadow**
-  (tight on the small type, wide on the title) — a mitigation the client accepted, and a documented
-  AA gap, because WCAG 1.4.3 does not count a shadow. Rationale and measurements:
-  [VERIFICATION.md](VERIFICATION.md) §V20, §V21 (the §V20 whole-block plate remains the compliant
-  alternative); the border gap it reopens is **F23** ([ISSUES.md](ISSUES.md)).
+- **Glass on the lead (`05d2ecb`, values set by the client in `bef8332`)**: on mobile the scene's lead
+  paragraph is read on a translucent frosted plate — `rgba(48,74,131,.35)` +
+  `backdrop-filter:blur(9px) saturate(1.15)` (the client's numbers, with the invalid negative alpha
+  corrected and the blur normalised — [VERIFICATION.md](VERIFICATION.md) §V22), `--radius`, tint 0.82
+  where `backdrop-filter` is unsupported (the hero's scroll cue keeps the 0,65 film as a pill). It is
+  a **legibility device, not an affordance surface**: it is translucent, it sits on photography and
+  it carries no border, shadow or hover, so it does not compete with the rule above. The plate covers
+  the lead **only** (the client's fourth-round instruction); the eyebrow, the title and the CTAs of
+  scenes 2-3 sit on the photograph and are separated from it by a **text-shadow** (tight on the small
+  type, wide on the title) — a mitigation the client accepted, and a documented AA gap, because WCAG
+  1.4.3 does not count a shadow. The lighter tint of `bef8332` costs the lead too: its worst pixel is
+  4,12-4,44:1 against the 4,5:1 of AA (mean 5,15-6,90:1), and **0,45 is the nearest AA-safe value**
+  (4,88-5,11:1). Rationale and measurements: [VERIFICATION.md](VERIFICATION.md) §V20, §V21, §V22 (the
+  §V20 whole-block plate remains the compliant alternative); the border gap it reopens is **F23**
+  ([ISSUES.md](ISSUES.md)).
 
 ## 5. Responsive behaviour
 
@@ -236,25 +240,27 @@ These must not be adopted as brand tokens without explicit approval. The brief's
     `rgba(48,74,131)` ramping 0.12 → 0.55 (10 %) → 0.88 (20 %) → 0.90 (62 %) → 0.92. The text
     band runs 21→84 % of the act height in the mobile layout and 23→77 % in the 88 vh static
     layout, so it always sits on ≥0.88.
-  - **Static at ≤768 px (`05d2ecb`)**: the veil is a **clear gauze** (0.06 → 0.24 at 26 % → 0.34 at
-    58 % → 0.42) and the legibility guarantee sits on the **lead's glass plate** (tint 0.65 +
-    `blur(16px)`, tint 0.82 without `backdrop-filter`). The plate runs 6 px from the viewport edge
-    and covers 15-33 % of each act, so the photograph is unveiled over **89-90 %** of it (6.7-7.2 %
-    before). The eyebrow, the title and the CTAs of scenes 2-3 are read on the photograph with a
-    **text-shadow**; with the plate on the lead only, those three elements measure 1,49-2,73:1 raw
-    — a client-accepted, documented AA gap (§V21). The lead itself passes AA (6,32-6,51:1), as do
-    the hero's solid CTA (7,40:1) and the cue pill (6,34-7,20:1); the ghost CTA's boundary does not
-    reach 3:1 over photography (F23). §V20 holds the whole-block variant, where every element passed
-    AA at 320/375/400/480/768 px (worst 4,68:1).
+  - **Static at ≤768 px (`05d2ecb`, plate tinted to the client's numbers in `bef8332`)**: the veil is
+    a **clear gauze** (0.06 → 0.24 at 26 % → 0.34 at 58 % → 0.42) and the legibility guarantee sits
+    on the **lead's glass plate** (tint 0,35 + `blur(9px)`, tint 0.82 without `backdrop-filter`). The
+    plate runs 6 px from the viewport edge and covers 15-33 % of each act, so the photograph is
+    unveiled over **89-90 %** of it (6.7-7.2 % before) — and with the lighter tint the photograph now
+    reads **through** the plate as well. The eyebrow, the title and the CTAs of scenes 2-3 are read
+    on the photograph with a **text-shadow**; those three measure 1,49-2,73:1 raw — a client-accepted,
+    documented AA gap (§V21). The lead itself is at **4,12-4,44:1 on its worst pixel** (mean
+    5,15-6,90:1), also just under AA since `bef8332`; the hero's solid CTA (7,40:1) and the cue pill
+    (6,34-7,20:1) still pass, and the ghost CTA's boundary does not reach 3:1 over photography (F23).
+    §V20 holds the whole-block variant, where every element passed AA at 320/375/400/480/768 px
+    (worst 4,68:1); 0,45 is the nearest AA-safe tint for today's plate (4,88-5,11:1).
   - **Immersive**: one shared veil inside the photographic level (so it inherits the panel's
     `clip-path` and never tints the paper the hero is read on), with **pixel stops** — 0.92 at
     0 → 0.86 at 640 px → 0.34 at 900 px → 0 at 1160 px — matching the width of the text column
     at any window size, faded in at timeline 1.6 (before scene 2's text).
   - Contrast is computed by drawing the real photograph on a `<canvas>` with the CSS geometry
     and compositing the veil per pixel: worst case 4.88:1 in immersive mode (scene 3, 809 px),
-    ≥5.07:1 in static mode above 768 px, ≥4.68:1 in the §V20 mobile variant and 6,32-6,51:1 for
-    the lead in the current one. Method and tables: [VERIFICATION.md](VERIFICATION.md) §V19.2,
-    §V20 and §V21.
+    ≥5.07:1 in static mode above 768 px, ≥4.68:1 in the §V20 mobile variant and 4,12-4,44:1 for
+    the lead's worst pixel in the current one (§V22; 0,45 would put it back above AA). Method and
+    tables: [VERIFICATION.md](VERIFICATION.md) §V19.2, §V20, §V21 and §V22.
   - **Price of the guarantee (above 768 px)**: AA against the *brightest* pixel of a photograph
     needs ≈0.87–0.88 opacity, so on desktop the photographs read as a blue-tinted backdrop with
     detail mainly in the top ~20 %. At ≤768 px the guarantee is now carried by the lead's plate
@@ -274,7 +280,7 @@ These must not be adopted as brand tokens without explicit approval. The brief's
 | Typography | Montserrat + IBM Plex Mono, but Manrope requested | Montserrat + IBM Plex Mono via `--font-title`/`--font-mono` | Resolved (Manrope) |
 | Institutional logos | 3 Arauco logos, GORE low-res, RAU absent | Same 3 logos, now on white plates with one height | Source material still pending (F13) |
 | Rapa Nui leftovers | Present in copy/tokens/theme name | Tokens cleaned; **copy/theme name untouched** | Migration pending (F7–F10) |
-| Scene text over photographs | Veils that missed the text (F21) | Vertical static veil above 768 px + pixel-stop immersive veil; at ≤768 px a gauze with a **glass plate on the lead** and a text-shadow for the rest, measured ≥6,32:1 on the plate | Applied; client decision on the trade open (F21, F23) |
+| Scene text over photographs | Veils that missed the text (F21) | Vertical static veil above 768 px + pixel-stop immersive veil; at ≤768 px a gauze with a **glass plate on the lead** (tint 0,35) and a text-shadow for the rest | Applied; the lead is 4,12-4,44:1 on its worst pixel, the copy off the plate is raw below AA — client decision open (F21, F23) |
 
 ## 8. Before → after token mapping
 
@@ -308,8 +314,10 @@ remapping of tiers/scales, the literal replacements and the deleted dead CSS is 
    gauze plus a plate behind the whole text block) and **narrowed again** hours later (fourth
    round, `05d2ecb`: the plate on the lead only, the rest on a text-shadow). Above 768 px the
    0.88-0.92 veils stand.
-5. **The trade of the fourth round (§V21)** — the eyebrow, the title and the CTAs of scenes 2-3
-   read on the photograph with a text-shadow and measure 1,49-2,73:1 raw. The client asked for the
-   photograph, and the shadow is the photo-preserving mitigation; the compliant alternative (a
-   plate behind the whole block, or one behind the eyebrow + title only) stays available. A client
+5. **The trade of the fourth and fifth rounds (§V21, §V22)** — the eyebrow, the title and the CTAs
+   of scenes 2-3 read on the photograph with a text-shadow and measure 1,49-2,73:1 raw; the lead, on
+   the client's lighter plate, is 4,12-4,44:1 on its worst pixel (mean 5,15-6,90:1). The client asked
+   for the photograph, and both measures are photo-preserving; the compliant alternatives are the
+   `649b01f` block plate (AA everywhere, photograph covered 62-84 %), a plate behind the eyebrow +
+   title only, or the one-number change of the lead's tint to **0,45** (4,88-5,11:1). A client
    decision.

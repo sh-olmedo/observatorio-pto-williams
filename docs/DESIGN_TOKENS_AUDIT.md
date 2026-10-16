@@ -568,3 +568,20 @@ narrowed it to the lead and put the rest of the scene copy back on the photograp
   a token problem.
 - **Files changed:** `assets/css/otrn-landing.css` only (the `@media (max-width:768px)` block).
   No file outside it was touched.
+
+### 13.11 Fifth round — the client sets the plate's numbers, and the glass family is now due (`bef8332`)
+
+The client replaced the plate's declaration with values of their own
+([VERIFICATION.md](VERIFICATION.md) §V22). Applied, with two corrections (the negative alpha, which
+is invalid CSS and would have dropped the tint entirely, and two mismatched blur values):
+
+- **Still no token change, but the duplication threshold of §13.9 is now crossed.** The file holds
+  the same navy literal with **two different alphas and two different blurs**:
+  `rgba(48,74,131,.35)` + `blur(9px)` on the lead and `rgba(48,74,131,.65)` + `blur(16px)` on the
+  scroll-cue pill. Until this round both surfaces shared one value, which is why no glass token was
+  created; now they differ and the values are client-tunable, so a small **`--glass-*` family**
+  (`--glass-tint`, `--glass-blur`) in `style.css :root` is the right next step — a **proposal, not
+  approved** (the tint is an open client decision: 0,35 today, 0,45 to hold AA).
+- **One value set by the client lives in the code as a comment**, including the measured consequence
+  (4,12-4,44:1 worst pixel), so the next reader does not "fix" it back to 0,65 by accident.
+- **Files changed:** `assets/css/otrn-landing.css` only (the `@media (max-width:768px)` block).

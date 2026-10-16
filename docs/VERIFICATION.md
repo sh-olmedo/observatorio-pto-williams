@@ -971,3 +971,76 @@ what the rendered result showed (developer look at 375 and 768 px, §V21.4).
 - **F23** (the ghost CTA's boundary over photography, §V21.3) is registered, not fixed.
 - Real touch, iOS dynamic viewport, reduced-motion as a browser preference and real keyboard
   modality: unchanged from §V13/§V18.
+
+## V22 — Client review, fifth round: the lead plate gets lighter (2026-10-16)
+
+The client sent the plate's declaration back with values to use:
+
+```css
+@media (max-width: 768px) {
+    .otrn-act .otrn-act__lead {
+        background: rgba(48, 74, 131, -0.35);
+        -webkit-backdrop-filter: blur(16px) saturate(1.15);
+        backdrop-filter: blur(9px) saturate(1.15);
+        border-radius: var(--radius);
+        padding: 12px 14px;
+        margin: 0 -14px 18px;
+    }
+}
+```
+
+**Two of those values cannot be applied as written**, so they were corrected rather than pasted:
+
+1. **`rgba(48, 74, 131, -0.35)` is an invalid declaration.** CSS alpha accepts 0-1, so the browser
+   discards the whole `background` declaration and the lead is left with **no tint at all** — only
+   the blur, i.e. *worse* legibility, not better. Measured in that state the lead falls to
+   **2,00-2,39:1**. The sign was taken as a typo and the tint applied as **0,35**.
+2. **Two different blurs** (`16px` behind the `-webkit-` prefix, `9px` in the standard property):
+   the later declaration wins, so the effective value is 9 px. **Both prefixes were normalised to
+   9 px** — the project keeps one value per declaration (DESIGN_TOKENS_AUDIT.md §13.10).
+
+Everything else in the snippet (the radius, the padding, the negative margins) matched the code
+that was already there and is unchanged. Fixed in **`bef8332`** — one file, `assets/css/otrn-landing.css`,
+inside the `@media (max-width:768px)` block; this documentation commit follows it.
+
+### V22.1 What the lighter tint costs
+
+The lead, on the plate, minimum / mean, at the five widths (hero / territorio / costa):
+
+| Tint + blur | 320 px | 375 px | 400 px | 480 px | 768 px |
+| --- | --- | --- | --- | --- | --- |
+| **0,35 + blur 9 (applied)** | 4,14 / 4,29 / 4,41 | 4,14 / 4,30 / 4,44 | 4,13 / 4,30 / 4,44 | **4,12** / 4,27 / 4,43 | 4,27 / 4,79 / 4,35 |
+| 0,45 + blur 9 | 4,90 / 4,99 / 5,09 | 4,90 / 4,99 / 5,11 | 4,88 / 4,97 / 5,11 | — | — |
+| 0,65 + blur 16 (previous round) | 6,46 / 6,41 / 6,35 | 6,49 / 6,39 / 6,41 | 6,48 / 6,36 / 6,40 | 6,43 / 6,32 / 6,42 | 6,51 / 6,48 / 6,35 |
+
+- **The worst pixel of the lead is now 4,12-4,44:1, i.e. 0,06-0,38 below the 4,5:1 of AA**, at every
+  width except the 768 px territory scene (4,79). The **mean is 5,15-6,90:1**, comfortably above, so
+  most of each paragraph passes and the shortfall is confined to the brightest spots of the plate's
+  backdrop.
+- **0,45 is the nearest value that holds AA** (4,88-5,11:1) and would look practically the same.
+  The client's own value was applied because it was given explicitly; the one-number change is
+  available. Recorded as the **fifth round of F21**.
+- **Blur 9 vs 16 moves nothing meaningful**: at 0,65 the lead measures 6,28-6,36 with blur 9 against
+  6,32-6,49 with blur 16. The tint, not the blur, is the knob.
+
+### V22.2 What did not change, and the checks
+
+- **Nothing else in the snippet's scope changed**: the veil (gasa ≤0,42), the scroll cue's glass pill
+  (6,34-7,20:1), the hero's solid CTA (7,40:1) and the **text-shadow** that separates the eyebrow, the
+  title and the CTAs of scenes 2-3 from the photograph (1,49-2,73:1 raw, 12,5-19,6 over the shadow)
+  are as recorded in §V21.
+- **Fallback without `backdrop-filter`** is untouched and still AA: the `@supports not` branch raises
+  the tint to 0,82 on the lead (5,42-5,60:1 without any blur).
+- **0 px horizontal overflow** at 320/375/400/480/768 px; the change lives inside the
+  `@media (max-width:768px)` query, so **above 768 px the plate does not exist at all** (§V21.4).
+- **No PHP, markup, content, route or database change.**
+- Rendered result looked at again (375 px: hero, territorio, costa): the photograph now reads
+  **through** the plate as well as around it — the client's goal — while the lead keeps its glass.
+
+### V22.3 NOT VERIFIED
+
+- **The client's judgement** on the lighter plate, and whether the 0,06-0,38 AA shortfall at the
+  brightest pixel is acceptable or should be closed with 0,45.
+- **F23** (the ghost CTA's boundary over photography) and the **F21 third/fourth-round gaps** are
+  open as described in §V21.
+- `backdrop-filter` cost on real hardware and iOS Safari: unchanged from §V20.6.

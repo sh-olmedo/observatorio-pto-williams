@@ -585,6 +585,18 @@ explicit UX/UI approval of the visuals**. Files: `header.php`, `functions.php`,
   counted by WCAG 1.4.3), so it is a **client-accepted, documented gap** — the §V20 block plate
   remains the compliant alternative. This round also **reintroduces a 1.4.11 gap** on the ghost
   CTA's border over photography: registered as **F23**. Detail: §V21.
+- **Fifth round — 2026-10-16** (`bef8332`, local, not pushed). The client sent the plate's
+  declaration back with values to use. Two were corrected, not pasted: `rgba(48, 74, 131, -0.35)`
+  is **invalid CSS** (alpha accepts 0-1, so the browser discards the declaration and the lead is
+  left with no tint at all — measured 2,00-2,39:1), so the tint was applied as **0,35**; and the
+  snippet carried **two different blurs** (`16px` in the `-webkit-` prefix, `9px` in the standard
+  property — the standard one wins), so both were normalised to **9 px**. Everything else already
+  matched. Consequence: the lead's worst pixel drops to **4,12-4,44:1** — 0,06-0,38 below the 4,5:1
+  of AA — with a mean of 5,15-6,90:1. **0,45 is the nearest value that holds AA** (4,88-5,11:1) and
+  looks practically the same; the client's own number was kept because it was given explicitly.
+  The rest of the scene is unchanged (veil, cue pill, hero CTA and the text-shadow of §V21), the
+  fallback without `backdrop-filter` still holds 5,42-5,60:1, and above 768 px the plate does not
+  exist. Detail: §V22.
 
 ### F22 — Home page has no print styles: the scene copy disappears on paper
 
