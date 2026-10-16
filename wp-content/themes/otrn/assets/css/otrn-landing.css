@@ -243,15 +243,13 @@
   .otrn-datos-head,.otrn-explora-head{grid-template-columns:1fr; gap:24px;}
 }
 @media (max-width:768px){
-  /* Revisión del cliente (16.10.2026): en móvil el velo ocultaba la fotografía.
-     El velo baja a una gasa clara (máx. 0,42) para que la foto se vea, y el
-     bloque de texto se lee sobre un panel de vidrio: tinte --blue-dark
-     translúcido + desenfoque del fondo (backdrop-filter). El desenfoque promedia
-     la fotografía y el velo que quedan tras el panel, así que el blanco se mide
-     contra ese promedio (docs/VERIFICATION.md §V20). El vidrio cubre eyebrow,
-     título y bajada, y la CTA queda dentro del panel; medido, el eyebrow de 12 px
-     y el título sobre cielo claro no llegan a AA con la gasa sola. El aviso de
-     scroll del hero lleva la misma lámina en formato píldora. */
+  /* Revisión del cliente (16.10.2026, tercera ronda): «El efecto glass es solo
+     para el texto demarcado con rojo [la bajada]. Así se podrá ver la imagen de
+     fondo». El velo se queda en gasa clara (máx. 0,42) y el vidrio pasa a la
+     bajada; el eyebrow, el título y la CTA vuelven a leerse sobre la fotografía.
+     Como el blanco no alcanza AA sobre cielo claro sin velo ni lámina (medido
+     1,5-2,6:1), esos tres se despegan con una sombra de texto, que no oculta la
+     fotografía. Medido en docs/VERIFICATION.md §V21. */
   .otrn-act__grad{
     background:linear-gradient(180deg,
       rgba(48,74,131,.06) 0%,
@@ -259,25 +257,42 @@
       rgba(48,74,131,.34) 58%,
       rgba(48,74,131,.42) 100%);
   }
-  /* Panel de vidrio del bloque de texto. Va en el propio .otrn-act__inner, que
-     es flex item de .otrn-act: con `width:auto` el panel se ajusta a su
-     contenido (la bajada, 52ch ≈ 551 px), así en 481-768 px deja fotografía a la
-     derecha en vez de estirarse; `margin:0 8px` lo separa del canto de la
-     pantalla y el texto queda a 20 px (8 + 12), de modo que el panel se lee como
-     una lámina con aire a los lados y no como una franja pegada al borde. Se sube
-     la especificidad a .wrap.otrn-act__inner para que el padding del .wrap en
-     los otros breakpoints no lo descoloque. */
+  /* El bloque mantiene su geometría (margen 8 px, padding 20×12: el texto queda
+     a 20 px del canto), pero ya no lleva lámina: el fondo es la fotografía. */
   .otrn-act .wrap.otrn-act__inner{
     width:auto; margin:0 8px; padding:20px 12px;
+  }
+  /* Lámina de vidrio de la bajada: tinte --blue-dark translúcido + desenfoque del
+     fondo. El desenfoque promedia la fotografía y el velo que quedan detrás, así
+     que el blanco se mide contra ese promedio. Los márgenes negativos devuelven
+     el texto a su sitio y dejan que la lámina sobresalga 14 px por lado (queda a
+     6 px del canto); el padding vertical se compensa en el margen
+     (18 + 12 = 30 px, el mismo ritmo que el margen base de la bajada). */
+  .otrn-act .otrn-act__lead{
     background:rgba(48,74,131,.65);
     -webkit-backdrop-filter:blur(16px) saturate(1.15);
     backdrop-filter:blur(16px) saturate(1.15);
     border-radius:var(--radius);
+    padding:12px 14px; margin:0 -14px 18px;
   }
-  /* El aviso de scroll es el único texto que queda sobre la fotografía desnuda
-     (el velo ya no basta): lleva el mismo vidrio en formato píldora. El texto
-     pasa a blanco pleno (11 px: el 0,85 se queda en ~4,1:1 sobre el panel) y el
-     borde del icono sube para que la píldora no se desdibuje. */
+  /* Texto que vuelve a quedar sobre la fotografía desnuda (eyebrow, título y la
+     CTA de las escenas 2 y 3): sombra suave que lo despega del fondo sin velo ni
+     lámina. Va acotada a las tres escenas porque las secciones claras («Datos»,
+     «Explora») reutilizan las mismas clases con texto oscuro sobre papel. La
+     sombra se ajusta al tamaño: cerrada en el eyebrow de 12 px, amplia en el
+     título. */
+  .otrn-act--hero .otrn-act__eyebrow,
+  .otrn-act--territorio .otrn-act__eyebrow,
+  .otrn-act--costa .otrn-act__eyebrow,
+  .otrn-act--territorio .otrn-act__cta--outline,
+  .otrn-act--costa .otrn-act__cta--link{text-shadow:0 1px 2px rgba(0,0,0,.9);}
+  .otrn-act--hero .otrn-act__titulo,
+  .otrn-act--territorio .otrn-act__titulo,
+  .otrn-act--costa .otrn-act__titulo{text-shadow:0 2px 8px rgba(0,0,0,.75);}
+  /* El aviso de scroll no es texto de la escena sino un indicador de interfaz, y
+     va sobre la fotografía desnuda en la esquina: conserva el vidrio en formato
+     píldora. El texto va a blanco pleno (11 px: el 0,85 se queda en ~4,1:1 sobre
+     la lámina) y el borde del icono sube para que la píldora no se desdibuje. */
   .otrn-stage__cue{
     left:10px; bottom:24px; padding:8px 14px; color:var(--paper);
     background:rgba(48,74,131,.65);
@@ -286,15 +301,16 @@
     border-radius:var(--radius-pill);
   }
   .otrn-stage__cue-ico{border-color:rgba(255,255,255,.8);}
-  /* El borde del CTA fantasma pasa de 0,55 a 0,8: sobre el panel (fondo más
-     claro que el velo anterior) el 0,55 baja a ~2,9:1 (WCAG 1.4.11 pide 3:1
-     para el límite del control). */
+  /* El borde del CTA fantasma pasa de 0,55 a 0,8. Sobre la fotografía desnuda
+     ningún borde blanco translúcido llega a 3:1 (WCAG 1.4.11) en la zona de
+     cielo claro: queda como carencia documentada en §V21, igual que el borde de
+     los campos de formulario. */
   .otrn-act .otrn-act__cta--outline{border-color:rgba(255,255,255,.8);}
   /* Sin backdrop-filter (navegadores antiguos) el tinte solo tiene que bastar:
      sube a 0,82, el valor que garantiza 4,5:1 sobre el punto más claro de la
      fotografía sin desenfoque. */
   @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
-    .otrn-act .wrap.otrn-act__inner,
+    .otrn-act .otrn-act__lead,
     .otrn-stage__cue{background:rgba(48,74,131,.82);}
   }
   .otrn-burger{display:flex;}
