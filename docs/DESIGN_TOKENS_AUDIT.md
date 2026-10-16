@@ -2,10 +2,10 @@
 
 **Status (2026-10-16):** the UX/UI direction is **confirmed** — the site must follow the
 **Municipalidad de Arauco** visual identity, and the coral/teal system is **no longer the
-authoritative design system** (F2 closed as a decision). This audit remains the *technical
-baseline* of the previous state; the confirmed municipal foundation and its verified sources
-are recorded in §12 below and in [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) §0/§2.5. No CSS or PHP
-was modified by this audit.
+authoritative design system** (F2 closed as a decision). §§1–11 are the *technical baseline* of
+the previous state; §12 records the verified municipal foundation and **§13 is the as-built
+record of the approved mapping, applied in code on 2026-10-16** (runtime evidence:
+[VERIFICATION.md](VERIFICATION.md) §V17). The resulting visuals are **pending client sign-off**.
 
 **Scope:** investigation and documentation only. No CSS, PHP, database, content or URL
 change; no commit of application code. The three pre-existing uncommitted files
@@ -385,3 +385,111 @@ roles:
 **Conclusion:** three of the six documented colours (`#0C1434`, `#0C0D0E`, `#D6D5D5`) cannot be
 confirmed as municipal; two of them are Elementor defaults. They must not be adopted as brand
 tokens without explicit approval (see the mapping in the handoff message / DESIGN_SYSTEM §2.5).
+
+---
+
+## 13. Implementation record — consolidation applied (2026-10-16)
+
+The mapping below was approved by the client and **applied in application code** on
+2026-10-16 (Phase 2). §§1–11 describe the *previous* state and are kept as the technical
+baseline; this section is the as-built record. Single source of truth is now
+`style.css :root` ([DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) §2.1). Runtime evidence:
+[VERIFICATION.md](VERIFICATION.md) §V17.
+
+### 13.1 Global tokens — before → after
+
+| Token | Before | After | Role in the new system |
+| --- | --- | --- | --- |
+| `--primary` | `#DF8056` | **`#0070FF`** | Brand blue. Fills without text, borders, chart series, ≥24 px / 800-weight headings. **Never small text on white** (4.41:1). |
+| `--primary-dark` | `#A05C3D` | **`#0050B8`** | Accessible brand blue (7.40:1 on white): all small text, links, active state, focus outlines, solid fills carrying white text. |
+| `--primary-soft` | `#FAEEE9` | **`#E7F1FF`** | Brand tint surface (chips, hover highlights, tables). Pairs with `--primary-dark` (6.49:1). |
+| `--primary-tint` | `#F0C5B2` | **`#BBD8FF`** | Mid brand tint (maturity ramp step 2). |
+| `--secondary` | `#2F6F79` | **`#DE232B`** | Municipal red. Emphasis/CTA (`4.79:1` both ways). No longer teal. |
+| `--accent` | — | **`#41BCFF`** | Municipal light blue, **decorative only** (2.13:1 on white): no text on it. |
+| `--blue-dark` | `#0E506D` | **`#304A83`** | Institutional dark blue surfaces (photo fallback, drawers, sparkline partner colour). |
+| `--dark` | `#2B2B2B` | **`#000000`** | Body text. |
+| `--text2` | `#666666` | **`#707070`** | Secondary text. Passes AA on every surface it is used on (4.58–4.95:1). |
+| `--text3` | `#888888` | **removed** | Collapsed into `--text2` (3.5:1 on white failed AA). |
+| `--secondary-soft` | `#E3ECED` | **removed** | No municipal equivalent; replaced by `--primary-soft` / `--success-soft`. |
+| `--blue-dark-soft` | `#DFE8EC` | **removed** | Was unused after remapping. |
+| `--grey` | `#E8EEE6` | **`#E0E0E0`** | Borders/dividers (neutral, not `--text2`-carrying surface). |
+| `--cream` | `#F6F3E0` | **`#F8F8F8`** | Municipal neutral background (sections, footer). |
+| `--lgrey` | `#F0F0F0` | **`#F6F6F6`** | Neutral component fill (tracks, headers, chips). Lightened so `--text2` reaches 4.58:1. |
+| `--error` | `#EA5252` | **`#C0272D`** | Semantic error (4.85:1 on `--error-soft`). |
+| `--success` / `--success-soft` | — | **`#0F7B4E` / `#E4F5EC`** | New semantic pair (4.69:1). |
+| `--warning` / `--warning-soft` | — | **`#8A5A00` / `#FCF1DC`** | New semantic pair (5.29:1). |
+| `--error-soft` | — | **`#FBE4E4`** | Error tint, now a token (was a literal). |
+| `--neutral` / `--neutral-soft` | — | **`#52525B` / `var(--lgrey)`** | "No data"/neutral status (7.15:1). |
+| `--paper` | `#FFFFFF` | `#FFFFFF` | Surface. |
+| `--radius` / `--radius-sm` | `14px` / `10px` | **`10px` / `6px`** | Container/control radii (municipal 10 px). |
+| `--radius-pill` | — | **`30px`** | Municipal pill radius, buttons/chips only. |
+| `--space-section` | — | **`clamp(48px,8vw,120px)`** | Section rhythm (was `--aru-gap`). |
+| `--font-title` | `'Montserrat',system-ui,sans-serif` | `var(--font-title)` | Montserrat (theme already self-hosts it). |
+| `--font-mono` | — | **`'IBM Plex Mono',monospace`** | Numeric content (temporary). No Poppins token: the font is not shipped. |
+
+### 13.2 Removed token layers
+
+| Layer | Action |
+| --- | --- |
+| `otrn-arauco.css` `.otrn.home{--aru-*}` (17 aliases) | **Deleted.** The file now holds only what is intrinsic to the front page: the fixed translucent header and the footer top margin. |
+| `otrn-landing.css` unscoped `:root` fallback (12 tokens) | **Deleted** (this was the F6 conflict: same names, different values). |
+| `--aru-papel-2`, `--aru-arena`, `--aru-ink-deep`, `--aru-linea`, `--aru-radio-sm`, `--aru-gap` | Removed; the last one replaced by `--space-section`. |
+
+Alias mapping used for that remap: `--aru-papel`→`--paper`, `--aru-terra`→`--primary`,
+`--aru-terra-deep`→`--primary-dark`, `--aru-terra-soft`→`--primary-soft`,
+`--aru-teal`→`--primary-dark` (page CTA fill), `--aru-teal-deep`→`--blue-dark`,
+`--aru-ink`→`--blue-dark`, `--aru-texto`→`--dark`, `--aru-texto-2`/`--aru-texto-3`→`--text2`,
+`--aru-radio`→`--radius`, `--aru-footer`→`--cream`.
+
+### 13.3 Semantic remapping (brand ≠ status)
+
+| Element | Before | After |
+| --- | --- | --- |
+| Tier scale `tier-high/mid/low/na` (status pills, KPIs, score boxes, percent badges) | teal / coral / coral-tint / grey | traffic light: **success / warning / error / neutral** |
+| Maturity scale `.opt.o0–o3` / `.otrn-score-tag.s0–s3` | teal ramp with a red floor | brand-blue ramp with a red floor: `o0/s0` error-soft, `o1/s1` primary-soft, `o2/s2` primary-tint, `o3/s3` primary-dark, `ona/sna` neutral |
+| `.otrn-tag` | `--secondary-soft` / `--secondary` | `--primary-soft` / `--primary-dark` (categorical chip, distinct from grey `.borrador`) |
+| `.otrn-avance .fill`, `--primary` bars | `--secondary` | `--primary` |
+| `.otrn-dato` photo fallback | `--secondary` | `--blue-dark` |
+| `.teal` heading, `.otrn-btn.teal` | teal (`--secondary`) | red `--secondary` (4.79:1) |
+| `.coral` (dead class, kept) | `--primary` | `--primary` |
+| Map legend + Leaflet tier colours | hardcoded hex in PHP/JS | read from `--success`/`--warning`/`--error`/`--neutral` via `getComputedStyle` (no duplicated palette) |
+| Chart/sparkline series | `--secondary` | `--primary` (active bars: `--primary`, inactive: `--blue-dark`) |
+
+### 13.4 Literal replacements (hardcoded values that bypassed tokens)
+
+`#fff` → `var(--paper)` · `#FBE4E4` → `var(--error-soft)` · `#fafbfa` (row hover) →
+`var(--lgrey)` · `#fcfcfb` → `var(--lgrey)` · `rgba(51,51,51,…)` → `rgba(0,0,0,…)` ·
+`rgba(10,46,60,…)` / `rgba(14,80,109,…)` → `rgba(48,74,131,…)` ·
+`rgba(20,94,107,.28)` → `rgba(0,80,184,.28)` · `rgba(160,92,61,.25)` → `rgba(138,90,0,.25)` ·
+`'IBM Plex Mono',monospace` → `var(--font-mono)` · `'Manrope',…` → `var(--font-title)` ·
+inline `border-radius:14px` → `var(--radius)` · `border-radius:999px` → `var(--radius-pill)`.
+
+### 13.5 Dead CSS deleted
+
+`.otrn-login` (button, no markup), `.otrn-hero` (+ `--hero-img`, the class was unused — only the
+`#otrn-hero` anchor id remains), the four `.otrn-footer-logos img:nth-child()` heights,
+`.otrn-home-menu`, and the front-page-specific footer override. `.otrn-mision` (dead but not
+authorised for removal) is kept.
+
+### 13.6 Deliberate decisions
+
+- **No Poppins token.** The theme ships only Montserrat + IBM Plex Mono (`assets/fonts`), so a
+  `--font-secondary` would be a broken fallback; it is documented instead.
+- **`--accent` is decorative.** #41BCFF is 2.13:1 on white, so it is used for icon/spots only
+  (`.otrn-dato-lite__ico`), never for text.
+- **Retained legacy token names** (`--cream`, `--lgrey`, `--paper`, `--dark`, `--text2`) to keep
+  the diff reviewable; their values are municipal/neutral, and the names are documented here.
+- **Remaining gap:** non-text contrast (WCAG 1.4.11) for form-control borders — the system has a
+  single light `--grey` (#E0E0E0, 1.3:1 on white), which is below the 3:1 needed to identify an
+  input boundary. Held for a UX decision rather than inventing a second border token.
+
+### 13.7 Files changed by the implementation
+
+`wp-content/themes/otrn/`: `style.css`, `assets/css/otrn-arauco.css`,
+`assets/css/otrn-landing.css`, `assets/css/otrn-menu.css` (comments/radii), `page-evaluar.php`,
+`page-estadisticas.php`, `page-noticias.php`, `archive-buena_practica.php`,
+`archive-evaluacion.php`, `archive-guia.php`, `archive-indicador.php`,
+`archive-iniciativa_pladetur.php`, `single-buena_practica.php`, `single-evaluacion.php`,
+`single-guia.php`, `single-indicador.php`, `single-iniciativa_pladetur.php`, `single-post.php`,
+`template-parts/material-lista.php`, `template-parts/mapa-evaluaciones.php`,
+`template-parts/pladetur/chart-anual.php`.

@@ -60,6 +60,13 @@ no desktop regressions.
 approved values; the landing fallback block no longer contradicts the system; visual
 spot-check of landing + internal pages.
 
+**Status 2026-10-16:** the client approved the Municipalidad de Arauco identity and the
+mapping, and both items were **executed ahead of this plan** in `52a7d4d` (single token layer
+in `style.css :root`; the landing fallback block deleted). The acceptance criteria above are
+met at the **measured** level (contrast + responsive passes, [VERIFICATION.md](VERIFICATION.md)
+§V17); the **visual spot-check by the client is still pending**, so this phase is implemented
+but **not closed**.
+
 ## Phase 4 — Content & data migration
 
 | Item | Related | Dependencies |

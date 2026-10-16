@@ -76,8 +76,8 @@ see §8.
 | Legacy brand assets: `assets/footer/logo-{corfo,corfo-valparaiso,rau}.png`, `assets/hero-rapanui.jpg`, `assets/logo.png` | Unreferenced (hero only inside unused helper `functions.php:469-485`) | Archive or delete (F12) |
 | GORE logo low-res; RAU logo missing | `assets/logos/README.md` ("Pendiente del cliente") | Request HD originals from client (F13) |
 | Municipal/oficina logo opaque backgrounds | `assets/logos/README.md`; "chapa" treatment in `otrn-arauco.css:66-75` | Accept chapa, get transparent PNGs, or recolor footer |
-| Municipal palette (`#0070FF`, `#41BCFF`, `#DE232B`, `#0C1434`, `#0C0D0E`, `#D6D5D5`) | Absent from code (grep); **roles verified against `muniarauco.cl` 2026-10-16** (`primary #0070FF`, `secondary #DE232B`, `accent #41BCFF`, `text #000000`; `#0C1434` unverifiable, `#0C0D0E`/`#D6D5D5` are Elementor defaults) | **Direction confirmed**; approve the token mapping then implement (F2, [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) §2.5) |
-| `--aru-*` palette interpretation | `otrn-arauco.css:1-17` ("para confirmación del cliente") | Superseded by the confirmed municipal identity: consolidate onto the approved tokens (F6) |
+| Municipal palette (`#0070FF`, `#41BCFF`, `#DE232B`, `#0C1434`, `#0C0D0E`, `#D6D5D5`) | **Implemented 2026-10-16** (`52a7d4d`); roles verified against `muniarauco.cl` (`primary #0070FF`, `secondary #DE232B`, `accent #41BCFF`, `text #000000`; `#0C1434` unverifiable, `#0C0D0E`/`#D6D5D5` are Elementor defaults and were **not** adopted) | **Applied**; pending the client's visual sign-off (F2, [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) §2, mapping §13 of the audit) |
+| `--aru-*` palette interpretation | Deleted in `52a7d4d` (`otrn-arauco.css` no longer defines tokens) | **Resolved** (F6): single source of truth in `style.css :root` |
 
 ## 6. Runtime status (2026-10-15) — [VERIFICATION.md](VERIFICATION.md)
 

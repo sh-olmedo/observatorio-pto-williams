@@ -12,19 +12,28 @@ check first), *Open — decision pending* (blocked on a client/team decision).
 Execution policy: **Phase 0 — runtime verification plus the baseline decisions — precedes any
 implementation** ([ROADMAP.md](ROADMAP.md)), because unverified behavior (F17) can change
 priorities. After Phase 0 is recorded, the recommended implementation order is
-**F3 → F1 → F2/F6 → content/data migration**, verifying each change as it lands.
+**F3 → F1 → F2/F6 → content/data migration**, verifying each change as it lands. (F2/F6 were
+executed ahead of F3/F1 on 2026-10-16 at the client's explicit request; the security pair
+remains first in the proposed plan.)
 
 Runtime status (first pass, **2026-10-15**): measured results are in
 [VERIFICATION.md](VERIFICATION.md); findings below marked *runtime confirmed* carry evidence.
 
+**Update 2026-10-16 (Phase 2 — design tokens):** the client confirmed the Municipalidad de
+Arauco identity and approved the token mapping, so **F2 and F6 moved from "decision pending" to
+"implemented in code, pending visual sign-off"** (local commits, not pushed). The F1 navigation
+was not modified by that pass and its rendered behaviour is unchanged (re-measured):
+[VERIFICATION.md](VERIFICATION.md) §V17, mapping in
+[DESIGN_TOKENS_AUDIT.md](DESIGN_TOKENS_AUDIT.md) §13.
+
 | ID | Title | Sev | Category | Phase |
 | --- | --- | --- | --- | --- |
 | F1 | Mobile navigation unusable on internal pages | P1 | Accessibility/UX | 2 |
-| F2 | Proposed Arauco palette not implemented | P2 | Design decision | 3 |
+| F2 | Municipal identity implemented, pending visual sign-off | P2 | Design decision | 3 |
 | F3 | Evaluation submission without capability check | P1 | Security | 1 |
 | F4 | ACF schemas not versioned (JSON missing) | P2 | Configuration | 0 |
 | F5 | `.otrn-reveal` invisible without JavaScript | P2 | Resilience/A11y | 2 |
-| F6 | Competing token systems (3 layers) | P2 | Design system | 3 |
+| F6 | Competing token systems — resolved (one source) | P2 | Design system | 3 |
 | F7 | Rapa Nui copy still user-visible | P2 | Migration | 4 |
 | F8 | Hardcoded Rapa Nui sectors + coordinates | P2 | Migration | 4 |
 | F9 | Geoportal hardcoded ArcGIS StoryMap | P2 | Migration decision | 4 |
@@ -157,14 +166,20 @@ explicit UX/UI approval of the visuals**. Files: `header.php`, `functions.php`,
   `prefers-reduced-motion` emulation. Session states were produced with a temporary,
   **deleted** mu-plugin (`wp_set_current_user()`, no DB write, no session token), not a real
   login.
+- **2026-10-16 (design-token pass)**: the navigation was **not** modified by the F2/F6
+  implementation; the row/dropdown/drawer thresholds and the account icon were re-measured on
+  the front page and on internal pages (7 pages × 9 widths, 375–1920 px): same breakpoints,
+  0 px horizontal overflow, 0 WCAG AA failures in the header
+  ([VERIFICATION.md](VERIFICATION.md) §V17). The pending items remain the client's visual
+  confirmation of the redesign and of the dropdown spacing.
 
 ### F2 — Municipal identity not implemented (direction confirmed)
 
-- **Severity**: P2 · **Status**: **Open — direction confirmed 2026-10-16; token mapping
-  pending UX/UI approval, not implemented.** **Evidence**: `#0070FF`, `#41BCFF`, `#DE232B`,
-  `#0C1434`, `#0C0D0E`, `#D6D5D5` absent from the theme (grep); implemented palette is the
-  photographed teal/terracotta system (`otrn-arauco.css:17-46`), self-described as pending
-  client confirmation (`otrn-arauco.css:9-12`).
+- **Severity**: P2 · **Status**: **Implemented in code 2026-10-16 (local, not pushed) — the
+  rendered result is _pending client sign-off_**. **Evidence (baseline)**: `#0070FF`, `#41BCFF`,
+  `#DE232B`, `#0C1434`, `#0C0D0E`, `#D6D5D5` absent from the theme (grep); the implemented
+  palette was the photographed teal/terracotta system (`otrn-arauco.css:17-46`),
+  self-described as pending client confirmation (`otrn-arauco.css:9-12`).
 - **Update 2026-10-16 (client decision)**: the site **must follow the Municipalidad de Arauco
   visual identity**; the coral/teal palette is no longer the authoritative design system.
   The palette was verified against the live municipal site (`muniarauco.cl`, Elementor global
@@ -172,13 +187,22 @@ explicit UX/UI approval of the visuals**. Files: `header.php`, `functions.php`,
   blue), text `#000000`** — the roles do **not** follow the brief's ordering. `#0C1434` is
   absent from the municipal site entirely; `#0C0D0E` and `#D6D5D5` appear only in Elementor's
   generic base styles, **not** in the municipal kit. See
-  [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) §0/§2.5 and
+  [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) §2.5 and
   [DESIGN_TOKENS_AUDIT.md](DESIGN_TOKENS_AUDIT.md) §12.
-- **Impact**: the visual identity must change site-wide; blocks/derives from the token
-  consolidation (F6). The three unverified colours must not be treated as brand tokens.
-- **Proposed fix (not approved)**: approve the token mapping, then apply it in one pass
-  (see [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) §2.5 and the audit's consolidation plan §9).
-- **Verification**: written approval of the mapping + rendered token diff before/after + contrast pass.
+- **Implementation (2026-10-16)**: the approved mapping was applied to the theme — single
+  `style.css :root` token block, all `--aru-*` layers deleted, every hardcoded legacy colour and
+  font literal routed through tokens, and the tier/maturity scales moved to semantic status
+  colours. Before → after mapping: [DESIGN_TOKENS_AUDIT.md](DESIGN_TOKENS_AUDIT.md) §13.
+  Measured result: 1 143 text elements across 11 public pages with **0 WCAG AA failures**, 63
+  page × width combinations with **0 px horizontal overflow**, nav/gate/account behaviour
+  unchanged ([VERIFICATION.md](VERIFICATION.md) §V17).
+- **Impact**: the visual identity changed site-wide; blocks/derives from the token consolidation
+  (F6, now resolved).
+- **Remaining (not a code task)**: the client's **visual sign-off** of the rendered result, and
+  the three colours that must not be treated as brand tokens (`#0C1434`, `#0C0D0E`, `#D6D5D5`).
+- **Verification**: rendered token diff before/after + contrast pass + responsive pass — done
+  ([VERIFICATION.md](VERIFICATION.md) §V17); visual confirmation by the client — **pending**
+  (no screenshot is possible while the harness window is not visible).
 
 ### F3 — Evaluation submission without capability check
 
@@ -227,23 +251,23 @@ explicit UX/UI approval of the visuals**. Files: `header.php`, `functions.php`,
 
 ### F6 — Competing token systems
 
-- **Severity**: P2 · **Status**: Open · **Evidence**: three layers —
-  `style.css:16-25`, `.otrn.home` `--aru-*` (`otrn-arauco.css:17-46`) and the **uncommitted**
-  unscoped `:root` fallback (`otrn-landing.css:25-31`) whose values differ from the scoped
-  tokens (e.g. `--aru-terra` `#C0392B` vs `#DF8056`) while its comment claims they are
-  identical; load order + specificity decide per element.
-- **Impact**: inconsistent colors if markup scope changes; misleading comments; fragile
-  theming. Ties into the F2 decision.
-- **Runtime (2026-10-15)**: on `/`, `--aru-terra` resolves simultaneously to `#C0392B`
+- **Severity**: P2 · **Status**: **Resolved in code 2026-10-16 (local, not pushed)** — one token
+  source (`style.css :root`); pending only the client's visual sign-off. **Evidence (baseline)**:
+  three layers — `style.css:16-25`, `.otrn.home` `--aru-*` (`otrn-arauco.css:17-46`) and the
+  **uncommitted** unscoped `:root` fallback (`otrn-landing.css:25-31`) whose values differed from
+  the scoped tokens (e.g. `--aru-terra` `#C0392B` vs `#DF8056`) while its comment claimed they
+  were identical; load order + specificity decided per element.
+- **Impact**: inconsistent colours if markup scope changed; misleading comments; fragile
+  theming. Tied into the F2 decision.
+- **Runtime (2026-10-15)**: on `/`, `--aru-terra` resolved simultaneously to `#C0392B`
   (`:root` fallback) and `#DF8056` (`.otrn.home` scope) ([VERIFICATION.md](VERIFICATION.md) §V8).
-- **Proposed fix (not approved)**: one source of truth; align or delete the fallback.
-- **Verification**: computed-style audit + token diff; re-check after F2 decision.
-- **Update 2026-10-16**: the direction is settled (F2 — municipal identity), so the
-  consolidation is unblocked **in direction** but still awaits mapping approval. The full
-  cascade/specificity inventory (including this layer, five coexisting layers, and 10 real
-  `--aru-*` value conflicts) is in
-  [DESIGN_TOKENS_AUDIT.md](DESIGN_TOKENS_AUDIT.md) §1–§4; the target tokens are in
-  [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) §2.5.
+- **Resolution (2026-10-16)**: both `--aru-*` layers (25 definitions in total, 10 with
+  conflicting values) and the unscoped fallback were **deleted**; every use was remapped to a
+  global token. No `--aru-*`, `--text3`, `--secondary-soft` or `--blue-dark-soft` reference
+  remains (grep). Full remap table: [DESIGN_TOKENS_AUDIT.md](DESIGN_TOKENS_AUDIT.md) §13.1–13.2;
+  token resolution re-measured per page: [VERIFICATION.md](VERIFICATION.md) §V17.
+- **Verification**: computed-style audit + token diff, re-executed after the change — done;
+  the remaining step is the client's visual confirmation.
 
 ### F7 — Rapa Nui copy still user-visible
 

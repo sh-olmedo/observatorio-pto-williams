@@ -1,107 +1,114 @@
 # Design System
 
-Description of the **implemented** visual system as of commit `5f43933`, plus the
-**uncommitted** working-tree deltas (clearly marked).
+Description of the **implemented** visual system. As of 2026-10-16 the theme follows the
+**Municipalidad de Arauco** identity: the global tokens were consolidated onto the verified
+municipal palette and applied across the site (Phase 2). The coral/teal system is no longer the
+design system; it survives only as the `5f43933` baseline, recorded in
+[DESIGN_TOKENS_AUDIT.md](DESIGN_TOKENS_AUDIT.md) §§1–11 and in §8 below.
 
-Runtime pass 2026-10-15: the F6 token divergence and the F1/F5 defects are confirmed
-([VERIFICATION.md](VERIFICATION.md)); the full visual review is still pending.
-
-**Update 2026-10-16 — direction confirmed:** the site must follow the **Municipalidad de
-Arauco** visual identity (§0, §2.5). The coral/teal system documented below is **no longer the
-authoritative design system**; it is kept as the *technical baseline* only. The colour roles
-are verified against the live municipal site (§2.5); the token mapping itself is **pending
-UX/UI approval** and **not implemented**. The full token/cascade audit is persisted in
-[DESIGN_TOKENS_AUDIT.md](DESIGN_TOKENS_AUDIT.md).
+**Status of this document.** The token mapping was approved by the client before
+implementation (2026-10-16) and is now **applied in code**; the *visual* result is **pending the
+client's sign-off**, as is the F1 navigation review. Nothing here is a "final approval".
+Runtime evidence for every claim below: [VERIFICATION.md](VERIFICATION.md) §V17.
 
 ## 0. Confirmed direction (2026-10-16)
 
-The client confirmed that **Observatorio Turístico de Arauco must follow the Municipalidad de
-Arauco visual identity**. The coral/teal palette described in §2 is therefore **not the
-authoritative design system** any more; it is retained here as the *implemented baseline* until
-the consolidated municipal tokens are approved and applied.
+The client confirmed that the site must follow the **Municipalidad de Arauco** visual identity.
+The verified foundation (palette roles, typography, geometry, read from the municipal site's
+Elementor kit) is in §2.5. Three of the six colours in the original brief have **no verified
+municipal source** and were **not** adopted (§2.6).
 
-- **Verified** municipal foundation (palette roles, typography, geometry): §2.5.
-- **Pending UX/UI approval**: the token mapping (existing token → municipal token) and the
-  colours that have **no** verified municipal source (§2.5.3). **Nothing is implemented yet.**
-- Technical baseline (full token, cascade, specificity and hardcoded-value inventory):
-  [DESIGN_TOKENS_AUDIT.md](DESIGN_TOKENS_AUDIT.md).
+## 1. One source of truth (F6 resolved)
 
-## 1. Sources of truth — and their gaps
+`style.css :root` (§2.1) is the **only** place where the theme defines tokens. The two
+competing layers are gone:
 
-- Code comments reference `docs/design-tokens.md` (`style.css:11`) but that file does not
-  exist anywhere in the repository (F15). A separate, current token/cascade audit **does**
-  exist: [DESIGN_TOKENS_AUDIT.md](DESIGN_TOKENS_AUDIT.md).
-- Three token layers currently coexist (F6):
-  1. `style.css:16-25` — global `:root` tokens (committed values; see §2).
-  2. `assets/css/otrn-arauco.css:17-46` — `--aru-*` tokens scoped to `.otrn.home`,
-     loaded **only on the front page**; its own header comment states it is an
-     *interpretation* of the approved photographs and **pending client confirmation**
-     (`otrn-arauco.css:1-17`).
-  3. `assets/css/otrn-landing.css:25-31` — an **uncommitted** unscoped `:root` fallback
-     duplicating `--aru-*` names with *different values* while claiming to be "idénticos
-     al sistema" (see §2.3).
-
-## 2. Actual tokens
-
-### 2.1 Global tokens — `style.css:16-25` *(working tree)*
-
-| Token | Value | Notes |
+| Removed layer | Was | Now |
 | --- | --- | --- |
-| `--primary` / `--primary-dark` / `--primary-soft` / `--primary-tint` | `#DF8056` / `#A05C3D` / `#FAEEE9` / `#F0C5B2` | Terracotta family |
-| `--secondary` / `--secondary-soft` | `#2F6F79` / `#E3ECED` | Teal |
-| `--blue-dark` / `--blue-dark-soft` | `#0E506D` / `#DFE8EC` | Deep blue |
-| `--dark` | `#2B2B2B` | **Uncommitted fix**; committed value was `#333333` |
-| `--text2` / `--text3` | `#666666` / `#888888` | Secondary text |
-| `--grey` / `--cream` / `--lgrey` | `#E8EEE6` / `#F6F3E0` / `#F0F0F0` | Surfaces/borders |
-| `--error` | `#EA5252` | Errors |
-| `--paper` | `#FFFFFF` | Background |
-| `--radius` / `--radius-sm` | `14px` / `10px` | Radii |
-| `--font-title` | `'Montserrat',system-ui,sans-serif` | **Uncommitted addition**; see §3 |
+| `otrn-arauco.css:17-46` — `--aru-*` aliases scoped to `.otrn.home` (10 real value conflicts) | Loaded only on the front page; self-described as an unapproved *interpretation* of the photographs | Deleted. The file keeps only what is intrinsic to the front page: the fixed translucent header and the footer top margin. |
+| `otrn-landing.css` — **unscoped** `:root` `--aru-*` fallback with *different* values from the scoped block | Two live values for the same name (e.g. `--aru-terra` `#C0392B` vs `#DF8056`) | Deleted entirely. Every `--aru-*` use was remapped to a global token. |
 
-### 2.2 Landing tokens — `otrn-arauco.css:17-46` (committed)
+No `--aru-*`, `--text3`, `--secondary-soft` or `--blue-dark-soft` reference remains anywhere in
+the theme (grep). Remaining token names that look legacy (`--cream`, `--lgrey`, `--paper`,
+`--dark`, `--text2`) are kept deliberately to keep the diff reviewable; their values are
+municipal or neutral — see the mapping in [DESIGN_TOKENS_AUDIT.md](DESIGN_TOKENS_AUDIT.md) §13.1.
 
-Scoped to `.otrn.home`, loaded only on the front page:
+## 2. Tokens
 
-- Ocean: `--aru-teal:#2F6F79`, `--aru-teal-deep:#145E6B`, `--aru-teal-soft:#E3ECED`,
-  `--aru-ink:#0E506D`, `--aru-ink-deep:#0A2E3C`.
-- Earth: `--aru-terra:#DF8056`, `--aru-terra-deep:#A05C3D`, `--aru-terra-soft:#FAEEE9`,
-  `--aru-terra-tint:#F0C5B2`.
-- Sand/neutrals: `--aru-arena:#F6F3E0`, `--aru-papel:#FFFFFF`, `--aru-texto:#2B2B2B`,
-  `--aru-texto-2:#5A5A5A`, `--aru-texto-3:#8A8A8A`.
-- Footer neutral: `--aru-footer:#F7F7F7` (client decision, per comment).
-- Rhythm/radii: `--aru-gap:clamp(48px,8vw,120px)`, `--aru-radio:14px`, `--aru-radio-sm:10px`.
+### 2.1 Global tokens — `style.css :root` (authoritative)
 
-### 2.3 Uncommitted landing fallback — `otrn-landing.css:25-31`
+| Group | Token | Value | Role |
+| --- | --- | --- | --- |
+| Brand | `--primary` | `#0070FF` | Municipal primary. Fills **without** text, borders, chart series, ≥24 px or 800-weight headings. **Not** for small text (4.41:1 on white, below AA). |
+| Brand | `--primary-dark` | `#0050B8` | Accessible brand blue (7.40:1 on white): all small text, links, active state, focus outlines, and any solid fill that carries small white text. |
+| Brand | `--primary-soft` | `#E7F1FF` | Brand tint surface (chips, hover highlights, table heads). Pairs with `--primary-dark` (6.49:1). |
+| Brand | `--primary-tint` | `#BBD8FF` | Mid brand tint (maturity ramp step 2; 5.06:1 with `--primary-dark`). |
+| Brand | `--secondary` | `#DE232B` | Municipal red. Emphasis and the news CTA (4.79:1 both ways). |
+| Brand | `--accent` | `#41BCFF` | Municipal light blue. **Decorative only** (2.13:1 on white) — icons and spots, never text. |
+| Brand | `--blue-dark` | `#304A83` | Institutional dark blue surfaces (photo fallback, indicator drawer, inactive chart bars; 8.63:1 with white). |
+| Neutral | `--dark` | `#000000` | Body text (21:1 on white). |
+| Neutral | `--text2` | `#707070` | Secondary text. Passes AA on every surface it is used on (4.58:1 on `--lgrey`, 4.66:1 on `--cream`, 4.95:1 on white). |
+| Neutral | `--grey` | `#E0E0E0` | Borders and dividers. Never a surface behind `--text2`. |
+| Neutral | `--cream` | `#F8F8F8` | Municipal neutral background: sections, footer. |
+| Neutral | `--lgrey` | `#F6F6F6` | Neutral component fill: table heads, progress tracks, chips. Lightened from `#F0F0F0` so `--text2` reaches 4.58:1. |
+| Neutral | `--paper` | `#FFFFFF` | Surface. |
+| Status | `--success` / `--success-soft` | `#0F7B4E` / `#E4F5EC` | 4.69:1 |
+| Status | `--warning` / `--warning-soft` | `#8A5A00` / `#FCF1DC` | 5.29:1 |
+| Status | `--error` / `--error-soft` | `#C0272D` / `#FBE4E4` | 4.85:1 |
+| Status | `--neutral` / `--neutral-soft` | `#52525B` / `var(--lgrey)` | 7.15:1 |
+| Rhythm | `--space-section` | `clamp(48px,8vw,120px)` | Vertical section spacing. |
+| Geometry | `--radius` / `--radius-sm` / `--radius-pill` | `10px` / `6px` / `30px` | Containers and controls / dense controls / pills (buttons and chips only). |
+| Type | `--font-title` / `--font-mono` | `'Montserrat',…` / `'IBM Plex Mono',monospace` | UI text / numeric content. |
 
-Unscoped `:root` fallback with **different values** from §2.2 — e.g. `--aru-terra:#C0392B`
-(vs `#DF8056`), `--aru-teal:#1A6B77` (vs `#2F6F79`), `--aru-ink:#0A2E3C` (vs `#0E506D`),
-`--aru-texto-2:#5A6B70` (vs `#5A5A5A`), plus extra tokens `--aru-papel-2`, `--aru-linea`
-and smaller radii (`10px`/`6px`). For elements inside `.otrn.home` the scoped §2.2 values
-win; for anything outside that subtree the fallback applies. The comment claims the values
-are identical to the system, which is not the case — this is issue F6.
-**Runtime (2026-10-15)**: on `/`, `:root` resolves `--aru-terra:#C0392B` while `.otrn.home`
-resolves `#DF8056` — both live simultaneously (confirmed).
+### 2.2 Brand and status are separate systems
 
-### 2.4 Municipal palette in the brief — **direction confirmed, mapping pending**
+Municipal brand colour never carries meaning, and status colour never carries brand. Status
+components always pair a **soft tint** with the **strong colour** (badge, pill, KPI, score box,
+percent badge), and the traffic-light scale is:
 
-The six colours carried in the brief are `#0070FF`, `#41BCFF`, `#DE232B`, `#0C1434`,
-`#0C0D0E`, `#D6D5D5`. None of them exists in the theme (grep); only `#F7F7F7` survives
-(the landing footer neutral, §2.2).
+| Tier | Meaning | Colours |
+| --- | --- | --- |
+| `tier-high` | Bueno (67–100 %) | `--success` on `--success-soft` |
+| `tier-mid` | Medio (34–66 %) | `--warning` on `--warning-soft` |
+| `tier-low` | Bajo (0–33 %) | `--error` on `--error-soft` |
+| `tier-na` | Sin datos | `--neutral` on `--neutral-soft` |
 
-**2026-10-16:** the direction is **confirmed** — the site adopts the Municipalidad de Arauco
-identity. The three colours verified against the live municipal site are in §2.5; the other
-three (`#0C1434`, `#0C0D0E`, `#D6D5D5`) have **no verified municipal source** and must not be
-adopted as brand tokens without approval (§2.5.3). The token mapping is **not implemented**.
+The **maturity scale** (autodiagnóstico 0–3, `.opt.o*` / `.otrn-score-tag.s*`) is *not* a status
+scale: it is a brand-blue ramp with a red floor — `o0/s0` error-soft, `o1/s1` primary-soft,
+`o2/s2` primary-tint, `o3/s3` primary-dark, `ona/sna` neutral. Before 2026-10-16 both scales
+were painted with the same teal/coral tokens, which is why a "good" answer and a "high" tier
+looked identical.
+
+The Leaflet map reads these tokens at runtime
+(`template-parts/mapa-evaluaciones.php`: `getComputedStyle(document.documentElement)`), so the
+map, its legend and the CSS cannot drift apart.
+
+### 2.3 Contrast rules of thumb
+
+- Small text on white/`--cream`: `--primary-dark`, `--dark`, `--text2`, or a status strong colour.
+- `--primary` only where it is a fill (no text on it), a border, a chart series, or a heading
+  ≥24 px / weight 800 (4.41:1 clears the 3:1 large-text threshold).
+- Solid fills that carry small white text use `--primary-dark` (7.40:1), never `--primary`.
+- White on `--secondary` (4.79:1) and on `--blue-dark` (8.63:1) are both safe.
+- **Known gap:** non-text contrast (WCAG 1.4.11) of form-control borders. The system has a single
+  light `--grey` (#E0E0E0, 1.3:1 on white), below the 3:1 needed to identify an input boundary.
+  Held for a UX decision instead of inventing a second border token.
+
+### 2.4 Geometry
+
+Municipal language is flat: **no decorative shadows** (the few remaining ones are 1 px borders
+emulations on cards and the drawer/panel shadow), the dominant radius is the **30 px pill** for
+buttons and chips, **10 px** for cards, panels, tables and larger controls, and **6 px** for
+dense controls (scale options, sub-nav rows, focus rings). Pill styling is **not** forced on
+cards, tables or containers.
 
 ### 2.5 Municipal foundation — verified 2026-10-16
 
-Verified against the live municipal site **`muniarauco.cl`** (identified via search; the site
-runs WordPress + Elementor; its global palette is the Elementor **kit**,
-`wp-content/uploads/elementor/css/post-5.css`). All 44 stylesheets the municipal home page
-loads were downloaded and searched; the in-repo institutional logos were histogrammed as a
-cross-check. Full evidence: [DESIGN_TOKENS_AUDIT.md](DESIGN_TOKENS_AUDIT.md) §12.
-
-#### 2.5.1 Verified palette and semantic roles
+Verified against the live municipal site **`muniarauco.cl`** (WordPress + Elementor; its global
+palette is the Elementor kit, `wp-content/uploads/elementor/css/post-5.css`). All 44
+stylesheets the municipal home page loads were downloaded and searched; the in-repo
+institutional logos were histogrammed as a cross-check. Full evidence:
+[DESIGN_TOKENS_AUDIT.md](DESIGN_TOKENS_AUDIT.md) §12.
 
 | Elementor global | Hex | Semantic role (verified) | Measured usage |
 | --- | --- | --- | --- |
@@ -112,21 +119,17 @@ cross-check. Full evidence: [DESIGN_TOKENS_AUDIT.md](DESIGN_TOKENS_AUDIT.md) §1
 | (white) | `#FFFFFF` | Surfaces | home 27 · footer 9 · header 11 |
 | kit background | `#F8F8F8` | Page background | kit `background-color` |
 
-**Roles do not follow the brief's order:** in the municipal kit the **red `#DE232B` is the
-global *secondary*** and the **light blue `#41BCFF` is the global *accent*** — the first colour
-(`#0070FF`) *is* the global primary, but not because it is listed first.
+**Roles do not follow the brief's order:** in the municipal kit the red `#DE232B` is the global
+*secondary* and the light blue `#41BCFF` is the global *accent*.
 
-#### 2.5.2 Verified typography, geometry and other properties
+Other verified properties: fonts **Montserrat** (primary + text) and **Poppins** (secondary);
+weights 600/400/500 plus in-page 700/800; container 1200 px (1024 at ≤1024, 767 at ≤767);
+radii **30 px** dominant plus 3 px and 10 px; **no shadows** on the templates. Additional
+page-level site colours: `#304A83` (header bg), `#0050B8` (dark blue text on the accent
+surface), `#707070` (grey text), `#FF7E24`, `#10B981`, `#004D69` — all adopted as above except
+the last three, which are not used by the theme.
 
-- Fonts: **Montserrat** (primary + text) and **Poppins** (secondary) — both already available
-  in spirit (the child theme self-hosts Montserrat; Poppins is not shipped here).
-- Weights: primary 600, text 400, accent 500, secondary 400; in-page 700 (19×), 800 (7×),
-  500 (7×), 600 (2×). Home heading sizes 32/24/29/20/18/16 px.
-- Container: **1200 px** (desktop) / 1024 px (≤1024) / **767 px** (≤767); widget spacing 20 px.
-- Radii: **30 px** dominant (pill, 17×), plus 3 px and 10 px.
-- Shadows: none on the templates (flat).
-
-#### 2.5.3 Not verified as municipal — approval required
+### 2.6 Not verified as municipal — not adopted
 
 | Colour | Finding |
 | --- | --- |
@@ -134,13 +137,9 @@ global *secondary*** and the **light blue `#41BCFF` is the global *accent*** —
 | `#0C0D0E` | Only in Elementor's generic `base-desktop.css` and `widget-divider.min.css` — **Elementor defaults**, not the municipal kit. |
 | `#D6D5D5` | Only in Elementor's generic `base-desktop.css` — **Elementor default**, not the municipal kit. |
 
-Additional site colours (page-level, not kit-level): `#304A83` (header bg), `#0050B8` (dark
-blue text on the accent surface), `#707070`/`#706F6F` (grey text), `#FF7E24`, `#10B981`,
-`#004D69`.
-
-The proposed **token mapping** (which existing global token adopts which municipal colour, and
-what happens to the tokens with no municipal equivalent) is presented in the handoff message
-and is **pending UX/UI approval before any CSS change**.
+These must not be adopted as brand tokens without explicit approval. The brief's `#0C1434`
+(deep navy) is therefore represented in the theme by the **verified** institutional blue
+`#304A83`.
 
 ## 3. Typography
 
@@ -148,76 +147,107 @@ and is **pending UX/UI approval before any CSS change**.
   (400/500/600/700) for figures, both self-hosted woff2 subsets with `font-display:swap`
   (`assets/css/fonts.css`, inventory in `assets/fonts/README.md`). No Google Fonts runtime
   dependency.
-- Usage: `.otrn .mono` and stat/table figures use IBM Plex Mono; headings use
-  `var(--font-title)` (heading weight 800, tight letter-spacing).
-- **Historical defect (being fixed in the working tree)**: committed `style.css` declared
-  `font-family:'Manrope',…` in several places while Manrope is **not shipped** — text fell
-  back to `system-ui`. The uncommitted delta replaces Manrope with `var(--font-title)`
-  (Montserrat) (`style.css:29-30, 98, 501`, `otrn-landing.css` title rule).
+- `--font-title` is Montserrat and `--font-mono` is IBM Plex Mono; every font declaration goes
+  through them. The historical defect (the committed CSS asked for `'Manrope'`, which is **not
+  shipped** — text fell back to `system-ui`) is fixed: no `Manrope` reference remains (grep).
+- **Poppins** (the municipal *secondary* family) is **not** declared as a token: the theme does
+  not ship it, so a `--font-secondary` would be a broken fallback. Add it only with the font
+  files.
+- IBM Plex Mono for numeric content is a **temporary** decision inherited from the baseline.
 
 ## 4. Components & conventions
 
 - Naming: `otrn-` prefix, BEM-ish blocks (`otrn-act__eyebrow`, `otrn-rail__item`,
   `otrn-burger__line`). Layout container `.wrap` = max-width 1440 px, 32 px padding.
-- Chrome: `.otrn-header` (72 px, border-bottom), `.otrn-brand`, `.otrn-nav`, `.otrn-login`,
-  `.otrn-burger`; footer = logo strip (`--cream`) + copy line.
-- Reusables: page head with `.eyebrow` chip; stat boxes (`.otrn-stats`/`.otrn-stat`);
-  cards (`.otrn-lin-card`, `.otrn-indexcard`, news cards); buttons (`.otrn-btn`, `.ghost`
-  variant on the eval form); tables (`.otrn-table`, with a `tarjetas-movil` mode that turns
-  rows into labeled cards on small screens); provisional notice (`.otrn-provisional`);
-  form controls on `/evaluar/`.
+- Chrome: `.otrn-header` (72 px, border-bottom), `.otrn-brand`, `.otrn-nav` (grouped row +
+  dropdowns + «Más» + mobile drawer, `assets/css/otrn-menu.css`), `.otrn-cuenta` (person icon
+  account control), `.otrn-burger`. The legacy `.otrn-login` button was removed: no markup used
+  it.
+- **One footer for both page families**: three institutional Arauco logos, each on a white
+  "plate" (`--paper` + `--grey` border, no shadow) because two of the PNGs have an opaque light
+  grey inner background, plus the copy line. The front page only overrides `margin-top:0`.
+- Reusables: page head with `.eyebrow` chip; stat boxes (`.otrn-stats`/`.otrn-stat`, plus an
+  `.accent` variant on `--primary-soft`); cards (`.otrn-lin-card`, `.otrn-indexcard`, news
+  cards); buttons (`.otrn-btn` — pill, `--primary-dark`; `.ghost` variant; the `.teal` variant
+  is now red); row links (`.otrn-rowlink`, solid/ghost); tables (`.otrn-table`, with a
+  `tarjetas-movil` mode that turns rows into labelled cards on small screens); filters/fields on
+  the archive forms; provisional notice (`.otrn-provisional`, now `--warning`); modality icons
+  (`.otrn-stat.accent`, `.otrn-dato-lite__ico` → `--accent`).
+- Link colours must beat `.otrn a{color:inherit}` (0,1,1). Button-like links therefore carry an
+  explicit higher-specificity rule — `.otrn a.otrn-btn`, `.otrn a.otrn-rowlink`,
+  `.otrn a.otrn-more`. This is why the solid row link was invisible-on-blue before the fix
+  ([VERIFICATION.md](VERIFICATION.md) §V17).
 - Landing scene system: `.otrn-landing`, `.otrn-stage` (shared photographic level),
-  `.otrn-act` scenes, `.otrn-rail` (01–05 indicator), `.otrn-reveal` (scroll reveal),
-  `.otrn-home-menu`, burger classes for the mobile panel.
+  `.otrn-act` scenes, `.otrn-rail` (01–05 indicator), `.otrn-reveal` (scroll reveal), burger
+  classes for the mobile panel.
 
-## 5. Responsive behavior (static analysis)
+## 5. Responsive behaviour
 
-Breakpoints present in the CSS: 1440 (wrap), 1280, 992, 980, **782** (admin bar), 768, 720,
-640, 600, 480, plus the navigation thresholds **1152/1151/910/909/680/679** (§V16) and a
-`prefers-reduced-motion` block (`otrn-landing.css:205-248`). The list is not aligned (992 vs
-980; 720 vs 768 vs 679/680) — see [DESIGN_TOKENS_AUDIT.md](DESIGN_TOKENS_AUDIT.md) §3.
-
-- **≤600 px**: `.otrn-nav{display:none}` (`style.css:508-509`). The intended replacement
-  (burger + sliding panel) is defined **only** in `otrn-landing.css` (`:194, :213-224`),
-  which loads only on the front page → internal pages lose navigation on phones (F1).
-  **Runtime (2026-10-15)**: confirmed on internal *and* front pages (nav 0×0, `display:none`;
-  the burger toggles state only).
-- **≤768 px**: landing switches to static mode (scenes stack full-bleed); rail hidden.
-- Grids collapse (data/news grids to 2 columns at 768, 1 at 480); head layouts stack at 980.
-- `prefers-reduced-motion`: animations neutralized, reveals forced visible, nav transition
-  off (`otrn-landing.css:241-248`).
-- Unverified: real-device behavior and touch/keyboard interaction; the 601–768 px internal
-  range was measured as visible-but-cramped (runtime 2026-10-15).
+- Breakpoints: 1440 (wrap), 1280, 992, 980, **782** (admin bar), 768, 720, 640, 600, 480, plus
+  the measured navigation thresholds **1152 / 910 / 680** (`otrn-menu.css`) and the footer logo
+  step at 600. The list is still not fully aligned (992 vs 980; 720 vs 768 vs 679/680) —
+  [DESIGN_TOKENS_AUDIT.md](DESIGN_TOKENS_AUDIT.md) §3.
+- Navigation (F1, implemented `5f17b38`): one grouped row from 1152 px, progressive collapse
+  into «Más» at 910 and 680, and an accessible full-height drawer with a burger at ≤679 px.
+  **Verified (2026-10-16)**: 7 pages × 9 widths from 375 to 1920 px, **0 px horizontal
+  overflow**, burger/panel thresholds identical on the front page and on internal pages, and
+  the token pass did not change any of it ([VERIFICATION.md](VERIFICATION.md) §V17).
+- ≤600 px: footer logos drop to 40 px.
+- ≤768 px: the landing switches to static mode (scenes stack full-bleed) and the rail is
+  hidden; grids collapse (data/news grids to 2 columns at 768, 1 at 480); head layouts stack at
+  980.
+- `prefers-reduced-motion`: animations neutralised, reveals forced visible, nav transition off
+  (`otrn-landing.css`).
+- Unverified: real-device behaviour and touch/keyboard interaction.
 
 ## 6. Scrollytelling architecture
 
-- **Static mode (default)**: no JS / reduced-motion / ≤768 px — scenes stack with photos
-  and legible text (`front-page.php:1-25`).
-- **Immersive mode**: desktop + GSAP/ScrollTrigger; shared stage pinned with `scrub:1`,
-  three crossfaded scenes, hero panel expanding to full-bleed, rail synced to scroll
-  progress (`assets/otrn-landing.js:75-160`).
+- **Static mode (default)**: no JS / reduced-motion / ≤768 px — scenes stack with photos and
+  legible text (`front-page.php`).
+- **Immersive mode**: desktop + GSAP/ScrollTrigger; the shared stage is pinned with `scrub:1`,
+  three crossfaded scenes, the hero panel expanding to full-bleed, and the rail synced to scroll
+  progress (`assets/otrn-landing.js`).
 - Reveal system: IntersectionObserver adds `.is-visible`; CSS pre-hides with
-  `.otrn-reveal{opacity:0}` (`otrn-landing.css:187-188`). **With JS fully disabled and no
-  reduced-motion preference, revealed content stays invisible** (F5). Runtime (2026-10-15):
-  confirmed — 9/9 hidden with scripts blocked; 3/9 reveal with JS in the control.
-- Vendor: GSAP + ScrollTrigger self-hosted (`assets/vendor/`), loaded only on the front
-  page (~115 KB noted in code comments); version fallback strings "3.12.5".
+  `.otrn-reveal{opacity:0}`. **With JS fully disabled and no reduced-motion preference, revealed
+  content stays invisible** (F5, confirmed at runtime).
+- **Unverifiable from computed styles**: text over the photographs. The scene veils are now the
+  institutional blue (`rgba(48,74,131,…)`) instead of the old dark teal, so the overlay
+  contrast changed; it still needs a human look at the rendered page
+  ([VERIFICATION.md](VERIFICATION.md) §V17).
+- Vendor: GSAP + ScrollTrigger self-hosted (`assets/vendor/`), loaded only on the front page
+  (~115 KB noted in code comments).
 
-## 7. Discrepancies vs the proposed Arauco identity
+## 7. Status vs the municipal identity
 
-| Aspect | Implemented | Proposed | Status |
+| Aspect | Before (baseline `5f43933`) | Now (implemented) | Status |
 | --- | --- | --- | --- |
-| Palette | Teal/terracotta derived from photos (`--aru-*`, §2.2) — **baseline only** | Municipal identity (§2.5), verified against `muniarauco.cl` | **Direction confirmed 2026-10-16**; token mapping pending UX/UI approval, not implemented (F2) |
-| Token layering | Three overlapping systems (§2.1–2.3) | One system | Conflict (F6) |
-| Typography | Montserrat + IBM Plex Mono (matches brief) | Montserrat + IBM Plex Mono | Aligned |
-| Institutional logos | 3 Arauco logos in footer; GORE low-res; RAU absent | Full quality set | Sourcing pending (F13) |
-| Rapa Nui leftovers | Still present in copy/tokens/theme name | Arauco only | Migration pending (F7–F10, §ARAUCO_MIGRATION) |
+| Palette | Teal/terracotta from photographs (`--aru-*`) | Municipal identity verified against `muniarauco.cl` (§2.1, §2.5) | **Applied**; visual sign-off pending (F2) |
+| Token layering | Three overlapping systems | One (`style.css :root`) | **Resolved** (F6) |
+| Suite of colours | 14 tokens, 3 semantic pairs | 26 tokens incl. 4 status pairs + rhythm + pill radius | Applied |
+| Typography | Montserrat + IBM Plex Mono, but Manrope requested | Montserrat + IBM Plex Mono via `--font-title`/`--font-mono` | Resolved (Manrope) |
+| Institutional logos | 3 Arauco logos, GORE low-res, RAU absent | Same 3 logos, now on white plates with one height | Source material still pending (F13) |
+| Rapa Nui leftovers | Present in copy/tokens/theme name | Tokens cleaned; **copy/theme name untouched** | Migration pending (F7–F10) |
 
-## 8. Working-tree deltas relevant to design (uncommitted, do not lose)
+## 8. Before → after token mapping
 
-- `style.css`: `--dark` `#333333`→`#2B2B2B`; Manrope→`var(--font-title)`; new `--font-title`.
-- `otrn-landing.css`: adds the §2.3 fallback block; title rule now uses
-  `var(--font-title,'Montserrat',…)`.
-- `99-studio-loader.php`: machine-specific Studio temp path — unrelated to design.
+The full table (token, previous value, new value, role) plus the alias remap, the semantic
+remapping of tiers/scales, the literal replacements and the deleted dead CSS is in
+[DESIGN_TOKENS_AUDIT.md](DESIGN_TOKENS_AUDIT.md) **§13**. Highlights:
 
-See [HANDOFF.md](HANDOFF.md) for the exact diff summary.
+| Was | Is |
+| --- | --- |
+| `--primary` coral `#DF8056`, `--primary-dark` `#A05C3D` | `#0070FF` / `#0050B8` |
+| `--secondary` teal `#2F6F79` | municipal red `#DE232B` |
+| — | new `--accent #41BCFF` (decorative) |
+| `--dark` `#2B2B2B`, `--text2` `#666666`, `--text3` `#888888` | `#000000`, `#707070`, *removed* |
+| single `--error` | `--success`/`--warning`/`--error`/`--neutral`, each with a soft pair |
+| `--radius 14px` / `--radius-sm 10px` | `10px` / `6px` + new `--radius-pill 30px` |
+| `--aru-*` (2 layers) | deleted; all uses remapped to global tokens |
+
+## 9. Open items for the client
+
+1. **Visual sign-off** of the token pass (and of the F1 navigation) — nothing here is approved.
+2. **Non-text contrast** of form-control borders (§2.3) — needs a UX decision.
+3. **Poppins**: ship it or drop it from the municipal parity list (§3).
+4. Text over the landing photographs: the veil hue changed (teal → institutional blue) and the
+   rendered result was not measurable from computed styles (§6).

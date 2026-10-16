@@ -406,3 +406,88 @@ from the stylesheet, not exercised); real touch devices and the iOS dynamic view
 `prefers-reduced-motion: reduce` emulation; a real login (the session was simulated
 server-side). Also untouched by design: the landing/internal page content, the private gates
 (re-confirmed 302/302/302 and `/criterio/` 301) and the orphan routes.
+
+## V17 — Municipal token implementation (F2/F6) — applied and measured (2026-10-16)
+
+Phase 2 of the approved direction: the global design tokens were consolidated onto the
+verified Municipalidad de Arauco identity and applied site-wide. **This pass did change
+application code** (`style.css`, the three asset stylesheets and seven PHP templates). It does
+not change content, URLs, authentication, database rows or the private gate. The mapping was
+approved by the client before implementation; the **visual result is still pending the
+client's sign-off** (the F1 nav review is likewise still open).
+
+**Scope of the change**
+
+| Area | Change |
+| --- | --- |
+| `style.css :root` | Single authoritative token block (brand + neutrals + semantic status + rhythm + radii + fonts). 14 legacy tokens removed. |
+| `assets/css/otrn-arauco.css` | Rewritten: the front-page `--aru-*` token block deleted; only the fixed translucent header and the footer top margin remain. |
+| `assets/css/otrn-landing.css` | Unscoped `:root` `--aru-*` fallback deleted (the F6 conflict); every `--aru-*` use remapped; dead `.otrn-home-menu` rule removed; `:root` veil/shadow colours converted to the institutional blue. |
+| `assets/css/otrn-menu.css` | Comments only (stale coral/terracota and `--text3` references); two dropdown radii moved to `--radius`. **No behavioural or colour change.** |
+| PHP (7 files) | `--text3` → `--text2`, literal mono font → `var(--font-mono)`, inline `border-radius:14px` → `var(--radius)`, `rgba(51,51,51,…)` → `rgba(0,0,0,…)`, map legend/JS tier colours → semantic status tokens, chart/sparkline series colours → brand tokens. |
+| Explicitly **not** touched | Content, copy, URLs, `functions.php` logic, the private gate, the account icon markup, `assets/otrn-landing.js`, vendor files. |
+
+**Token resolution** (computed `:root`, `/`): `--primary #0070FF`, `--primary-dark #0050B8`,
+`--primary-soft #E7F1FF`, `--primary-tint #BBD8FF`, `--secondary #DE232B`, `--accent #41BCFF`,
+`--blue-dark #304A83`, `--dark #000000`, `--text2 #707070`, `--grey #E0E0E0`,
+`--cream #F8F8F8`, `--lgrey #F6F6F6`, `--paper #FFFFFF`, `--success #0F7B4E`,
+`--warning #8A5A00`, `--error #C0272D`, `--neutral #52525B`, `--radius 10px`,
+`--radius-sm 6px`, `--radius-pill 30px`, `--font-title Montserrat`, `--font-mono IBM Plex
+Mono`, `--space-section clamp(48px,8vw,120px)`. All 26 tokens resolve; `--text3`,
+`--secondary-soft`, `--blue-dark-soft` and every `--aru-*` name are gone from the tree (grep).
+
+**Responsive pass — 63 combinations, 0 px horizontal overflow.** 7 pages (`/`, `/indicadores/`,
+`/seguimiento-pladetur/`, `/material/documentacion-tecnica/`, `/buenas-practicas/`,
+`/noticias/`, `/acerca/`) × 9 widths (375, 414, 679, 680, 768, 910, 1152, 1440, 1920 px),
+measured as computed styles in same-origin iframes. Navigation behaviour is unchanged at every
+width: burger `display:flex` at ≤679 px with `.otrn-nav` as a `fixed` full-height panel, and
+burger `display:none` with `.otrn-nav` `static` from 680 px up — identical on the front page
+and on internal pages, i.e. the rewritten `otrn-landing.css` did not disturb the F1 nav.
+
+**Contrast pass — 0 WCAG AA failures.** A per-element computed-style scan (every text-bearing
+element, effective background resolved by walking ancestors, large text judged at its own 3:1
+threshold) over the 11 public pages above: **1 143 elements checked, 0 failures**. 10 elements
+on `/` were excluded because they sit on the immersive photo layer (scene text over
+photographs — not measurable from computed styles and unchanged by this pass).
+
+A synthetic lab page injected into `/indicadores/` exercised the state and scoring components
+that only occur on the private pages (`tier-high/mid/low/na` KPIs, status pills, score boxes,
+score tags `s0`–`sna`, the 0–3 maturity scale, notices, tags, priorities, tabs, buttons):
+**75 elements, 0 failures**. Measured pairs (text on tint): success `4.69`, warning `5.29`,
+error `4.85`, neutral `7.15`; score tags `s0 4.85`, `s1 6.49`, `s2 5.06`, `s3 7.40`,
+`sna 7.15`; `.otrn-tag` 6.49 on `--primary-soft`; `.otrn-tag.borrador` / table head /
+question index / inactive tab 4.58 on `--lgrey`; white on `--primary-dark` 7.40; white on
+`--secondary` 4.79; `.otrn-dato` white on `--blue-dark` 8.63.
+
+**Contrast defects found and fixed during this pass** (all were latent, exposed by the darker
+brand blue):
+
+1. `.otrn-table thead th` and every other `--text2` label on a neutral fill failed AA
+   (4.35:1 on the old `#F0F0F0`): the fill token moved to `#F6F6F6` (4.58:1) and the row-hover
+   fill from `--primary-soft` (4.35:1) to `--lgrey` (4.58:1).
+2. `.otrn-stat.accent` kept `--text2` on `--primary-soft` (4.35:1) → its label now uses
+   `--primary-dark` (6.49:1).
+3. `.otrn-notice.ok` kept `--text2` on `--success-soft` (4.38:1) → the notice now takes
+   `--success` (4.69:1).
+4. `.otrn a.otrn-rowlink` and `.otrn a.otrn-more` lost their colour to the existing
+   `.otrn a{color:inherit}` rule (0,1,1). With the old light coral the black text was still
+   readable; with `--primary-dark` the solid row link dropped to **2.84:1**. Both link
+   variants now carry an explicit higher-specificity rule (mirroring the existing
+   `.otrn a.otrn-btn` fix) and the row-link hover darkens to `--blue-dark`.
+5. The landing «outline» CTA (`Ver todos los indicadores`) keeps its white border, which is
+   invisible on the light section where it is also used; the light-section variant now takes
+   the neutral border and `--primary-dark`.
+
+**Unchanged functionality, re-checked**: nav destination list and URLs (identical), account
+control (`<a class="otrn-cuenta__boton" aria-label="Iniciar sesión">` with the 21 px inline
+SVG person glyph, 44×44 hit box), private gate `/evaluar/`, `/autoevaluacion/`, `/mapa/` →
+302 to `wp-login.php` and `/criterio/` → 301 (same as §V16), and the PHP syntax check of every
+modified template (`php -l`, all clean).
+
+**NOT VERIFIED in this pass**: the visual result (no screenshot is possible while the harness
+window is not visible, so every statement here is a computed style); the private pages as
+rendered (their components were exercised synthetically, and their gate was confirmed, but the
+pages themselves were not opened); text over photographs on the landing (excluded above);
+non-text contrast of form-control borders against white (WCAG 1.4.11 — the single light
+`--grey` border is a documented gap pending a UX decision); the rendered focus ring, real
+keyboard modality, real touch devices, the iOS dynamic viewport and `prefers-reduced-motion`.
