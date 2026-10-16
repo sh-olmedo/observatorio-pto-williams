@@ -491,3 +491,64 @@ pages themselves were not opened); text over photographs on the landing (exclude
 non-text contrast of form-control borders against white (WCAG 1.4.11 — the single light
 `--grey` border is a documented gap pending a UX decision); the rendered focus ring, real
 keyboard modality, real touch devices, the iOS dynamic viewport and `prefers-reduced-motion`.
+
+## V18 — Client review of the token pass: two defects fixed (2026-10-16)
+
+The client reviewed the rendered result (logged in, so the admin bar is present) and reported
+**two defects**; both are fixed in local commits after `52a7d4d`.
+
+### V18.1 Desktop dropdown closed before the pointer reached it (F1) — `3dbfbc6`
+
+**Report:** *"no puedo acceder al menú ya que desaparece antes de posicionar el mouse sobre el
+menú desplegado"* (the «Datos» panel, screenshot). **Cause:** `otrn-subnav` is positioned
+`top: calc(100% + 12px)`, so between the trigger and the panel there is a 12 px band that does
+**not** belong to the group `<li>`. Crossing it fired the `li`'s `mouseleave`
+(`assets/otrn-menu.js:163`), which closed the panel — and the same happened to the no-JS
+`:hover` fallback. This is the gap introduced by the `510e981` spacing fix. **Fix:** a
+hit-area "mouse bridge" the exact height of the gap, as an `::after` of the group
+(`.otrn-nav__item--grupo::after`, `--mas` included), inside the existing
+`@media (min-width:680px)` row-mode block. It hangs off the group rather than the panel
+because the «Más» panel has `overflow-y:auto` and would clip a child pseudo-element, and it is
+excluded from the mobile accordion (≤679 px, `position:static` subnav) so it cannot cover the
+accordion button. It does not overlap the trigger, so it intercepts no clicks.
+
+**Verification** — hit-testing with `elementFromPoint` on the exact descent path (from the
+trigger's top edge to just inside the panel, every 3 px):
+
+| Page (width) | Mode | Path stays inside the group | Trigger still hit at its centre | Bridge computed |
+| --- | --- | --- | --- | --- |
+| `/` 1024 px | row | yes (10/10 points) | yes | `"" / top:17.55px / h:12px` |
+| `/` 768 px | row | yes | yes | present |
+| `/` 700 px | row | yes | yes | present |
+| `/indicadores/` 1440 px | row | yes | yes | present |
+| `/indicadores/` 1152 px | row | yes | yes | present |
+| `/indicadores/` 910 px («Más») | row | yes | yes | present |
+| `/indicadores/` 768 px («Más») | row | yes | yes | present |
+| `/indicadores/` 700 px («Más») | row | yes | yes | present |
+| `/indicadores/` 679 px | accordion | n/a | n/a | **`content:none`** (absent) |
+| `/indicadores/` 375 px | accordion | n/a | n/a | **`content:none`** (absent) |
+
+The «button still hit at its centre» column is what rules out the bridge swallowing clicks on
+the trigger: the scan returns `button.otrn-nav__boton` for every point inside the button and
+`li.otrn-nav__item` only below its bottom edge.
+
+**NOT VERIFIED:** the mobile accordion button under the open drawer (the harness iframe never
+completes the drawer's `transform` transition while the browser window is not visible, so
+`elementFromPoint` returns `null` there) — but the bridge does not exist in that mode, so the
+change cannot affect it; and the account panel's bridge (the panel only renders with a session,
+and a real login was not performed) — same mechanism, reasoned only.
+
+### V18.2 Drawer content read as secondary text (F2) — `9142179`
+
+**Report:** the criterion question and the "what each answer means" options looked washed out.
+**Cause:** both are the content the evaluator must read, but `.otrn-drawer-preg p` used
+`--text2` on `--lgrey` (4.58:1) and `.otrn-drawer-nivel .txt` used `--text2` on white
+(4.95:1) — AA by the bare minimum, and inconsistent with `.otrn-drawer-ind`, which is black.
+**Fix:** both now use `--dark`.
+
+**Measured** (synthetic reproduction of the drawer DOM, real markup and classes, computed
+styles): question **19.43:1**, answer descriptions **21:1** (18.42:1 on the highlighted row),
+19 elements checked, 0 failures. Unchanged: the `.et` labels (4.58:1 inside the grey panel,
+4.95:1 on white — AA) and the level chips `o0 4.85` / `o1 6.49` / `o2 5.06` / `o3 7.40` /
+`ona 7.15`. The labels were left in `--text2` on purpose to keep the hierarchy; if the client
+wants them darker it is a one-line change.

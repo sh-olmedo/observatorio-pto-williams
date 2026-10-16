@@ -473,6 +473,12 @@ authorised for removal) is kept.
 
 ### 13.6 Deliberate decisions
 
+- **Content vs label inside drawers.** The text the evaluator must read to decide an answer (the
+  criterion question, the description of each level) uses `--dark`; the small uppercase labels
+  (`.et`) and the state text keep `--text2`. With `--text2` the question sat at 4.58:1 on
+  `--lgrey` and the descriptions at 4.95:1 on white — AA by the minimum, but out of step with
+  the indicator definition, which is black. Fixed in `9142179`
+  ([VERIFICATION.md](VERIFICATION.md) §V18.2).
 - **No Poppins token.** The theme ships only Montserrat + IBM Plex Mono (`assets/fonts`), so a
   `--font-secondary` would be a broken fallback; it is documented instead.
 - **`--accent` is decorative.** #41BCFF is 2.13:1 on white, so it is used for icon/spots only
@@ -486,7 +492,8 @@ authorised for removal) is kept.
 ### 13.7 Files changed by the implementation
 
 `wp-content/themes/otrn/`: `style.css`, `assets/css/otrn-arauco.css`,
-`assets/css/otrn-landing.css`, `assets/css/otrn-menu.css` (comments/radii), `page-evaluar.php`,
+`assets/css/otrn-landing.css`, `assets/css/otrn-menu.css` (comments/radii here; the dropdown
+mouse bridge arrived later, in `3dbfbc6`), `page-evaluar.php`,
 `page-estadisticas.php`, `page-noticias.php`, `archive-buena_practica.php`,
 `archive-evaluacion.php`, `archive-guia.php`, `archive-indicador.php`,
 `archive-iniciativa_pladetur.php`, `single-buena_practica.php`, `single-evaluacion.php`,

@@ -66,13 +66,31 @@ link into invisible-on-blue 2,84:1 text). Measured evidence: [VERIFICATION.md](V
 §V17; mapping: [DESIGN_TOKENS_AUDIT.md](DESIGN_TOKENS_AUDIT.md) §13; system:
 [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md).
 
+**Update 2026-10-16 (sixth round — client review of the token pass):** the client reviewed the
+rendered result (logged in) and reported **two defects, both now fixed**:
+
+- **F1 (`3dbfbc6`)**: the desktop dropdown disappeared before the pointer could reach it. The
+  12 px gap that `510e981` introduced is a band outside the group, so crossing it fired the
+  `mouseleave` that closes the panel. Fixed with a mouse bridge (`::after` of the group), row
+  mode only, verified by hit-testing the whole descent path (375–1440 px, including the «Más»
+  panel) and confirmed absent in the mobile accordion — [VERIFICATION.md](VERIFICATION.md)
+  §V18.1.
+- **F2 (`9142179`)**: the evaluation drawer's criterion question and answer descriptions read
+  as secondary text (`--text2`, 4.58:1 and 4.95:1 — AA by the bare minimum) while the
+  indicator definition above them was black. Both now use `--dark` (19.43:1 and 21:1);
+  the labels keep `--text2` for hierarchy — §V18.2.
+
+No other page was reported. The client's **final visual sign-off is still pending** (the review
+found these two things, it did not approve the pass); the non-text contrast of form borders and
+the Poppins decision remain open.
+
 ## Git baseline
 
 | Item | Value |
 | --- | --- |
 | Branch | `main` (remote `origin` configured; no remote refs fetched locally) |
-| HEAD | `52a7d4d` — `fix(otrn): consolidar los tokens de diseño en la identidad municipal (F2, F6)` (local, not pushed; the docs commit for this round follows it) |
-| History | `99092d1` repo init → `70b22a7` "portada scrollytelling inmersiva + branding Arauco (ETAPA A+B+C)" → `5f43933` "modo dual estatico/inmersivo" → `f506104` docs baseline → `bb38d8b` runtime record → `8d3d40b` F11b protections → `d4fa738` F19 docs → `0dd2de4` F1 nav → `e727756` F1 regression fix → `932986b` F1 docs → `5f17b38` F1 grouped navigation → `57e09a8` F1 redesign docs → `510e981` F1 dropdown spacing fix → `cd9fd09` F1 spacing docs → `9aeaa82` design-token audit docs → `52a7d4d` municipal token consolidation (last fourteen local, not pushed) |
+| HEAD | `d691f03` — `docs(arauco): registrar la implementación de tokens municipales y su verificación (F2, F6)` (local, not pushed; the two client-review fixes `3dbfbc6`/`9142179` and their docs commit follow it) |
+| History | `99092d1` repo init → `70b22a7` "portada scrollytelling inmersiva + branding Arauco (ETAPA A+B+C)" → `5f43933` "modo dual estatico/inmersivo" → `f506104` docs baseline → `bb38d8b` runtime record → `8d3d40b` F11b protections → `d4fa738` F19 docs → `0dd2de4` F1 nav → `e727756` F1 regression fix → `932986b` F1 docs → `5f17b38` F1 grouped navigation → `57e09a8` F1 redesign docs → `510e981` F1 dropdown spacing fix → `cd9fd09` F1 spacing docs → `9aeaa82` design-token audit docs → `52a7d4d` municipal token consolidation → `d691f03` token docs → `3dbfbc6` dropdown hover fix (F1) → `9142179` drawer contrast fix (F2) (last eighteen local, not pushed) |
 | Remote | `https://github.com/sh-olmedo/observatorio-arauco.git` |
 | Tracked files | 803 (`bb38d8b` added `docs/VERIFICATION.md`; `8d3d40b` added `wp-content/mu-plugins/otrn-privacidad-seccion.php`; `52a7d4d` added/removed no files) |
 
@@ -110,7 +128,7 @@ loader remains.
 | Operator/role model for evaluation submission | F3 | Client/team (Phase 1) |
 | Palette | **Implemented 2026-10-16**: the Municipalidad de Arauco identity was verified (primary `#0070FF`, secondary `#DE232B`, accent `#41BCFF`, text `#000000`) and applied in `52a7d4d`. Pending: **the client's visual sign-off** of the rendered result | F2, F6 | Client (review) |
 | Token mapping and the fate of the colours with no municipal source (`#0C1434`, `#0C0D0E`, `#D6D5D5`) | **Applied** ([DESIGN_TOKENS_AUDIT.md](DESIGN_TOKENS_AUDIT.md) §13); the three unverified colours were **not** adopted | F2, F6 | Client (review) |
-| **Visual sign-off of the municipal token pass (`52a7d4d`)** — brand blue/red/navy applied to headers, buttons, links, cards, tables, filters, forms and the footer, on the homepage and on internal pages. Measured, not seen: no screenshot is possible while the harness window is not visible | F2, F6 | Client/team |
+| **Visual sign-off of the municipal token pass (`52a7d4d`)** — brand blue/red/navy applied to headers, buttons, links, cards, tables, filters, forms and the footer, on the homepage and on internal pages. Measured, not seen: no screenshot is possible while the harness window is not visible. **First review round (2026-10-16) found one contrast defect in the evaluation drawer, fixed in `9142179`; final sign-off still pending** | F2, F6 | Client/team |
 | Arauco geography: sector list + coordinates | F8 | Client (Phase 4) |
 | Geoportal StoryMap URL (scope unknown) | F9 | Client (Phase 4) |
 | Survey embed fate | F10 | Client (Phase 4) |
@@ -120,7 +138,7 @@ loader remains.
 | Fate of the curated sector list and of the location metas under the new search picker | F8 ↔ F19 | Client/team (Phase 4/6) |
 | Push/deploy decision for the local commits (`8d3d40b`, `d4fa738`, `0dd2de4`, `e727756`, `932986b`, `5f17b38`, `57e09a8`, `510e981`, `cd9fd09`, `9aeaa82`, `52a7d4d` and the docs commit of this round) | F14 | User |
 | **Explicit UX/UI sign-off of the grouped navigation (F1 redesign, `5f17b38`)** — colours, wording, chevrons, «Más» behaviour; nothing else should change until it is reviewed | F1 | Client/team |
-| **Visual confirmation of the dropdown spacing (`510e981`)** — 12 px rows / 2 px gap / inset highlight, and the account-menu row. Measured, not seen: the harness window is not visible from here, so no screenshot could be taken | F1 | Client/team |
+| **Visual confirmation of the dropdown spacing (`510e981`)** — 12 px rows / 2 px gap / inset highlight, and the account-menu row. Measured, not seen: the harness window is not visible from here, so no screenshot could be taken. **The client's review found that the 12 px gap made the panel unreachable with the mouse; the mouse bridge in `3dbfbc6` fixes it and the confirmation is pending again** | F1 | Client/team |
 | Real authenticated-session pass for the F1 nav (login writes session tokens to the DB; the 2026-10-16 pass used a temporary `wp_set_current_user()` mu-plugin, since deleted) | F1, F17 | Team (needs a disposable environment) |
 | Real-device pass: touch, iOS dynamic viewport, `prefers-reduced-motion` and the rendered focus ring (the harness could not deliver real key events while its window was hidden) | F1, F17 | Team |
 
@@ -174,6 +192,14 @@ secondary family), which currently has no token because the font files are absen
 pass introduced no new component, route or dependency, and left the private gate, the DB and
 the content untouched.
 
+**2026-10-16 addition (sixth round — client review):** the client reviewed the rendered pass
+and reported two defects, both fixed (`3dbfbc6` dropdown hover, `9142179` drawer contrast), with
+the measurements in [VERIFICATION.md](VERIFICATION.md) §V18. What is left for the client is the
+**final visual sign-off** of the municipal token pass and of the F1 navigation — the review
+found defects, it did not approve either. The open design decisions are unchanged (non-text
+contrast of form borders; whether to ship Poppins). The proposed code order is still
+**F3 + F11b**, then **F5**.
+
 ## How to run the site (reference only — not executed in this task)
 
 - Current local site (2026-10-15): `http://localhost:8895/`, WordPress 7.1.3, PHP 8.3 —
@@ -203,9 +229,12 @@ the content untouched.
   touched no application code. The municipal token consolidation is committed as **`52a7d4d`**
   (application code: `style.css`, the three asset stylesheets, and 17 PHP templates — colour,
   font and radius values only; no markup, no logic, no content, no route, no new file) and it
-  **absorbs** the two pre-existing CSS working-tree deltas. All of them are local and unpushed.
-  The visual result of `52a7d4d` is **not** claimed as approved: it is pending the client's
-  review.
+  **absorbs** the two pre-existing CSS working-tree deltas. The client's review of that pass
+  produced two further fixes: **`3dbfbc6`** (`assets/css/otrn-menu.css`: a mouse bridge over the
+  dropdown gap, plus one line of reasoning-only CSS for the account panel) and **`9142179`**
+  (`style.css`: two text colours in the evaluation drawer). All of them are local and unpushed.
+  The visual result of `52a7d4d` is **not** claimed as approved: the client's review found two
+  defects and the final sign-off is pending.
 - Temporary files used to verify F1 (§V16) were deleted before committing: the simulation
   mu-plugin (`wp_set_current_user()`, re-created and deleted again for the `510e981` re-check)
   and the local evidence pages. The token pass (§V17) created **no** files: it measured

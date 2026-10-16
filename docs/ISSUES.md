@@ -172,6 +172,15 @@ explicit UX/UI approval of the visuals**. Files: `header.php`, `functions.php`,
   0 px horizontal overflow, 0 WCAG AA failures in the header
   ([VERIFICATION.md](VERIFICATION.md) §V17). The pending items remain the client's visual
   confirmation of the redesign and of the dropdown spacing.
+- **2026-10-16 (client review of the token pass)**: the client could not reach the desktop
+  dropdown — *"desaparece antes de posicionar el mouse"*. The 12 px gap that `510e981` added
+  between the trigger and the panel (`top:calc(100% + 12px)`) is a band that does not belong to
+  the group, so crossing it fired the `mouseleave` that closes the panel (the no-JS `:hover`
+  fallback had the same hole). Fixed in **`3dbfbc6`** with a mouse bridge (`::after` of the
+  group) the exact height of the gap, row mode only; verified by hit-testing the whole descent
+  path from 375 to 1440 px, including the «Más» panel and the accordion mode where the bridge
+  must not exist ([VERIFICATION.md](VERIFICATION.md) §V18.1). The client's visual confirmation
+  of the redesign is still pending.
 
 ### F2 — Municipal identity not implemented (direction confirmed)
 
@@ -200,6 +209,12 @@ explicit UX/UI approval of the visuals**. Files: `header.php`, `functions.php`,
   (F6, now resolved).
 - **Remaining (not a code task)**: the client's **visual sign-off** of the rendered result, and
   the three colours that must not be treated as brand tokens (`#0C1434`, `#0C0D0E`, `#D6D5D5`).
+- **Client review (2026-10-16)**: the evaluation drawer's criterion question and answer
+  descriptions were reported as too faint: they are the content the evaluator must read, but
+  they carried `--text2` (4.58:1 on `--lgrey`, 4.95:1 on white — AA by the minimum, and out of
+  step with the indicator definition, which is black). Fixed in **`9142179`**: both now use
+  `--dark`; the `.et` labels keep `--text2` for hierarchy. Measured: 19.43:1 and 21:1
+  ([VERIFICATION.md](VERIFICATION.md) §V18.2). No other page was reported.
 - **Verification**: rendered token diff before/after + contrast pass + responsive pass — done
   ([VERIFICATION.md](VERIFICATION.md) §V17); visual confirmation by the client — **pending**
   (no screenshot is possible while the harness window is not visible).
