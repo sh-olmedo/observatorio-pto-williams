@@ -382,6 +382,24 @@ leaked into the mobile drawer; (3) `esFocable()` treated `visibility:hidden` pan
 focusable; (4) Escape could return focus to `<body>` when the browser had not focused the
 burger, so the burger is used as the fallback target.
 
+**Follow-up after client review (2026-10-16, `510e981`).** The client reported the desktop
+dropdown destinations as «muy juntos y pegados». The cause was the cascade, not the value:
+the landing reset `.otrn-header .otrn-nav a` has the *same* specificity (0,2,1) as
+`.otrn-header .otrn-subnav a` and comes later in the file, so it cancelled the `padding` of
+the destinations, which rendered 18 px tall with no separation. The reset now targets
+`.otrn-nav__enlace` / `.otrn-nav__boton`; each destination is a row of 12 px padding with a
+2 px gap and an inset rounded highlight, the «Más» headings are indented to match, and the
+account menu reuses the same row. Re-measured at 1440/768/700/390 px (anonymous and simulated
+session): rows **42 px** with a 2 px gap; panels 220 px wide (Autoevaluación: 3 destinations,
+151 px tall, right edge 1429 px at 1440 px; Planificación: «Iniciativas Pladetur» on one
+line); «Más» 250×438 with headings and destinations both starting 9 px from the panel edge
+(21 px of text indent); account panel 190×66 with a 44 px row; mobile accordion unchanged
+(`padding:11px 0`, `border-radius:0`, no gap, 1 px separator); **0 px page overflow from 1920
+to 375 px**; and at 700 px on the front page the landing rules do not leak into the dropdown
+(`padding:12px`, `border:0 none`, 13.5 px/600, `#2B2B2B`). **Still pending: the client's
+visual confirmation of the new spacing** — screenshots remain impossible while the harness
+window is not visible.
+
 **NOT VERIFIED in this pass**: the rendered focus ring and real keyboard modality (the
 harness refuses key events while its window is hidden — the `:focus-visible` rules are read
 from the stylesheet, not exercised); real touch devices and the iOS dynamic viewport;

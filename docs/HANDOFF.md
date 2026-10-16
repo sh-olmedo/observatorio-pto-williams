@@ -24,13 +24,20 @@ treat the current look as signed off). Breakpoints come from measured row widths
 910 / 680 px) and the pass is recorded in [VERIFICATION.md](VERIFICATION.md) §V16. The three
 pre-existing working-tree files were again left untouched.
 
+**Update 2026-10-16 (third round, client review):** the client reported the desktop dropdown
+destinations as too tight, so the spacing was rebuilt and the underlying cascade defect fixed
+(`510e981`: the file's 9 px padding had never applied — the landing reset
+`.otrn-header .otrn-nav a` shares specificity with `.otrn-header .otrn-subnav a` and came
+later). Destinations are now 42 px rows with a 2 px gap and an inset highlight. F1 is **still
+pending the client's visual confirmation of this spacing**; see §V16.
+
 ## Git baseline
 
 | Item | Value |
 | --- | --- |
 | Branch | `main` (remote `origin` configured; no remote refs fetched locally) |
-| HEAD | `5f17b38` — `fix(otrn): navegación agrupada, icono de cuenta y puntos de corte medidos (F1)` (local, not pushed) |
-| History | `99092d1` repo init → `70b22a7` "portada scrollytelling inmersiva + branding Arauco (ETAPA A+B+C)" → `5f43933` "modo dual estatico/inmersivo" → `f506104` docs baseline → `bb38d8b` runtime record → `8d3d40b` F11b protections → `d4fa738` F19 docs → `0dd2de4` F1 nav → `e727756` F1 regression fix → `932986b` F1 docs → `5f17b38` F1 grouped navigation (last seven local, not pushed) |
+| HEAD | `510e981` — `fix(otrn): dar aire a los destinos de los desplegables (F1)` (local, not pushed) |
+| History | `99092d1` repo init → `70b22a7` "portada scrollytelling inmersiva + branding Arauco (ETAPA A+B+C)" → `5f43933` "modo dual estatico/inmersivo" → `f506104` docs baseline → `bb38d8b` runtime record → `8d3d40b` F11b protections → `d4fa738` F19 docs → `0dd2de4` F1 nav → `e727756` F1 regression fix → `932986b` F1 docs → `5f17b38` F1 grouped navigation → `57e09a8` F1 redesign docs → `510e981` F1 dropdown spacing fix (last nine local, not pushed) |
 | Remote | `https://github.com/sh-olmedo/observatorio-arauco.git` |
 | Tracked files | 803 (`bb38d8b` added `docs/VERIFICATION.md`; `8d3d40b` added `wp-content/mu-plugins/otrn-privacidad-seccion.php`) |
 
@@ -46,7 +53,8 @@ pre-existing working-tree files were again left untouched.
 
 These changes are part of the current documentation baseline (the audit read them as-is).
 Decide their commit strategy in Phase 0 ([ROADMAP.md](ROADMAP.md), F14) — either way, they
-must be reviewed, not reverted. The F1 fixes (`0dd2de4` + `e727756` + `5f17b38`) intentionally
+must be reviewed, not reverted. The F1 fixes (`0dd2de4` + `e727756` + `5f17b38` + `510e981`)
+intentionally
 do not touch them: they add the globally enqueued `assets/css/otrn-menu.css` (which wins by
 specificity, including over `.otrn-nav a.active` in `style.css`) instead of editing
 `style.css` or `otrn-landing.css`. `git status` therefore still shows exactly these 3 files.
@@ -77,8 +85,9 @@ specificity, including over `.otrn-nav a.active` in `style.css`) instead of edit
 | DB content inventoried at count level (2026-10-15): pages, 74 criteria, 10 sectors, 6 evaluations, 3 data cards; copy migration still pending | F18 | Team (Phase 4) |
 | Geocoding provider + usage policy for the location search (rate limits, attribution, caching; browser-direct vs server proxy) | F19 | Client/team (before Phase 6) |
 | Fate of the curated sector list and of the location metas under the new search picker | F8 ↔ F19 | Client/team (Phase 4/6) |
-| Push/deploy decision for the local commits (`8d3d40b`, `d4fa738`, `0dd2de4`, `e727756`, `932986b`, `5f17b38` + the F1 docs commit) | F14 | User |
+| Push/deploy decision for the local commits (`8d3d40b`, `d4fa738`, `0dd2de4`, `e727756`, `932986b`, `5f17b38`, `57e09a8`, `510e981`) | F14 | User |
 | **Explicit UX/UI sign-off of the grouped navigation (F1 redesign, `5f17b38`)** — colours, wording, chevrons, «Más» behaviour; nothing else should change until it is reviewed | F1 | Client/team |
+| **Visual confirmation of the dropdown spacing (`510e981`)** — 12 px rows / 2 px gap / inset highlight, and the account-menu row. Measured, not seen: the harness window is not visible from here, so no screenshot could be taken | F1 | Client/team |
 | Real authenticated-session pass for the F1 nav (login writes session tokens to the DB; the 2026-10-16 pass used a temporary `wp_set_current_user()` mu-plugin, since deleted) | F1, F17 | Team (needs a disposable environment) |
 | Real-device pass: touch, iOS dynamic viewport, `prefers-reduced-motion` and the rendered focus ring (the harness could not deliver real key events while its window was hidden) | F1, F17 | Team |
 
@@ -105,6 +114,12 @@ recommended order above.
 above: the security pair **F3 + F11b** is still the proposed first implementation scope, with
 **F5** next.
 
+**2026-10-16 addition (third round):** the client's first review note was the spacing of the
+dropdown destinations, now rebuilt in `510e981` (12 px rows, 2 px gap, inset highlight; the
+earlier padding never applied because of a specificity clash with the landing reset). The next
+task for F1 is still the same: **the client's visual confirmation**, now of this spacing in
+particular. No other visual change should be started until then.
+
 ## How to run the site (reference only — not executed in this task)
 
 - Current local site (2026-10-15): `http://localhost:8895/`, WordPress 7.1.3, PHP 8.3 —
@@ -126,11 +141,13 @@ above: the security pair **F3 + F11b** is still the proposed first implementatio
   edits were committed locally as `bb38d8b` (not pushed). Application-code changes since:
   `8d3d40b` (F11b protections: one new mu-plugin) and the F1 navigation changes `0dd2de4` +
   `e727756` (new `assets/css/otrn-menu.css`, `assets/otrn-menu.js`, `functions.php` enqueue)
-  and `5f17b38` (grouped navigation in `header.php` + `functions.php` + the two assets). The
+  and `5f17b38` (grouped navigation in `header.php` + `functions.php` + the two assets), plus
+  the dropdown-spacing fix `510e981` (only `assets/css/otrn-menu.css`). The
   F19 change set is committed as `d4fa738` (documentation only). All of them are local and
   unpushed.
 - Temporary files used to verify F1 (§V16) were deleted before committing: the simulation
-  mu-plugin (`wp_set_current_user()`) and the local evidence pages. `git status` lists no new
+  mu-plugin (`wp_set_current_user()`, re-created and deleted again for the `510e981` re-check)
+  and the local evidence pages. `git status` lists no new
   files, and the database was never written to (no login, no post/meta/option change).
 
 ## Documentation maintenance

@@ -44,7 +44,7 @@ Runtime status (first pass, **2026-10-15**): measured results are in
 
 ### F1 — Mobile navigation unusable on internal pages
 
-- **Severity**: P1 · **Status**: **Fixed in code (2026-10-16, two rounds) and
+- **Severity**: P1 · **Status**: **Fixed in code (2026-10-16, three rounds) and
   browser-verified, but the grouped-navigation redesign is _pending explicit UX/UI
   sign-off_ — see *Redesign* and the limitations below** · **Evidence**:
   - `style.css:508-509` hides `.otrn-nav` under 600 px with no replacement rule elsewhere.
@@ -127,6 +127,18 @@ explicit UX/UI approval of the visuals**. Files: `header.php`, `functions.php`,
   horizontal page overflow on internal pages, where the header is `static`; the «Más» item
   leaked into the mobile drawer; `esFocable()` ignored `visibility:hidden`; focus return fell
   back to `<body>` when the browser did not focus the burger.
+- **Spacing of the dropdown destinations — client review, 2026-10-16** (`510e981`, local): the
+  client reported that on desktop the dropdown destinations looked «muy juntos y pegados». The
+  cause was not the padding value but the cascade: the landing-panel reset
+  (`.otrn-header .otrn-nav a`) has the **same specificity** (0,2,1) as the destination rule
+  (`.otrn-header .otrn-subnav a`) and sits lower in the file, so it cancelled the padding and
+  every destination rendered at 18 px — the value in the stylesheet had never been applied.
+  The reset now targets `.otrn-nav__enlace` / `.otrn-nav__boton` (the two real elements of the
+  row), and each destination is a row with 12 px padding, a 2 px gap and an inset rounded
+  pointer highlight; the «Más» headings are indented 12 px to align with the destinations and
+  the account menu uses the same row. Measured: 42 px rows, 2 px apart; panels stay 220 px wide
+  (Autoevaluación, 3 destinations, 151 px tall, right edge 1429 px at a 1440 px viewport);
+  mobile accordion unchanged; 0 px page overflow from 1920 to 375 px.
 - **Contrast**: `--primary` (#DF8056) is only 2.6:1 on white, so active/hover text and focus
   outlines use `--primary-dark` (#A05C3D, 5.1–5.4:1) — the same colour the front page already
   used for `a.active`, which `style.css:41` had been overriding with the failing token ever
