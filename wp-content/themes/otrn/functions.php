@@ -621,6 +621,181 @@ function otrn_material_secciones() {
 }
 
 /**
+ * Estructura de la navegación principal (F1).
+ *
+ * Una sola fuente para la fila de escritorio, el desplegable «Más» de tableta y
+ * el panel lateral de móvil: `header.php` la recorre una vez y
+ * `assets/otrn-menu.js` solo gestiona el estado (abierto/cerrado, foco, Escape).
+ *
+ * Claves de cada entrada:
+ *   - `tipo`:      'enlace' (un destino) o 'grupo' (con desplegable).
+ *   - `etiqueta`:  texto visible.
+ *   - `url`:       destino (solo en 'enlace').
+ *   - `hijos`:     destinos del desplegable (solo en 'grupo').
+ *   - `prioridad`: orden del colapso progresivo en tableta (menor = se queda más
+ *                  tiempo en la fila). Los grupos con prioridad > 2 se replican
+ *                  dentro de «Más» y su copia se muestra solo cuando su original
+ *                  está colapsada (ver `assets/css/otrn-menu.css`).
+ *   - `activo`:    la página actual es ese destino (marca `active` + aria-current).
+ *
+ * El grupo privado de autoevaluación se incluye solo con sesión iniciada, igual
+ * que antes de este cambio: el gate real lo aplica
+ * `otrn_seccion_autoevaluacion_privada()` en este mismo archivo.
+ *
+ * @return array<int,array<string,mixed>> Destinos primarios en orden.
+ */
+function otrn_nav_estructura() {
+	$items = array();
+
+	$items[] = array(
+		'tipo'      => 'enlace',
+		'etiqueta'  => 'Inicio',
+		'url'       => home_url( '/' ),
+		'prioridad' => 0,
+		'activo'    => is_front_page() || is_home(),
+	);
+
+	$items[] = array(
+		'tipo'      => 'grupo',
+		'id'        => 'observatorio',
+		'etiqueta'  => 'Observatorio',
+		'prioridad' => 3,
+		'activo'    => is_page( 'acerca' ) || is_page( 'noticias' ) || is_singular( 'post' ),
+		'hijos'     => array(
+			array(
+				'etiqueta' => 'Acerca de',
+				'url'      => otrn_acerca_url(),
+				'activo'   => is_page( 'acerca' ),
+			),
+			array(
+				'etiqueta' => 'Noticias',
+				'url'      => otrn_noticias_url(),
+				'activo'   => is_page( 'noticias' ) || is_singular( 'post' ),
+			),
+		),
+	);
+
+	$items[] = array(
+		'tipo'      => 'grupo',
+		'id'        => 'datos',
+		'etiqueta'  => 'Datos',
+		'prioridad' => 1,
+		'activo'    => is_post_type_archive( 'indicador' ) || is_singular( 'indicador' ) || is_page( 'geoportal' ),
+		'hijos'     => array(
+			array(
+				'etiqueta' => 'Indicadores',
+				'url'      => get_post_type_archive_link( 'indicador' ),
+				'activo'   => is_post_type_archive( 'indicador' ) || is_singular( 'indicador' ),
+			),
+			array(
+				'etiqueta' => 'Geoportal',
+				'url'      => home_url( '/geoportal/' ),
+				'activo'   => is_page( 'geoportal' ),
+			),
+		),
+	);
+
+	$items[] = array(
+		'tipo'      => 'enlace',
+		'etiqueta'  => 'Buenas prácticas',
+		'url'       => get_post_type_archive_link( 'buena_practica' ),
+		'prioridad' => 2,
+		'activo'    => is_post_type_archive( 'buena_practica' ) || is_singular( 'buena_practica' ),
+	);
+
+	$items[] = array(
+		'tipo'      => 'grupo',
+		'id'        => 'planificacion',
+		'etiqueta'  => 'Planificación',
+		'prioridad' => 4,
+		'activo'    => is_post_type_archive( 'iniciativa_pladetur' ) || is_singular( 'iniciativa_pladetur' ) || is_page( 'estadisticas' ),
+		'hijos'     => array(
+			array(
+				'etiqueta' => 'Iniciativas Pladetur',
+				'url'      => get_post_type_archive_link( 'iniciativa_pladetur' ),
+				'activo'   => is_post_type_archive( 'iniciativa_pladetur' ) || is_singular( 'iniciativa_pladetur' ),
+			),
+			array(
+				'etiqueta' => 'Estadísticas',
+				'url'      => otrn_estadisticas_url(),
+				'activo'   => is_page( 'estadisticas' ),
+			),
+		),
+	);
+
+	// Material de apoyo: la guía de usuario (CPT `guia`) y los dos tipos de
+	// material (`tipo_material`). Si la taxonomía aún no existe se cae al archivo
+	// del CPT para no dejar el grupo vacío.
+	$material_hijos  = array(
+		array(
+			'etiqueta' => 'Guía de usuario',
+			'url'      => get_post_type_archive_link( 'guia' ),
+			'activo'   => is_post_type_archive( 'guia' ) || is_singular( 'guia' ),
+		),
+	);
+	$material_activo = is_post_type_archive( 'guia' ) || is_singular( 'guia' );
+	foreach ( otrn_material_secciones() as $otrn_slug => $otrn_sec ) {
+		$material_hijos[] = array(
+			'etiqueta' => $otrn_sec['nav'],
+			'url'      => $otrn_sec['url'],
+			'activo'   => is_tax( 'tipo_material', $otrn_slug ),
+		);
+		$material_activo  = $material_activo || is_tax( 'tipo_material', $otrn_slug );
+	}
+	if ( count( $material_hijos ) < 2 ) {
+		$material_hijos[] = array(
+			'etiqueta' => 'Material de apoyo',
+			'url'      => get_post_type_archive_link( 'material_apoyo' ),
+			'activo'   => is_post_type_archive( 'material_apoyo' ) || is_singular( 'material_apoyo' ),
+		);
+		$material_activo  = $material_activo || is_post_type_archive( 'material_apoyo' ) || is_singular( 'material_apoyo' );
+	}
+
+	$items[] = array(
+		'tipo'      => 'grupo',
+		'id'        => 'material',
+		'etiqueta'  => 'Material de apoyo',
+		'prioridad' => 5,
+		'activo'    => $material_activo,
+		'hijos'     => $material_hijos,
+	);
+
+	if ( is_user_logged_in() ) {
+		$items[] = array(
+			'tipo'      => 'grupo',
+			'id'        => 'autoevaluacion',
+			'etiqueta'  => 'Autoevaluación',
+			'prioridad' => 6,
+			'activo'    => is_post_type_archive( 'evaluacion' ) || is_singular( 'evaluacion' ) || is_page( 'evaluar' ) || is_page( 'mapa' ),
+			'hijos'     => array(
+				array(
+					'etiqueta' => 'Autoevaluaciones',
+					'url'      => get_post_type_archive_link( 'evaluacion' ),
+					'activo'   => is_post_type_archive( 'evaluacion' ) || is_singular( 'evaluacion' ),
+				),
+				array(
+					'etiqueta' => 'Mapa',
+					'url'      => home_url( '/mapa/' ),
+					'activo'   => is_page( 'mapa' ),
+				),
+				array(
+					'etiqueta' => 'Nueva autoevaluación',
+					'url'      => home_url( '/evaluar/' ),
+					'activo'   => is_page( 'evaluar' ),
+				),
+			),
+		);
+	}
+
+	/**
+	 * Permite ajustar la navegación principal sin editar este archivo.
+	 *
+	 * @param array<int,array<string,mixed>> $items Destinos primarios.
+	 */
+	return (array) apply_filters( 'otrn_nav_estructura', $items );
+}
+
+/**
  * Documento descargable de un material de apoyo (docs/05 Parte A §3).
  *
  * El campo `documento` guarda el ID del adjunto cuando se sube desde ACF, pero

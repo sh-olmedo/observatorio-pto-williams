@@ -2,58 +2,232 @@
  * Navegación responsive (F1) — un solo sistema para la portada y las páginas
  * internas.
  *
- * La cabecera (`header.php`) pinta siempre `.otrn-brand`, `#otrn-nav` y
- * `.otrn-burger`, y `assets/otrn-menu.js` gestiona el estado (aria + foco).
- * Los estilos de la hamburguesa y del panel vivían solo en `otrn-landing.css`,
- * que se encola únicamente en la portada; en el resto de páginas el menú móvil
- * no existía porque `style.css` oculta `.otrn-nav` a ≤600 px sin reemplazo.
+ * `header.php` recorre `otrn_nav_estructura()` (functions.php) y pinta la misma
+ * estructura en los tres modos; `assets/otrn-menu.js` solo gobierna el estado
+ * (abierto/cerrado, aria, foco, Escape). El CSS decide qué se ve en cada ancho,
+ * sin repetir ningún punto de corte en el JS.
  *
- * Esta hoja se encola en todas las vistas, al final, y sus selectores incluyen
- * `.otrn-header` para ganar por especificidad a `style.css`, `otrn-arauco.css`
- * y `otrn-landing.css` sin depender del orden de carga.
+ *   - Escritorio (≥ 1152 px): fila completa con desplegables. Incluye a quien
+ *     tiene sesión: agrupar los destinos deja la fila en 1066 px en el peor
+ *     caso (portada + sesión), así que la hamburguesa nunca hace falta aquí.
+ *   - Tableta ancha (910–1151 px): la misma fila con los cinco destinos de mayor
+ *     prioridad y «Más» (Material de apoyo y, con sesión, Autoevaluación).
+ *   - Tableta estrecha (680–909 px): la fila conserva Inicio, Datos y Buenas
+ *     prácticas; «Más» reúne Observatorio, Planificación, Material de apoyo y
+ *     Autoevaluación.
+ *   - Móvil (≤ 679 px): panel lateral accesible con acordeones (mismo markup:
+ *     el desplegable de escritorio pasa a ser un acordeón dentro del panel).
  *
- * Puntos de corte (medidos en navegador con el texto a 13,5 px). El contenedor
- * de la cabecera (`.otrn .wrap`) nunca pasa de 1440 px, así que el ancho útil
- * real para la fila son 1376 px (1440 menos los 32 px de padding de cada lado):
+ * En tableta la copia de cada grupo colapsado solo se muestra dentro de «Más»
+ * cuando su original está oculto (ver «Colapso progresivo»), de modo que nunca
+ * hay dos veces el mismo destino a la vista.
  *
- *   - Escritorio: hueco de 18 px, enlaces que no se encogen (`flex:0 0 auto`) ni
- *     se parten en dos líneas (`white-space:nowrap`).
- *       · Sin sesión: la fila ocupa 1274 px —logo de la portada de 56 px, 10
- *         enlaces (957 px) y botón de 133 px—, así que cabe desde 1338 px de
- *         viewport. El panel entra a ≤1360 px (23 px de margen de seguridad).
- *       · Con sesión: el 11.º enlace («Evaluación de sostenibilidad», 195 px)
- *         sube la fila a 1424 px, más de los 1376 px útiles, y el contenedor ya
- *         está al máximo a partir de 1504 px de viewport. Por eso con sesión
- *         iniciada el nav es *siempre* el panel lateral.
- *   - Antes el hueco era de 26 px y el nav se partía en dos líneas desde 1382 px
- *     de viewport (tres etiquetas rotas a 1366 px sin sesión). Con sesión la fila
- *     necesitaba 1568 px y en la portada el botón «Salir» acababa fuera de
- *     pantalla: la cabecera es `fixed` y el desborde no genera barra de scroll.
+ * Puntos de corte medidos en navegador (texto a 13,5 px). El contenedor de la
+ * cabecera (`.otrn .wrap`) nunca pasa de 1440 px, así que el ancho útil real es
+ * 1376 px (1440 − 32 px de padding por lado) y el peor caso siempre es la
+ * portada, cuyo logo mide 56 px de alto (≈158 px de ancho) frente a 46 px
+ * (≈130 px) en las internas. Fila natural medida (ancho del contenido, sin el
+ * padding del contenedor) y viewport mínimo que la contiene:
+ *
+ *   - Fila completa: 1066 px → 1130 px (portada + sesión).
+ *   - Tableta ancha:  831 px →  895 px (portada).
+ *   - Tableta estrecha: 590 px → 654 px (portada).
+ *
+ * Los umbrales (1152 / 910 / 680) dejan 22, 15 y 26 px de holgura sobre esos
+ * mínimos, para que ninguna etiqueta llegue a partirse ni a desbordar.
+ *
+ * Notas de arquitectura:
+ *   - Selectores anclados a `.otrn-header` para ganar por especificidad a
+ *     `style.css`, `otrn-arauco.css` y `otrn-landing.css` sin depender del orden
+ *     de carga. `otrn-landing.css` (no editable: cambios previos en el árbol de
+ *     trabajo) convierte `.otrn-nav` en panel a ≤768 px solo en la portada, así
+ *     que el modo fila repone explícitamente `position`, `width`, `padding`,
+ *     `transform`, etc. (ver «Modo fila»).
  *   - Panel lateral: `position:fixed` a altura completa, anclado con `top:0` y
  *     `height:100vh` porque en la portada el `backdrop-filter` de la cabecera la
  *     convierte en su bloque contenedor (por eso no se usa `inset`/`bottom:0`).
  *   - Barra de administración de WordPress: ocupa los 32 px superiores (46 px a
  *     ≤782 px) con `z-index:99999`. El `html{margin-top}` de core solo desplaza
- *     el flujo estático, así que la cabecera `fixed` de la portada quedaba
- *     debajo de la barra (enlaces y botón tapados) y hay que desplazarla a mano.
+ *     el flujo estático, así que la cabecera `fixed` de la portada se desplaza a
+ *     mano y el panel se ancla bajo la barra.
  *
  * Tokens: solo los globales de `style.css` (`--paper`, `--grey`, `--blue-dark`,
- * `--primary`, `--primary-soft`). No se usan `--aru-*` (existen solo en la
- * portada; F6 sigue pendiente) ni se definen tokens nuevos.
+ * `--primary`, `--primary-dark`, `--primary-soft`, `--text3`, `--radius-sm`).
+ * No se definen tokens nuevos.
  */
 
-/* ---- Escritorio: fila compacta, siempre en una sola línea ------------- */
-.otrn-header .otrn-nav{
-  gap:18px;
-  justify-content:flex-start;
+/* ---- Base compartida por los tres modos ------------------------------ */
+.otrn-header .otrn-nav__lista{
+  display:flex; align-items:center; gap:18px;
+  margin:0; padding:0; list-style:none;
 }
-/* Sin encogerse ni partir etiquetas: si algún día no cupieran, el desborde se
-   vería en vez de disfrazarse con un salto de línea. */
-.otrn-header .otrn-nav a{ flex:0 0 auto; white-space:nowrap; }
+.otrn-header .otrn-nav__item{position:relative; display:flex; align-items:center;}
+
+/* Enlaces y botones de grupo comparten tipografía y comportamiento: la fila
+   nunca se estira ni parte etiquetas (`flex:0 0 auto` + `nowrap`). */
+.otrn-header .otrn-nav a,
+.otrn-header .otrn-nav__boton{
+  flex:0 0 auto;
+  font:inherit; font-size:13.5px; font-weight:600; line-height:1.3;
+  color:inherit; background:none; border:0; padding:0; margin:0;
+  display:inline-flex; align-items:center; white-space:nowrap;
+  text-decoration:none; cursor:pointer;
+}
+/* Especificidad deliberada (5 clases) para que el estado abierto y el hover
+   también ganen en la portada, donde `otrn-arauco.css` fija el color de los
+   enlaces del nav con (0,4,1). Se usa el terracota oscuro del sistema
+   (`--primary-dark`, 5,4:1 sobre blanco) y no `--primary` (2,6:1), que no
+   alcanza el contraste AA en texto de 13,5 px. */
+.otrn-header .otrn-nav .otrn-nav__lista .otrn-nav__item .otrn-nav__enlace:hover,
+.otrn-header .otrn-nav .otrn-nav__lista .otrn-nav__item .otrn-nav__boton:hover,
+.otrn-header .otrn-nav .otrn-nav__lista .otrn-nav__item.is-abierto > .otrn-nav__boton,
+.otrn-header .otrn-nav .otrn-nav__lista .otrn-nav__item .otrn-nav__boton[aria-current="true"]{
+  color:var(--primary-dark);
+}
+/* Destino actual. `style.css` ya trae `.otrn-nav a.active{color:var(--primary)}`
+   (0,2,1) —regla que hasta ahora nunca se aplicaba—, así que se sobreescribe
+   aquí por contraste (AA) y por coherencia con la portada, que ya pinta su
+   enlace activo con el terracota oscuro. */
+.otrn-header .otrn-nav .otrn-nav__enlace.active,
+.otrn-header .otrn-nav .otrn-nav__boton.active,
+.otrn-header .otrn-nav .otrn-subnav a.active{
+  color:var(--primary-dark);
+}
+.otrn-header .otrn-nav__enlace:focus-visible,
+.otrn-header .otrn-nav__boton:focus-visible,
+.otrn-header .otrn-subnav a:focus-visible{
+  outline:2px solid var(--primary-dark); outline-offset:3px; border-radius:4px;
+}
+
+/* Indicador de desplegable: galón discreto dibujado con bordes. La opacidad se
+   queda en 0,65 (≈5:1 sobre blanco) para que el indicador se perciba aunque el
+   galón sea decorativo. */
+.otrn-header .otrn-nav__caret{
+  width:6px; height:6px; margin-left:7px; flex:0 0 auto;
+  border-right:1.6px solid currentColor; border-bottom:1.6px solid currentColor;
+  transform:rotate(45deg) translate(-1px,-1px);
+  transition:transform .2s ease; opacity:.65;
+}
+.otrn-header .otrn-nav__item.is-abierto > .otrn-nav__boton .otrn-nav__caret{
+  transform:rotate(-135deg) translate(-2px,-2px);
+}
+
+/* Desplegable: tarjeta discreta con los tokens del sitio. */
+.otrn-header .otrn-subnav{
+  position:absolute; top:calc(100% + 12px); left:-14px; z-index:62;
+  min-width:220px; margin:0; padding:8px 0; list-style:none;
+  background:var(--paper); border:1px solid var(--grey); border-radius:var(--radius-sm);
+  box-shadow:0 10px 26px rgba(16,28,40,.10);
+  opacity:0; visibility:hidden; transform:translateY(-6px);
+  transition:opacity .18s ease, transform .18s ease, visibility 0s linear .18s;
+}
+/* Abierto por JS (`is-abierto`) o, si el script no corre, por teclado/ratón. */
+.otrn-header .otrn-nav__item.is-abierto > .otrn-subnav,
+.otrn-header:not(.otrn-js) .otrn-nav__item:focus-within > .otrn-subnav,
+.otrn-header:not(.otrn-js) .otrn-nav__item:hover > .otrn-subnav{
+  opacity:1; visibility:visible; transform:none;
+  transition:opacity .18s ease, transform .18s ease, visibility 0s linear 0s;
+}
+.otrn-header .otrn-subnav a{
+  display:block; padding:9px 18px; font-size:13.5px; font-weight:600;
+}
+.otrn-header .otrn-subnav a:hover,
+.otrn-header .otrn-subnav a:focus-visible{
+  background:var(--primary-soft);
+}
+
+/* «Más» (tableta): panel con los grupos que no caben en la fila. Va anclado a
+   la derecha porque es el último destino de la fila: si creciera hacia la
+   derecha, su panel (oculto pero maquetado) añadiría desborde horizontal a la
+   página en las internas, donde la cabecera es `static`. */
+.otrn-header .otrn-subnav--mas{
+  left:auto; right:0;
+  min-width:250px; max-height:min(70vh,520px); overflow-y:auto; padding:12px 0;
+}
+/* Título de grupo dentro de «Más». Con `--text3` (#888888) se quedaba en 3,5:1,
+   por debajo del mínimo AA para texto de 10,5 px; `--text2` (#666666) da 5,7:1
+   y sigue leyéndose como texto secundario. */
+.otrn-header .otrn-mas__titulo{
+  margin:0; padding:8px 18px 4px;
+  font-size:10.5px; font-weight:800; letter-spacing:.07em; text-transform:uppercase;
+  color:var(--text2);
+}
+.otrn-header .otrn-mas__lista{margin:0 0 6px; padding:0; list-style:none;}
+
+/* Por defecto la fila muestra todos los grupos y «Más» no existe. */
+.otrn-header .otrn-nav__item--mas{display:none;}
+.otrn-header .otrn-mas__grupo{display:none;}
+
+/* ---- Modo fila (escritorio y tableta) -------------------------------- */
+/* Repone el layout en línea frente al panel de `otrn-landing.css` (≤768 px,
+   solo portada) cuando el ancho aún permite la fila. */
+@media (min-width:680px){
+  .otrn-header .otrn-nav{
+    display:block; position:static; inset:auto; width:auto; height:auto;
+    max-height:none; margin-left:auto; padding:0; overflow:visible;
+    background:none; border:0; box-shadow:none; transform:none;
+    visibility:visible; z-index:auto; transition:none;
+  }
+  .otrn-header .otrn-nav a,
+  .otrn-header .otrn-nav__boton{
+    padding:0; border:0; background:none;
+  }
+}
+
+/* Colapso progresivo en tableta: lo que no cabe se ofrece en «Más». */
+@media (min-width:680px) and (max-width:1151px){
+  .otrn-header .otrn-nav__lista{gap:14px;}
+  .otrn-header .otrn-nav__item--mas{display:flex;}
+  .otrn-header .otrn-nav__item--grupo[data-prioridad="5"],
+  .otrn-header .otrn-nav__item--grupo[data-prioridad="6"]{display:none;}
+  .otrn-header .otrn-mas__grupo[data-prioridad="5"],
+  .otrn-header .otrn-mas__grupo[data-prioridad="6"]{display:block;}
+}
+@media (min-width:680px) and (max-width:909px){
+  .otrn-header .otrn-nav__item--grupo[data-prioridad="3"],
+  .otrn-header .otrn-nav__item--grupo[data-prioridad="4"]{display:none;}
+  .otrn-header .otrn-mas__grupo[data-prioridad="3"],
+  .otrn-header .otrn-mas__grupo[data-prioridad="4"]{display:block;}
+}
+
+/* ---- Icono de cuenta ------------------------------------------------- */
+/* Sin borde, sin fondo, sin forma de píldora: solo el icono. El área táctil
+   son 44×44 px, invisibles (el icono mide 21 px y queda centrado). */
+.otrn-header .otrn-cuenta{position:relative; flex:0 0 auto; margin-left:20px; z-index:61;}
+.otrn-header .otrn-cuenta__boton{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:44px; height:44px; padding:0; margin:0;
+  background:none; border:0; border-radius:0; box-shadow:none;
+  color:inherit; cursor:pointer; -webkit-appearance:none; appearance:none;
+  transition:color .18s ease, opacity .18s ease;
+}
+.otrn-header .otrn-cuenta__icono{display:block; width:21px; height:21px;}
+.otrn-header .otrn-cuenta__boton:hover{color:var(--primary-dark);}
+.otrn-header .otrn-cuenta__boton:active{opacity:.7;}
+.otrn-header .otrn-cuenta__boton:focus-visible{outline:2px solid var(--primary-dark); outline-offset:2px; border-radius:6px;}
+.otrn-header .otrn-cuenta__panel{
+  position:absolute; top:calc(100% + 8px); right:0; z-index:62;
+  min-width:190px; padding:6px 0;
+  background:var(--paper); border:1px solid var(--grey); border-radius:var(--radius-sm);
+  box-shadow:0 10px 26px rgba(16,28,40,.10);
+  opacity:0; visibility:hidden; transform:translateY(-6px);
+  transition:opacity .18s ease, transform .18s ease, visibility 0s linear .18s;
+}
+.otrn-header .otrn-cuenta.is-abierto .otrn-cuenta__panel,
+.otrn-header:not(.otrn-js) .otrn-cuenta:hover .otrn-cuenta__panel,
+.otrn-header:not(.otrn-js) .otrn-cuenta:focus-within .otrn-cuenta__panel{
+  opacity:1; visibility:visible; transform:none;
+  transition:opacity .18s ease, transform .18s ease, visibility 0s linear 0s;
+}
+.otrn-header .otrn-cuenta__panel a{
+  display:block; padding:10px 18px; font-size:13.5px; font-weight:600;
+}
+.otrn-header .otrn-cuenta__panel a:hover,
+.otrn-header .otrn-cuenta__panel a:focus-visible{background:var(--primary-soft);}
 
 /* ---- Botón de menú (hamburguesa) ------------------------------------- */
 .otrn-header .otrn-burger{
-  display:none; flex:0 0 auto; width:46px; height:46px; margin-left:14px;
+  display:none; flex:0 0 auto; width:46px; height:46px; margin-left:6px;
   background:none; border:0; cursor:pointer; padding:0; position:relative; z-index:61;
 }
 .otrn-header .otrn-burger__box{position:absolute; inset:0; display:flex; flex-direction:column; justify-content:center; gap:6px; padding:0 11px;}
@@ -61,7 +235,7 @@
 .otrn-header .otrn-burger.is-active .otrn-burger__line:nth-child(1){transform:translateY(8px) rotate(45deg);}
 .otrn-header .otrn-burger.is-active .otrn-burger__line:nth-child(2){opacity:0;}
 .otrn-header .otrn-burger.is-active .otrn-burger__line:nth-child(3){transform:translateY(-8px) rotate(-45deg);}
-.otrn-header .otrn-burger:focus-visible{outline:2px solid var(--primary); outline-offset:3px;}
+.otrn-header .otrn-burger:focus-visible{outline:2px solid var(--primary-dark); outline-offset:3px;}
 
 /* ---- Barra de administración de WordPress ---------------------------- */
 /* La cabecera de la portada es `fixed` (`.otrn.home .otrn-header{top:0}`, en
@@ -70,11 +244,6 @@
    `top:0`—. En las páginas internas la cabecera es `static` y la desplaza el
    margen de core, así que ahí `top` no tiene efecto. */
 body.admin-bar.home .otrn-header{ top:32px; }
-/* El panel se ancla al contenedor (la cabecera en la portada, el viewport en
-   las internas), así que el desplazamiento se declara para cada caso. Se usan
-   `top` y `max-height` (no `height`) porque ninguna de las dos propiedades
-   afecta a la fila estática de escritorio: así estas reglas no dependen del
-   punto de corte del panel y se declaran una sola vez. */
 body.admin-bar.home .otrn-header .otrn-nav{ max-height:calc(100vh - 32px); }
 body.admin-bar:not(.home) .otrn-header .otrn-nav{ top:32px; max-height:calc(100vh - 32px); }
 @media screen and (max-width:782px){
@@ -83,25 +252,20 @@ body.admin-bar:not(.home) .otrn-header .otrn-nav{ top:32px; max-height:calc(100v
   body.admin-bar:not(.home) .otrn-header .otrn-nav{ top:46px; max-height:calc(100vh - 46px); }
 }
 
-/* ---- Panel lateral --------------------------------------------------- */
-/* El mismo panel se declara en dos sitios: (1) a ≤1360 px para cualquier
-   visitante —ahí la fila sin sesión ya no cabe— y (2) con sesión iniciada a
-   cualquier ancho, porque el 11.º enlace hace que la fila no quepa nunca dentro
-   de los 1376 px útiles. Si se edita un bloque, editar el otro. */
-
-/* (1) Sin sesión: la fila necesita 1338 px de viewport. */
-@media (max-width:1360px){
-  .otrn-header .otrn-login{margin-left:auto;}
+/* ---- Modo panel (móvil) ---------------------------------------------- */
+/* Mismo markup que la fila: el desplegable se vuelve acordeón y el nav, panel
+   lateral a altura completa con captura de foco (assets/otrn-menu.js). */
+@media (max-width:679px){
   .otrn-header .otrn-burger{display:flex;}
+  .otrn-header .otrn-cuenta{margin-left:auto;}
   .otrn-header .otrn-nav{
-    display:flex;
+    display:flex; flex-direction:column;
     position:fixed; top:0; right:0;
     height:100vh; max-height:100vh;
-    width:min(84vw,360px);
-    flex-direction:column; gap:4px; margin:0;
+    width:min(86vw,340px);
+    margin:0; padding:88px 24px 32px;
     background:var(--paper);
     border-left:1px solid var(--grey);
-    padding:96px 28px 32px;
     box-shadow:-20px 0 60px rgba(16,28,40,.18);
     overflow-y:auto;
     transform:translateX(100%);
@@ -110,49 +274,42 @@ body.admin-bar:not(.home) .otrn-header .otrn-nav{ top:32px; max-height:calc(100v
     z-index:60;
   }
   body.otrn-menu-abierto .otrn-header .otrn-nav{
-    transform:translateX(0);
-    visibility:visible;
+    transform:translateX(0); visibility:visible;
     transition:transform .34s ease, visibility 0s linear 0s;
   }
-  .otrn-header .otrn-nav a{
-    font-size:16px; font-weight:600; padding:12px 0;
+  .otrn-header .otrn-nav__lista{flex-direction:column; align-items:stretch; gap:0;}
+  .otrn-header .otrn-nav__item{display:block;}
+  /* En el panel lateral sobra «Más»: se listan los grupos completos. */
+  .otrn-header .otrn-nav__item--mas{display:none;}
+  .otrn-header .otrn-nav a,
+  .otrn-header .otrn-nav__boton{
+    width:100%; justify-content:space-between;
+    font-size:16px; font-weight:600; padding:13px 0;
     border-bottom:1px solid var(--primary-soft);
   }
-  .otrn-header .otrn-nav a:focus-visible{outline:2px solid var(--primary); outline-offset:2px;}
+  .otrn-header .otrn-nav__caret{margin-left:auto;}
+  /* Acordeón: el panel absoluto pasa a lista en línea, cerrada por defecto. */
+  .otrn-header .otrn-subnav{
+    position:static; min-width:0; max-height:none; overflow:visible;
+    display:none; margin:0; padding:0 0 6px 14px;
+    background:none; border:0; border-radius:0; box-shadow:none;
+    opacity:1; visibility:visible; transform:none; transition:none;
+  }
+  .otrn-header .otrn-nav__item.is-abierto > .otrn-subnav{display:block;}
+  .otrn-header .otrn-subnav a{
+    display:block; font-size:15px; font-weight:600; padding:11px 0;
+    border-bottom:1px solid var(--grey);
+  }
+  .otrn-header .otrn-nav a:focus-visible,
+  .otrn-header .otrn-nav__boton:focus-visible{outline:2px solid var(--primary-dark); outline-offset:2px;}
 }
-
-/* (2) Con sesión: la fila necesita 1424 px y nunca caben más de 1376 px. */
-body.logged-in .otrn-header .otrn-login{margin-left:auto;}
-body.logged-in .otrn-header .otrn-burger{display:flex;}
-body.logged-in .otrn-header .otrn-nav{
-  display:flex;
-  position:fixed; top:0; right:0;
-  height:100vh; max-height:100vh;
-  width:min(84vw,360px);
-  flex-direction:column; gap:4px; margin:0;
-  background:var(--paper);
-  border-left:1px solid var(--grey);
-  padding:96px 28px 32px;
-  box-shadow:-20px 0 60px rgba(16,28,40,.18);
-  overflow-y:auto;
-  transform:translateX(100%);
-  visibility:hidden;
-  transition:transform .34s ease, visibility 0s linear .34s;
-  z-index:60;
-}
-body.logged-in.otrn-menu-abierto .otrn-header .otrn-nav{
-  transform:translateX(0);
-  visibility:visible;
-  transition:transform .34s ease, visibility 0s linear 0s;
-}
-body.logged-in .otrn-header .otrn-nav a{
-  font-size:16px; font-weight:600; padding:12px 0;
-  border-bottom:1px solid var(--primary-soft);
-}
-body.logged-in .otrn-header .otrn-nav a:focus-visible{outline:2px solid var(--primary); outline-offset:2px;}
 
 /* ---- Accesibilidad: movimiento reducido ------------------------------ */
 @media (prefers-reduced-motion:reduce){
-  .otrn-header .otrn-burger__line{transition:none;}
-  .otrn-header .otrn-nav{transition:none;}
+  .otrn-header .otrn-burger__line,
+  .otrn-header .otrn-nav,
+  .otrn-header .otrn-subnav,
+  .otrn-header .otrn-nav__caret,
+  .otrn-header .otrn-cuenta__panel,
+  .otrn-header .otrn-cuenta__boton{transition:none;}
 }
