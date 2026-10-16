@@ -28,7 +28,7 @@ while ( have_posts() ) :
 	?>
 
 	<article class="wrap otrn-detail otrn-noticia">
-		<div class="otrn-crumb"><a href="<?php echo esc_url( otrn_noticias_url() ); ?>">Noticias</a> <span style="color:var(--text3);font-weight:400;">/</span> Detalle</div>
+		<div class="otrn-crumb"><a href="<?php echo esc_url( otrn_noticias_url() ); ?>">Noticias</a> <span style="color:var(--text2);font-weight:400;">/</span> Detalle</div>
 
 		<div class="otrn-noticia-head">
 			<?php foreach ( $otrn_cats as $otrn_cat ) : ?>

@@ -18,7 +18,7 @@ $puntos = otrn_evaluaciones_geo();
 ?>
 
 <?php if ( empty( $puntos ) ) : ?>
-	<div class="otrn-empty" style="border:1px solid var(--grey);border-radius:14px;">Aún no hay autoevaluaciones geolocalizadas.</div>
+	<div class="otrn-empty" style="border:1px solid var(--grey);border-radius:var(--radius);">Aún no hay autoevaluaciones geolocalizadas.</div>
 <?php else : ?>
 	<div class="otrn-kpigrid" id="otrn-mapkpis">
 		<?php foreach ( $puntos as $i => $p ) : ?>
@@ -31,14 +31,21 @@ $puntos = otrn_evaluaciones_geo();
 	</div>
 
 	<div id="otrn-map"></div>
-	<p style="color:var(--text3);font-size:12px;margin:10px 0 40px;">Tramos: <b style="color:var(--error);">Bajo 0–33%</b> · <b style="color:var(--primary-dark);">Medio 34–66%</b> · <b style="color:var(--secondary);">Bueno 67–100%</b>. Tiles © OpenStreetMap contributors.</p>
+	<p style="color:var(--text2);font-size:12px;margin:10px 0 40px;">Tramos: <b style="color:var(--error);">Bajo 0–33%</b> · <b style="color:var(--warning);">Medio 34–66%</b> · <b style="color:var(--success);">Bueno 67–100%</b>. Tiles © OpenStreetMap contributors.</p>
 
 	<script>
 	document.addEventListener('DOMContentLoaded', function(){
 		var puntos = <?php echo wp_json_encode( $puntos ); ?>;
 		if (!window.L || !puntos.length) { return; }
 
-		var colores = { high:'#2F6F79', mid:'#DF8056', low:'#EA5252', na:'#888888' };
+		// Tramos leídos del sistema de diseño (style.css :root) para no duplicar
+		// la paleta de estado: alto = éxito, medio = aviso, bajo = error, s/d = neutro.
+		var raiz = getComputedStyle(document.documentElement);
+		var token = function(n){ return raiz.getPropertyValue(n).trim(); };
+		var colores = {
+			high: token('--success'), mid: token('--warning'),
+			low: token('--error'), na: token('--neutral')
+		};
 		var map = L.map('otrn-map', { scrollWheelZoom:false });
 		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 			maxZoom: 19,
@@ -63,7 +70,7 @@ $puntos = otrn_evaluaciones_geo();
 			var tier = prom === null ? 'na' : (prom >= 67 ? 'high' : (prom >= 34 ? 'mid' : 'low'));
 
 			var marker = L.circleMarker([lat,lng], {
-				radius: 12, color:'#fff', weight:2, fillColor:colores[tier], fillOpacity:0.95
+				radius: 12, color: token('--paper'), weight:2, fillColor:colores[tier], fillOpacity:0.95
 			}).addTo(map);
 
 			var lista = g.map(function(x){
@@ -72,7 +79,7 @@ $puntos = otrn_evaluaciones_geo();
 			}).join('');
 			marker.bindPopup('<b>'+g[0].destino+'</b>'
 				+ (g.length>1 ? '<br>Promedio: <b>'+(prom===null?'—':prom+'%')+'</b> · '+g.length+' evaluaciones' : '')
-				+ '<hr style="margin:6px 0;border:none;border-top:1px solid #eee;">' + lista);
+				+ '<hr style="margin:6px 0;border:none;border-top:1px solid var(--grey);">' + lista);
 
 			if (g.length > 1) {
 				L.marker([lat,lng], { icon: L.divIcon({

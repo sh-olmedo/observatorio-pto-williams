@@ -47,7 +47,7 @@ $base = get_permalink();
 	</form>
 
 	<?php if ( ! $q->have_posts() ) : ?>
-		<div class="otrn-empty" style="border:1px solid var(--grey);border-radius:14px;">No hay noticias que coincidan.</div>
+		<div class="otrn-empty" style="border:1px solid var(--grey);border-radius:var(--radius);">No hay noticias que coincidan.</div>
 	<?php else : ?>
 		<div class="otrn-newsgrid">
 			<?php

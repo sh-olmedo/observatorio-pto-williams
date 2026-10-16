@@ -29,7 +29,7 @@ while ( have_posts() ) :
 		<div style="padding-top:36px;">
 			<div class="otrn-crumb">
 				<a href="<?php echo esc_url( get_post_type_archive_link( 'evaluacion' ) ); ?>">Autoevaluaciones</a>
-				<span style="color:var(--text3);font-weight:400;"> / </span> Resultados
+				<span style="color:var(--text2);font-weight:400;"> / </span> Resultados
 			</div>
 
 			<?php if ( $es_demo ) : ?>

@@ -234,7 +234,7 @@ $prio_tot = max( 1, $prio_si + $prio_no );
 	endif;
 	?>
 
-	<p style="color:var(--text3);font-size:12px;margin:4px 0 0;">
+	<p style="color:var(--text2);font-size:12px;margin:4px 0 0;">
 		Mostrando <?php echo count( $filas_pagina ); ?> de <?php echo count( $filas ); ?> iniciativas<?php echo 'todos' !== $f_anio ? ' en ' . (int) $f_anio : ''; ?> · Fuente: Pladetur Rapa Nui.
 	</p>
 

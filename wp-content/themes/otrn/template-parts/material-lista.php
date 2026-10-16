@@ -41,7 +41,7 @@ $listado  = $args['query'];
 	</form>
 
 	<?php if ( ! $listado->have_posts() ) : ?>
-		<div class="otrn-empty" style="border:1px solid var(--grey);border-radius:14px;"><?php echo esc_html( $args['vacio'] ); ?></div>
+		<div class="otrn-empty" style="border:1px solid var(--grey);border-radius:var(--radius);"><?php echo esc_html( $args['vacio'] ); ?></div>
 	<?php else : ?>
 		<div class="otrn-rowlist">
 			<?php while ( $listado->have_posts() ) : $listado->the_post();

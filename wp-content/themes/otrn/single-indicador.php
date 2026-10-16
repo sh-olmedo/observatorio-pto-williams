@@ -93,7 +93,7 @@ while ( have_posts() ) :
 		</aside>
 
 		<article class="otrn-ind-visor">
-			<div class="otrn-crumb"><a href="<?php echo esc_url( get_post_type_archive_link( 'indicador' ) ); ?>">Indicadores</a> <span style="color:var(--text3);font-weight:400;">/</span> Detalle</div>
+			<div class="otrn-crumb"><a href="<?php echo esc_url( get_post_type_archive_link( 'indicador' ) ); ?>">Indicadores</a> <span style="color:var(--text2);font-weight:400;">/</span> Detalle</div>
 
 			<div class="otrn-ind-tags">
 				<?php if ( $cat ) : ?><span class="otrn-tag"><?php echo esc_html( $cat ); ?></span><?php endif; ?>
@@ -141,15 +141,15 @@ while ( have_posts() ) :
 					}
 					?>
 					<svg viewBox="0 0 100 54" preserveAspectRatio="none" style="width:100%;height:260px;">
-						<polyline points="<?php echo esc_attr( implode( ' ', $pts ) ); ?>" fill="none" stroke="var(--secondary)" stroke-width="0.8" stroke-linejoin="round"></polyline>
+						<polyline points="<?php echo esc_attr( implode( ' ', $pts ) ); ?>" fill="none" stroke="var(--primary)" stroke-width="0.8" stroke-linejoin="round"></polyline>
 						<?php foreach ( $pts as $p ) : list($px,$py)=explode(',',$p); ?>
-							<circle cx="<?php echo esc_attr( $px ); ?>" cy="<?php echo esc_attr( $py ); ?>" r="0.9" fill="var(--secondary)"></circle>
+							<circle cx="<?php echo esc_attr( $px ); ?>" cy="<?php echo esc_attr( $py ); ?>" r="0.9" fill="var(--primary)"></circle>
 						<?php endforeach; ?>
 					</svg>
-					<div style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text3);margin-top:6px;">
+					<div style="display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:11px;color:var(--text2);margin-top:6px;">
 						<?php foreach ( $serie as $r ) : ?><span><?php echo esc_html( $r['fecha'] ); ?></span><?php endforeach; ?>
 					</div>
-					<p style="font-size:12px;color:var(--text3);margin-top:10px;">Último valor (<?php echo esc_html( end( $serie )['fecha'] ); ?>): <b class="mono"><?php echo esc_html( number_format( end( $vals ), 0, ',', '.' ) ); ?></b></p>
+					<p style="font-size:12px;color:var(--text2);margin-top:10px;">Último valor (<?php echo esc_html( end( $serie )['fecha'] ); ?>): <b class="mono"><?php echo esc_html( number_format( end( $vals ), 0, ',', '.' ) ); ?></b></p>
 				</div>
 			<?php else : ?>
 				<p class="otrn-ind-nota">Sin serie de datos ni visor cargado.</p>

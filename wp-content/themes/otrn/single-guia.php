@@ -14,7 +14,7 @@ while ( have_posts() ) :
 	?>
 
 	<article class="wrap otrn-detail" style="padding-top:36px;">
-		<div class="otrn-crumb"><a href="<?php echo esc_url( get_post_type_archive_link( 'guia' ) ); ?>">Guía de usuario</a> <span style="color:var(--text3);font-weight:400;">/</span> Detalle</div>
+		<div class="otrn-crumb"><a href="<?php echo esc_url( get_post_type_archive_link( 'guia' ) ); ?>">Guía de usuario</a> <span style="color:var(--text2);font-weight:400;">/</span> Detalle</div>
 
 		<h1 style="font-size:30px;margin:12px 0;"><?php the_title(); ?></h1>
 

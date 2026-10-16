@@ -142,7 +142,7 @@ $total_crit  = count( otrn_codigos_criterios() );
 	<?php endif; ?>
 
 	<?php if ( empty( $ids ) ) : ?>
-		<div class="otrn-empty" style="border:1px solid var(--grey);border-radius:14px;">
+		<div class="otrn-empty" style="border:1px solid var(--grey);border-radius:var(--radius);">
 			<?php echo $hay_filtros ? 'Ninguna autoevaluación coincide con los filtros.' : 'Aún no hay autoevaluaciones registradas.'; ?>
 		</div>
 	<?php else : ?>

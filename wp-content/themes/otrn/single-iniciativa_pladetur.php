@@ -79,7 +79,7 @@ while ( have_posts() ) :
 						</tbody>
 					</table>
 				</div>
-				<p style="color:var(--text3);font-size:12px;margin-top:12px;">Los ejes «previsto» e «invertido» quedan diferidos hasta contar con datos de ejecución (docs/04 §0).</p>
+				<p style="color:var(--text2);font-size:12px;margin-top:12px;">Los ejes «previsto» e «invertido» quedan diferidos hasta contar con datos de ejecución (docs/04 §0).</p>
 			</div>
 		<?php endif; ?>
 

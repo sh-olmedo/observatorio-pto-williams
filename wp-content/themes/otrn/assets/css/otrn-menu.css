@@ -38,11 +38,7 @@
  *
  * Notas de arquitectura:
  *   - Selectores anclados a `.otrn-header` para ganar por especificidad a
- *     `style.css`, `otrn-arauco.css` y `otrn-landing.css` sin depender del orden
- *     de carga. `otrn-landing.css` (no editable: cambios previos en el árbol de
- *     trabajo) convierte `.otrn-nav` en panel a ≤768 px solo en la portada, así
- *     que el modo fila repone explícitamente `position`, `width`, `padding`,
- *     `transform`, etc. (ver «Modo fila»).
+ *     `style.css` sin depender del orden de carga.
  *   - Panel lateral: `position:fixed` a altura completa, anclado con `top:0` y
  *     `height:100vh` porque en la portada el `backdrop-filter` de la cabecera la
  *     convierte en su bloque contenedor (por eso no se usa `inset`/`bottom:0`).
@@ -75,8 +71,8 @@
 }
 /* Especificidad deliberada (5 clases) para que el estado abierto y el hover
    también ganen en la portada, donde `otrn-arauco.css` fija el color de los
-   enlaces del nav con (0,4,1). Se usa el terracota oscuro del sistema
-   (`--primary-dark`, 5,4:1 sobre blanco) y no `--primary` (2,6:1), que no
+   enlaces del nav con (0,4,1). Se usa el azul accesible del sistema
+   (`--primary-dark`, 7,4:1 sobre blanco) y no `--primary` (4,41:1), que no
    alcanza el contraste AA en texto de 13,5 px. */
 .otrn-header .otrn-nav .otrn-nav__lista .otrn-nav__item .otrn-nav__enlace:hover,
 .otrn-header .otrn-nav .otrn-nav__lista .otrn-nav__item .otrn-nav__boton:hover,
@@ -84,10 +80,10 @@
 .otrn-header .otrn-nav .otrn-nav__lista .otrn-nav__item .otrn-nav__boton[aria-current="true"]{
   color:var(--primary-dark);
 }
-/* Destino actual. `style.css` ya trae `.otrn-nav a.active{color:var(--primary)}`
+/* Destino actual. `style.css` ya trae `.otrn-nav a.active{color:var(--primary-dark)}`
    (0,2,1) —regla que hasta ahora nunca se aplicaba—, así que se sobreescribe
    aquí por contraste (AA) y por coherencia con la portada, que ya pinta su
-   enlace activo con el terracota oscuro. */
+   enlace activo con el azul accesible. */
 .otrn-header .otrn-nav .otrn-nav__enlace.active,
 .otrn-header .otrn-nav .otrn-nav__boton.active,
 .otrn-header .otrn-nav .otrn-subnav a.active{
@@ -116,7 +112,7 @@
 .otrn-header .otrn-subnav{
   position:absolute; top:calc(100% + 12px); left:-14px; z-index:62;
   min-width:220px; margin:0; padding:10px 8px; list-style:none;
-  background:var(--paper); border:1px solid var(--grey); border-radius:var(--radius-sm);
+  background:var(--paper); border:1px solid var(--grey); border-radius:var(--radius);
   box-shadow:0 10px 26px rgba(16,28,40,.10);
   opacity:0; visibility:hidden; transform:translateY(-6px);
   transition:opacity .18s ease, transform .18s ease, visibility 0s linear .18s;
@@ -138,7 +134,7 @@
    relleno —fue justo el defecto por el que los destinos se veían pegados— y por
    eso allí se apunta a `.otrn-nav__enlace` y `.otrn-nav__boton`. */
 .otrn-header .otrn-subnav a{
-  display:block; padding:12px; border:0; border-radius:8px;
+  display:block; padding:12px; border:0; border-radius:var(--radius-sm);
   font-size:13.5px; font-weight:600;
 }
 .otrn-header .otrn-subnav > li + li{margin-top:2px;}
@@ -155,9 +151,9 @@
   left:auto; right:0;
   min-width:250px; max-height:min(70vh,520px); overflow-y:auto; padding:12px 8px;
 }
-/* Título de grupo dentro de «Más». Con `--text3` (#888888) se quedaba en 3,5:1,
-   por debajo del mínimo AA para texto de 10,5 px; `--text2` (#666666) da 5,7:1
-   y sigue leyéndose como texto secundario. Comparte el sangrado de 12 px de las
+/* Título de grupo dentro de «Más». Con el gris `--text2` (#707070) se queda en
+   4,95:1 sobre blanco, por encima del mínimo AA para texto de 10,5 px, y sigue
+   leyéndose como texto secundario. Comparte el sangrado de 12 px de las
    filas para que títulos y destinos queden alineados. */
 .otrn-header .otrn-mas__titulo{
   margin:0; padding:10px 12px 4px;
@@ -226,7 +222,7 @@
 .otrn-header .otrn-cuenta__panel{
   position:absolute; top:calc(100% + 8px); right:0; z-index:62;
   min-width:190px; padding:10px 8px;
-  background:var(--paper); border:1px solid var(--grey); border-radius:var(--radius-sm);
+  background:var(--paper); border:1px solid var(--grey); border-radius:var(--radius);
   box-shadow:0 10px 26px rgba(16,28,40,.10);
   opacity:0; visibility:hidden; transform:translateY(-6px);
   transition:opacity .18s ease, transform .18s ease, visibility 0s linear .18s;
@@ -239,7 +235,7 @@
 }
 /* Misma fila que los desplegables del nav, para que ambos menús se lean igual. */
 .otrn-header .otrn-cuenta__panel a{
-  display:block; padding:12px; border-radius:8px; font-size:13.5px; font-weight:600;
+  display:block; padding:12px; border-radius:var(--radius-sm); font-size:13.5px; font-weight:600;
 }
 .otrn-header .otrn-cuenta__panel a:hover,
 .otrn-header .otrn-cuenta__panel a:focus-visible{background:var(--primary-soft);}

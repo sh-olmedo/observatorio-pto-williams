@@ -100,7 +100,7 @@ $ambitos = get_terms( array( 'taxonomy' => 'ambito', 'hide_empty' => false ) );
 	</form>
 
 	<?php if ( ! $q->have_posts() ) : ?>
-		<div class="otrn-empty" style="border:1px solid var(--grey);border-radius:14px;">No hay indicadores que coincidan.</div>
+		<div class="otrn-empty" style="border:1px solid var(--grey);border-radius:var(--radius);">No hay indicadores que coincidan.</div>
 	<?php else : ?>
 		<div class="otrn-cardgrid">
 			<?php while ( $q->have_posts() ) : $q->the_post();

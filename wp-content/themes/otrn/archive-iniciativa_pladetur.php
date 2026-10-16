@@ -188,7 +188,7 @@ $lineamientos_terms = get_terms( array( 'taxonomy' => 'lineamiento', 'hide_empty
 		</table>
 	</div>
 
-	<p style="color:var(--text3);font-size:12px;margin:16px 0 60px;">
+	<p style="color:var(--text2);font-size:12px;margin:16px 0 60px;">
 		Mostrando <?php echo count( $filas ); ?> de <?php echo count( $ids ); ?> iniciativas · Fuente: Pladetur Rapa Nui.
 	</p>
 

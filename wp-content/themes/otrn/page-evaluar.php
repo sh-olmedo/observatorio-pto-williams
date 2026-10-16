@@ -107,7 +107,7 @@ $total_ind = count( $detalle );
 					<option value="<?php echo esc_attr( $slug ); ?>" data-isla="<?php echo 'isla-completa' === $slug ? '1' : '0'; ?>" <?php selected( $pre_sector, $slug ); ?>><?php echo esc_html( $s['nombre'] ); ?></option>
 				<?php endforeach; ?>
 			</select>
-			<span style="font-size:12px;color:var(--text3);margin-top:6px;">Elige una sección de la isla o la isla completa. Al evaluar un <strong>sector</strong> puedes marcar <strong>N/A</strong> cuando un indicador no aplique; para la <strong>isla completa</strong> se responde solo 0–3. Es obligatorio para calcular resultados.</span>
+			<span style="font-size:12px;color:var(--text2);margin-top:6px;">Elige una sección de la isla o la isla completa. Al evaluar un <strong>sector</strong> puedes marcar <strong>N/A</strong> cuando un indicador no aplique; para la <strong>isla completa</strong> se responde solo 0–3. Es obligatorio para calcular resultados.</span>
 		</div>
 	</div>
 
@@ -432,13 +432,13 @@ $total_ind = count( $detalle );
 </div>
 
 <style>
-.otrn-modal-fondo{position:fixed;inset:0;background:rgba(51,51,51,.5);z-index:2000;opacity:0;transition:opacity .2s;}
+.otrn-modal-fondo{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:2000;opacity:0;transition:opacity .2s;}
 .otrn-modal-fondo.abierto{opacity:1;}
 .otrn-modal{position:fixed;z-index:2001;top:50%;left:50%;transform:translate(-50%,-46%);width:min(720px,92vw);max-height:86vh;display:flex;flex-direction:column;background:var(--paper);border-radius:var(--radius);box-shadow:0 20px 60px rgba(0,0,0,.22);opacity:0;transition:opacity .2s,transform .2s;}
 .otrn-modal.abierto{opacity:1;transform:translate(-50%,-50%);}
 .otrn-modal-h{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:22px 26px;border-bottom:1px solid var(--grey);}
 .otrn-modal-h h2{font-size:20px;font-weight:800;letter-spacing:-0.02em;margin:0;}
-.otrn-modal-x{border:none;background:transparent;font-size:26px;line-height:1;color:var(--text3);cursor:pointer;padding:0 4px;}
+.otrn-modal-x{border:none;background:transparent;font-size:26px;line-height:1;color:var(--text2);cursor:pointer;padding:0 4px;}
 .otrn-modal-x:hover{color:var(--dark);}
 .otrn-modal-body{padding:22px 26px;overflow:auto;}
 .otrn-modal-body p{font-size:14px;color:var(--text2);line-height:1.65;margin:0 0 12px;}

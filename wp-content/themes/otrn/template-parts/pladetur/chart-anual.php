@@ -26,7 +26,7 @@ foreach ( $anios as $a ) {
 }
 $bw = 100 / count( $anios );
 ?>
-<svg viewBox="0 0 100 62" preserveAspectRatio="none" style="width:100%;height:170px;overflow:visible;font-family:'IBM Plex Mono',monospace;">
+<svg viewBox="0 0 100 62" preserveAspectRatio="none" style="width:100%;height:170px;overflow:visible;font-family:var(--font-mono);">
 	<?php
 	$x = 0;
 	foreach ( $anios as $a ) :
@@ -36,8 +36,8 @@ $bw = 100 / count( $anios );
 		$bwi    = $bw * 0.64;
 		$activo = ( 'todos' !== $resaltar && (int) $resaltar === $a );
 		?>
-		<rect x="<?php echo esc_attr( $bx ); ?>" y="<?php echo esc_attr( 50 - $h ); ?>" width="<?php echo esc_attr( $bwi ); ?>" height="<?php echo esc_attr( max( $h, 0.4 ) ); ?>" rx="0.6" fill="<?php echo $activo ? 'var(--primary)' : 'var(--secondary)'; ?>"></rect>
-		<text x="<?php echo esc_attr( $x + $bw / 2 ); ?>" y="57" font-size="3" fill="<?php echo $activo ? 'var(--primary-dark)' : 'var(--text3)'; ?>" font-weight="<?php echo $activo ? '700' : '400'; ?>" text-anchor="middle"><?php echo esc_html( substr( (string) $a, 2 ) ); ?></text>
+		<rect x="<?php echo esc_attr( $bx ); ?>" y="<?php echo esc_attr( 50 - $h ); ?>" width="<?php echo esc_attr( $bwi ); ?>" height="<?php echo esc_attr( max( $h, 0.4 ) ); ?>" rx="0.6" fill="<?php echo $activo ? 'var(--primary)' : 'var(--blue-dark)'; ?>"></rect>
+		<text x="<?php echo esc_attr( $x + $bw / 2 ); ?>" y="57" font-size="3" fill="<?php echo $activo ? 'var(--primary-dark)' : 'var(--text2)'; ?>" font-weight="<?php echo $activo ? '700' : '400'; ?>" text-anchor="middle"><?php echo esc_html( substr( (string) $a, 2 ) ); ?></text>
 		<?php $x += $bw; ?>
 	<?php endforeach; ?>
 </svg>

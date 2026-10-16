@@ -26,7 +26,7 @@ $q = new WP_Query( array(
 
 <div class="wrap" style="padding-bottom:60px;display:flex;flex-direction:column;gap:18px;">
 	<?php if ( ! $q->have_posts() ) : ?>
-		<div class="otrn-empty" style="border:1px solid var(--grey);border-radius:14px;">Todavía no hay guías publicadas.</div>
+		<div class="otrn-empty" style="border:1px solid var(--grey);border-radius:var(--radius);">Todavía no hay guías publicadas.</div>
 	<?php else : ?>
 		<?php while ( $q->have_posts() ) : $q->the_post(); ?>
 			<div class="otrn-panel">
