@@ -186,6 +186,19 @@
   .otrn-header .otrn-nav__boton{
     padding:0; border:0; background:none;
   }
+  /* Puente de ratón sobre el hueco de 12 px del desplegable. Los paneles van
+     `top:calc(100% + 12px)`, de modo que el puntero cruza una franja que no
+     pertenece al grupo y `mouseleave` (o el `:hover` del respaldo sin JS) cerraba
+     la tarjeta justo antes de llegar a ella. El puente cuelga del propio grupo
+     —que no recorta—, mide exactamente el hueco y no invade el botón, así que no
+     intercepta clics. Va aquí y no dentro del panel porque el de «Más» lleva
+     `overflow-y:auto` y recortaría el pseudo-elemento. Solo en modo fila: en el
+     panel lateral (≤679 px) el subnav es `position:static` (acordeón) y este
+     puente taparía el botón. */
+  .otrn-header .otrn-nav__item--grupo::after,
+  .otrn-header .otrn-nav__item--mas::after{
+    content:""; position:absolute; left:0; right:0; top:100%; height:12px;
+  }
 }
 
 /* Colapso progresivo en tableta: lo que no cabe se ofrece en «Más». */
@@ -226,6 +239,12 @@
   box-shadow:0 10px 26px rgba(16,28,40,.10);
   opacity:0; visibility:hidden; transform:translateY(-6px);
   transition:opacity .18s ease, transform .18s ease, visibility 0s linear .18s;
+}
+/* Mismo puente de ratón que los desplegables del nav, sobre los 8 px de hueco.
+   Con JS el menú de cuenta se abre al pulsar (no depende del puntero); esto
+   cubre el respaldo sin JS, donde la apertura es por `:hover`. */
+.otrn-header .otrn-cuenta__panel::before{
+  content:""; position:absolute; left:0; right:0; top:-8px; height:8px;
 }
 .otrn-header .otrn-cuenta.is-abierto .otrn-cuenta__panel,
 .otrn-header:not(.otrn-js) .otrn-cuenta:hover .otrn-cuenta__panel,
