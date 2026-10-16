@@ -112,8 +112,9 @@ document.addEventListener( 'DOMContentLoaded', function () {
 			tl.to( '.otrn-layer[data-layer="1"]', { opacity: 0, duration: 1.4 }, 5.4 );
 			tl.fromTo( '.otrn-layer[data-layer="2"]', { opacity: 0 }, { opacity: 1, duration: 1.4 }, 5.6 );
 
-			// Vello para legibilidad en la escena costera (3).
-			tl.fromTo( '.otrn-stage__grad', { opacity: 0 }, { opacity: 1, duration: 1.2 }, 5.8 );
+			// Velo de legibilidad de las escenas 2 y 3 (texto claro sobre foto):
+			// entra antes de que aparezca el texto de la escena 2 y se queda.
+			tl.fromTo( '.otrn-stage__grad', { opacity: 0 }, { opacity: 1, duration: 1.0 }, 1.6 );
 
 			// Aparición / retiro del texto de cada escena.
 			tl.to( '.otrn-act--hero .otrn-act__inner', { opacity: 0, duration: 1.0 }, 1.4 );

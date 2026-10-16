@@ -60,13 +60,22 @@
   position:relative; min-height:88vh; display:flex; align-items:center;
   color:var(--paper); background:var(--scene, var(--blue-dark)) center/cover no-repeat; isolation:isolate;
 }
-.otrn-act__grad{position:absolute; inset:0; z-index:1;}
-.otrn-act--hero .otrn-act__grad{
-  background:linear-gradient(180deg, rgba(48,74,131,.18) 0%, rgba(48,74,131,.34) 52%, rgba(48,74,131,.74) 100%);
-}
-.otrn-act--territorio .otrn-act__grad,
-.otrn-act--costa .otrn-act__grad{
-  background:linear-gradient(90deg, rgba(48,74,131,.82) 0%, rgba(48,74,131,.46) 38%, rgba(48,74,131,.06) 68%, rgba(48,74,131,0) 100%);
+/* Velo de las escenas sobre fotografía. Lo dibuja cada acto SOLO en modo
+   estático (móvil, sin JS o con movimiento reducido); en inmersivo el acto no
+   lleva velo (ver .otrn-stage.is-immersiva .otrn-act__grad).
+   El texto claro va centrado en vertical y ocupa del ~21% al ~84% del alto del
+   acto, así que el velo llega a 0,88 de opacidad justo antes de esa franja y
+   la mantiene hasta la base: el blanco queda en ≥4,5:1 sobre cualquier punto
+   de la fotografía (medido pixel a pixel, docs/VERIFICATION.md §V19). La
+   franja superior conserva fotografía a la vista. */
+.otrn-act__grad{
+  position:absolute; inset:0; z-index:1;
+  background:linear-gradient(180deg,
+    rgba(48,74,131,.12) 0%,
+    rgba(48,74,131,.55) 10%,
+    rgba(48,74,131,.88) 20%,
+    rgba(48,74,131,.90) 62%,
+    rgba(48,74,131,.92) 100%);
 }
 .otrn-act__inner{position:relative; z-index:2; width:100%;}
 /* Alineación a la izquierda (columna): anula el centrado del .wrap. */
@@ -102,25 +111,43 @@
 }
 @keyframes otrn-cue{0%{opacity:0; top:6px} 45%{opacity:1} 80%{opacity:0; top:18px} 100%{opacity:0}}
 /* ---- Modo inmersivo (.is-immersiva, escritorio + GSAP) --------------- */
+/* Ancho del panel fotográfico inicial (derecha). Se usa dos veces: para el
+   recorte del nivel fotográfico y para que el texto del hero nunca se meta
+   debajo de la foto. */
+.otrn-stage.is-immersiva{--panel-w:54%;}
 .otrn-stage.is-immersiva .otrn-stage__viewport{
   position:relative; height:100vh; height:100svh; overflow:hidden; background:var(--paper);
 }
 .otrn-stage.is-immersiva .otrn-stage__media{
   display:block; position:absolute; inset:0; z-index:1; will-change:clip-path;
   /* Panel vertical derecho que crece a sangre con --expand (0→1). */
-  clip-path:inset(0 0 0 calc((1 - var(--expand, 0)) * 54%));
+  clip-path:inset(0 0 0 calc((1 - var(--expand, 0)) * var(--panel-w)));
 }
 .otrn-stage.is-immersiva .otrn-layer{position:absolute; inset:0; opacity:0;}
 .otrn-stage.is-immersiva .otrn-layer.is-active{opacity:1;}
 .otrn-stage.is-immersiva .otrn-layer img{width:100%; height:100%; object-fit:cover; object-position:center 42%;}
+/* Velo de legibilidad de las escenas 2 y 3, que se leen sobre fotografía a
+   sangre (la 1 se lee sobre papel). Vive dentro del nivel fotográfico, así que
+   hereda su recorte y nunca invade el papel. Las paradas van en píxeles porque
+   la columna de texto arranca en el borde izquierdo del acto y nunca pasa de
+   ~620 px: así el velo cubre la columna sea cual sea el ancho de ventana y
+   deja fotografía limpia a la derecha. assets/otrn-landing.js lo enciende
+   antes de que aparezca el texto de la escena 2. */
 .otrn-stage.is-immersiva .otrn-stage__grad{
   position:absolute; inset:0; z-index:2; opacity:0;
-  background:linear-gradient(90deg, rgba(48,74,131,.74) 0%, rgba(48,74,131,.36) 42%, rgba(48,74,131,0) 66%);
+  background:linear-gradient(90deg,
+    rgba(48,74,131,.92) 0,
+    rgba(48,74,131,.86) 640px,
+    rgba(48,74,131,.34) 900px,
+    rgba(48,74,131,0) 1160px);
 }
 .otrn-stage.is-immersiva .otrn-act{position:absolute; inset:0; z-index:3; background:none; min-height:0;}
 .otrn-stage.is-immersiva .otrn-act__grad{display:none;}
 .otrn-stage.is-immersiva .otrn-act__inner{opacity:0;}
-.otrn-stage.is-immersiva .otrn-act--hero .otrn-act__inner{opacity:1;}
+/* El texto del hero se lee sobre el papel: en ventanas estrechas la columna se
+   limita al papel (--panel-w) en vez de crecer hasta 640 px, para no quedar
+   texto oscuro sobre la fotografía. */
+.otrn-stage.is-immersiva .otrn-act--hero .otrn-act__inner{opacity:1; max-width:min(640px, calc(var(--panel-w) - 56px));}
 /* Hero sobre papel (izquierda): texto oscuro. */
 .otrn-stage.is-immersiva .otrn-act--hero .otrn-act__eyebrow{color:var(--primary-dark);}
 .otrn-stage.is-immersiva .otrn-act--hero .otrn-act__titulo{color:var(--blue-dark);}
@@ -143,10 +170,15 @@
 .otrn-provisional svg{flex:0 0 auto; margin-top:2px; color:var(--warning);}
 .otrn-provisional strong{color:var(--warning);}
 .otrn-datos{display:grid; grid-template-columns:repeat(3,1fr); gap:18px;}
+/* Cifras informativas: no navegan a ningún sitio, así que no llevan la
+   superficie de tarjeta con la que se señalan los elementos accionables de la
+   portada (`.otrn-indexcard` de indicadores, `.otrn-card` de noticias): sin
+   caja, sin borde envolvente ni sombra. La regla superior las lee como datos y
+   no como botones (revisión del cliente, docs/VERIFICATION.md §V19). */
 .otrn-dato-lite{
-  position:relative; background:var(--paper); border:1px solid rgba(48,74,131,.14);
-  border-radius:var(--radius); padding:26px 24px 22px; display:flex; flex-direction:column; gap:10px;
-  box-shadow:0 1px 3px rgba(0,0,0,.06);
+  position:relative; display:flex; flex-direction:column; gap:10px;
+  background:transparent; border:0; border-top:2px solid var(--primary);
+  border-radius:0; box-shadow:none; padding:20px 0 0;
 }
 .otrn-dato-lite__ico{color:var(--accent); display:flex;}
 .otrn-dato-lite__ico svg{width:26px; height:26px;}
@@ -172,7 +204,11 @@
   -webkit-backdrop-filter:blur(6px); border:1px solid rgba(48,74,131,.12);
 }
 .otrn-rail__item a{display:flex; align-items:center; gap:10px; justify-content:flex-end; text-decoration:none;}
-.otrn-rail__n{font-family:var(--font-mono); font-size:11px; font-weight:600; letter-spacing:.05em; color:var(--primary-dark); opacity:0; transition:opacity .25s ease;}
+/* Número del riel sobre la chapa translúcida y la fotografía: en texto oscuro
+   (`--dark`) pasa AA holgadamente sobre cualquier foto (medido ≥6,6:1), mientras
+   que en `--primary-dark` se queda en 2,3-3,8:1 en la escena oscura
+   (docs/VERIFICATION.md §V19.2). */
+.otrn-rail__n{font-family:var(--font-mono); font-size:11px; font-weight:600; letter-spacing:.05em; color:var(--dark); opacity:0; transition:opacity .25s ease;}
 .otrn-rail__d{width:9px; height:9px; border-radius:50%; background:rgba(48,74,131,.32); box-shadow:0 0 0 1px rgba(255,255,255,.3); transition:transform .25s ease, background .25s ease;}
 .otrn-rail__item.is-active .otrn-rail__d{background:var(--primary); transform:scale(1.4);}
 .otrn-rail__item.is-active .otrn-rail__n{opacity:1;}
