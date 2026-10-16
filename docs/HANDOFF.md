@@ -29,15 +29,28 @@ destinations as too tight, so the spacing was rebuilt and the underlying cascade
 (`510e981`: the file's 9 px padding had never applied — the landing reset
 `.otrn-header .otrn-nav a` shares specificity with `.otrn-header .otrn-subnav a` and came
 later). Destinations are now 42 px rows with a 2 px gap and an inset highlight. F1 is **still
-pending the client's visual confirmation of this spacing**; see §V16.
+pending the client's visual confirmation of this spacing**; see §V16. Recorded in `cd9fd09`.
+
+**Update 2026-10-16 (fourth round — design direction confirmed):** the client confirmed that
+the site **must follow the Municipalidad de Arauco visual identity**; the coral/teal palette is
+no longer the authoritative design system (F2 direction closed). A full **design-token and
+global-style audit** was executed read-only and persisted as
+[DESIGN_TOKENS_AUDIT.md](DESIGN_TOKENS_AUDIT.md); the municipal palette was verified against
+the live site `muniarauco.cl` (Elementor kit `post-5.css`):
+**primary `#0070FF`, secondary `#DE232B` (red), accent `#41BCFF`, text `#000000`** — roles do
+**not** follow the brief's ordering; `#0C1434` is unverifiable and `#0C0D0E`/`#D6D5D5` are
+Elementor defaults ([DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) §2.5). **No CSS/PHP was modified.**
+The token mapping is **pending UX/UI approval before any style change**. This round changed
+**documentation only** (this file, `DESIGN_SYSTEM.md`, `ISSUES.md`, `README.md`,
+`ARAUCO_MIGRATION.md`, new `DESIGN_TOKENS_AUDIT.md`).
 
 ## Git baseline
 
 | Item | Value |
 | --- | --- |
 | Branch | `main` (remote `origin` configured; no remote refs fetched locally) |
-| HEAD | `510e981` — `fix(otrn): dar aire a los destinos de los desplegables (F1)` (local, not pushed) |
-| History | `99092d1` repo init → `70b22a7` "portada scrollytelling inmersiva + branding Arauco (ETAPA A+B+C)" → `5f43933` "modo dual estatico/inmersivo" → `f506104` docs baseline → `bb38d8b` runtime record → `8d3d40b` F11b protections → `d4fa738` F19 docs → `0dd2de4` F1 nav → `e727756` F1 regression fix → `932986b` F1 docs → `5f17b38` F1 grouped navigation → `57e09a8` F1 redesign docs → `510e981` F1 dropdown spacing fix (last nine local, not pushed) |
+| HEAD | `cd9fd09` — `docs(arauco): registrar el defecto de espaciado de los desplegables (F1)` (local, not pushed; the docs-only design audit commit follows it) |
+| History | `99092d1` repo init → `70b22a7` "portada scrollytelling inmersiva + branding Arauco (ETAPA A+B+C)" → `5f43933` "modo dual estatico/inmersivo" → `f506104` docs baseline → `bb38d8b` runtime record → `8d3d40b` F11b protections → `d4fa738` F19 docs → `0dd2de4` F1 nav → `e727756` F1 regression fix → `932986b` F1 docs → `5f17b38` F1 grouped navigation → `57e09a8` F1 redesign docs → `510e981` F1 dropdown spacing fix → `cd9fd09` F1 spacing docs (last ten local, not pushed) |
 | Remote | `https://github.com/sh-olmedo/observatorio-arauco.git` |
 | Tracked files | 803 (`bb38d8b` added `docs/VERIFICATION.md`; `8d3d40b` added `wp-content/mu-plugins/otrn-privacidad-seccion.php`) |
 
@@ -77,7 +90,8 @@ specificity, including over `.otrn-nav a.active` in `style.css`) instead of edit
 | Commit strategy for the 3 uncommitted files | F14 | Team (Phase 0) |
 | ACF workflow — runtime shows **0 field groups** and raw-meta fields; decide define-or-document (exporting is currently impossible) | F4 | Team (Phase 0) |
 | Operator/role model for evaluation submission | F3 | Client/team (Phase 1) |
-| Palette: approve proposed municipal colors or the current teal/terracotta | F2, F6 | Client (Phase 3) |
+| Palette | **Direction confirmed 2026-10-16**: adopt the Municipalidad de Arauco identity (verified: primary `#0070FF`, secondary `#DE232B`, accent `#41BCFF`, text `#000000`; §2.5). Pending: **approval of the token mapping** before any CSS change | F2, F6 | Client/team (approval) |
+| Token mapping (`existing token → municipal token`) and the fate of the colours with no municipal source (`#0C1434`, `#0C0D0E`, `#D6D5D5`) | F2, F6 | Client/team |
 | Arauco geography: sector list + coordinates | F8 | Client (Phase 4) |
 | Geoportal StoryMap URL (scope unknown) | F9 | Client (Phase 4) |
 | Survey embed fate | F10 | Client (Phase 4) |
@@ -85,7 +99,7 @@ specificity, including over `.otrn-nav a.active` in `style.css`) instead of edit
 | DB content inventoried at count level (2026-10-15): pages, 74 criteria, 10 sectors, 6 evaluations, 3 data cards; copy migration still pending | F18 | Team (Phase 4) |
 | Geocoding provider + usage policy for the location search (rate limits, attribution, caching; browser-direct vs server proxy) | F19 | Client/team (before Phase 6) |
 | Fate of the curated sector list and of the location metas under the new search picker | F8 ↔ F19 | Client/team (Phase 4/6) |
-| Push/deploy decision for the local commits (`8d3d40b`, `d4fa738`, `0dd2de4`, `e727756`, `932986b`, `5f17b38`, `57e09a8`, `510e981`) | F14 | User |
+| Push/deploy decision for the local commits (`8d3d40b`, `d4fa738`, `0dd2de4`, `e727756`, `932986b`, `5f17b38`, `57e09a8`, `510e981`, `cd9fd09` and the design-audit docs commit) | F14 | User |
 | **Explicit UX/UI sign-off of the grouped navigation (F1 redesign, `5f17b38`)** — colours, wording, chevrons, «Más» behaviour; nothing else should change until it is reviewed | F1 | Client/team |
 | **Visual confirmation of the dropdown spacing (`510e981`)** — 12 px rows / 2 px gap / inset highlight, and the account-menu row. Measured, not seen: the harness window is not visible from here, so no screenshot could be taken | F1 | Client/team |
 | Real authenticated-session pass for the F1 nav (login writes session tokens to the DB; the 2026-10-16 pass used a temporary `wp_set_current_user()` mu-plugin, since deleted) | F1, F17 | Team (needs a disposable environment) |
@@ -120,6 +134,16 @@ earlier padding never applied because of a specificity clash with the landing re
 task for F1 is still the same: **the client's visual confirmation**, now of this spacing in
 particular. No other visual change should be started until then.
 
+**2026-10-16 addition (fourth round — design direction):** the client confirmed the municipal
+identity and asked for the design-system consolidation. Before any style change, the
+deliverable is the **token mapping** (existing token → municipal token, verified source,
+semantic role, affected components), presented for approval. Once approved, the implementation
+order proposed by the audit is: (1) approve the mapping and the fate of the colours with no
+municipal source; (2) consolidate to a single token source (remove the 10 conflicting `--aru-*`
+redefinitions and the unscoped `:root` fallback); (3) replace hardcoded legacy colours; (4)
+verify on the homepage and representative internal pages. This does **not** change the security
+order above; the F1 visual sign-off remains outstanding in parallel.
+
 ## How to run the site (reference only — not executed in this task)
 
 - Current local site (2026-10-15): `http://localhost:8895/`, WordPress 7.1.3, PHP 8.3 —
@@ -143,8 +167,10 @@ particular. No other visual change should be started until then.
   `e727756` (new `assets/css/otrn-menu.css`, `assets/otrn-menu.js`, `functions.php` enqueue)
   and `5f17b38` (grouped navigation in `header.php` + `functions.php` + the two assets), plus
   the dropdown-spacing fix `510e981` (only `assets/css/otrn-menu.css`). The
-  F19 change set is committed as `d4fa738` (documentation only). All of them are local and
-  unpushed.
+  F19 change set is committed as `d4fa738` (documentation only). The 2026-10-16 design audit
+  changed **documentation only** (new `docs/DESIGN_TOKENS_AUDIT.md` plus updates to
+  `DESIGN_SYSTEM.md`, `ISSUES.md`, `ARAUCO_MIGRATION.md`, `README.md` and this file) and
+  touched no application code. All of them are local and unpushed.
 - Temporary files used to verify F1 (§V16) were deleted before committing: the simulation
   mu-plugin (`wp_set_current_user()`, re-created and deleted again for the `510e981` re-check)
   and the local evidence pages. `git status` lists no new

@@ -24,7 +24,8 @@ status of every Rapa Nui element still present here is inventoried in
 | --- | --- | --- |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | How the site is built: Studio, SQLite, theme, mu-plugins, CPTs, templates, assets, integrations, data flows | Developers |
 | [FEATURES.md](FEATURES.md) | Which functional modules exist, their files, dependencies and verification status | Developers, PM |
-| [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) | Actual tokens, typography, components, responsive behavior, scrollytelling; discrepancy with the proposed Arauco identity | Design, frontend |
+| [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) | Actual tokens, typography, components, responsive behavior, scrollytelling; confirmed municipal foundation (§0/§2.5) | Design, frontend |
+| [DESIGN_TOKENS_AUDIT.md](DESIGN_TOKENS_AUDIT.md) | Full token/cascade/specificity audit (baseline) + municipal identity verification (§12) | Design, frontend |
 | [ARAUCO_MIGRATION.md](ARAUCO_MIGRATION.md) | Rapa Nui → Arauco inventory: completed, pending, provisional, unverified | PM, client, developers |
 | [SECURITY_AUDIT.md](SECURITY_AUDIT.md) | Security/privacy findings with evidence, severity, impact and verification procedures | Developers, client |
 | [ISSUES.md](ISSUES.md) | The persistent register of findings F1–F19 (including F11b) with priorities | Everyone |
@@ -37,11 +38,12 @@ status of every Rapa Nui element still present here is inventoried in
 1. `README.md` (repo root) and `STUDIO.md` — repository scope and how to run WP-CLI via Studio.
 2. [ARCHITECTURE.md](ARCHITECTURE.md) — structure and data flows.
 3. [FEATURES.md](FEATURES.md) — what exists today and how far it is verified.
-4. [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) — visual system and its discrepancies.
-5. [ARAUCO_MIGRATION.md](ARAUCO_MIGRATION.md) + [ISSUES.md](ISSUES.md) — what still needs work.
-6. [SECURITY_AUDIT.md](SECURITY_AUDIT.md) — security constraints before touching handlers.
-7. [ROADMAP.md](ROADMAP.md) + [HANDOFF.md](HANDOFF.md) — what to do next.
-8. [VERIFICATION.md](VERIFICATION.md) — what was actually tested at runtime and what remains.
+4. [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) — visual system, confirmed municipal foundation and pending mapping.
+5. [DESIGN_TOKENS_AUDIT.md](DESIGN_TOKENS_AUDIT.md) — token/cascade evidence and the municipal verification (§12).
+6. [ARAUCO_MIGRATION.md](ARAUCO_MIGRATION.md) + [ISSUES.md](ISSUES.md) — what still needs work.
+7. [SECURITY_AUDIT.md](SECURITY_AUDIT.md) — security constraints before touching handlers.
+8. [ROADMAP.md](ROADMAP.md) + [HANDOFF.md](HANDOFF.md) — what to do next.
+9. [VERIFICATION.md](VERIFICATION.md) — what was actually tested at runtime and what remains.
 
 For a quick start as an agent: read [HANDOFF.md](HANDOFF.md) first, then `ISSUES.md`
 findings F1, F3, F11, F14, F17 (the current high-priority set) with their runtime status in

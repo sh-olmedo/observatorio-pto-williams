@@ -158,18 +158,27 @@ explicit UX/UI approval of the visuals**. Files: `header.php`, `functions.php`,
   **deleted** mu-plugin (`wp_set_current_user()`, no DB write, no session token), not a real
   login.
 
-### F2 — Proposed Arauco palette not implemented
+### F2 — Municipal identity not implemented (direction confirmed)
 
-- **Severity**: P2 · **Status**: Open — decision pending. **Evidence**: `#0070FF`,
-  `#41BCFF`, `#DE232B`, `#0C1434`, `#0C0D0E`, `#D6D5D5` absent from the theme (grep);
-  implemented palette is the photographed teal/terracotta system
-  (`otrn-arauco.css:17-46`), self-described as pending client confirmation
-  (`otrn-arauco.css:9-12`). Typography already matches the brief.
-- **Impact**: visual identity may diverge from the approved municipal brand; blocks
-  design-token work. **Do not assume the proposed palette is approved.**
-- **Proposed fix (not approved)**: obtain formal approval, then map approved colors onto
-  tokens (see [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) §2).
-- **Verification**: written client sign-off + token diff before/after.
+- **Severity**: P2 · **Status**: **Open — direction confirmed 2026-10-16; token mapping
+  pending UX/UI approval, not implemented.** **Evidence**: `#0070FF`, `#41BCFF`, `#DE232B`,
+  `#0C1434`, `#0C0D0E`, `#D6D5D5` absent from the theme (grep); implemented palette is the
+  photographed teal/terracotta system (`otrn-arauco.css:17-46`), self-described as pending
+  client confirmation (`otrn-arauco.css:9-12`).
+- **Update 2026-10-16 (client decision)**: the site **must follow the Municipalidad de Arauco
+  visual identity**; the coral/teal palette is no longer the authoritative design system.
+  The palette was verified against the live municipal site (`muniarauco.cl`, Elementor global
+  kit `post-5.css`): **primary `#0070FF`, secondary `#DE232B` (red), accent `#41BCFF` (light
+  blue), text `#000000`** — the roles do **not** follow the brief's ordering. `#0C1434` is
+  absent from the municipal site entirely; `#0C0D0E` and `#D6D5D5` appear only in Elementor's
+  generic base styles, **not** in the municipal kit. See
+  [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) §0/§2.5 and
+  [DESIGN_TOKENS_AUDIT.md](DESIGN_TOKENS_AUDIT.md) §12.
+- **Impact**: the visual identity must change site-wide; blocks/derives from the token
+  consolidation (F6). The three unverified colours must not be treated as brand tokens.
+- **Proposed fix (not approved)**: approve the token mapping, then apply it in one pass
+  (see [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) §2.5 and the audit's consolidation plan §9).
+- **Verification**: written approval of the mapping + rendered token diff before/after + contrast pass.
 
 ### F3 — Evaluation submission without capability check
 
@@ -229,6 +238,12 @@ explicit UX/UI approval of the visuals**. Files: `header.php`, `functions.php`,
   (`:root` fallback) and `#DF8056` (`.otrn.home` scope) ([VERIFICATION.md](VERIFICATION.md) §V8).
 - **Proposed fix (not approved)**: one source of truth; align or delete the fallback.
 - **Verification**: computed-style audit + token diff; re-check after F2 decision.
+- **Update 2026-10-16**: the direction is settled (F2 — municipal identity), so the
+  consolidation is unblocked **in direction** but still awaits mapping approval. The full
+  cascade/specificity inventory (including this layer, five coexisting layers, and 10 real
+  `--aru-*` value conflicts) is in
+  [DESIGN_TOKENS_AUDIT.md](DESIGN_TOKENS_AUDIT.md) §1–§4; the target tokens are in
+  [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) §2.5.
 
 ### F7 — Rapa Nui copy still user-visible
 

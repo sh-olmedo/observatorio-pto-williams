@@ -1,15 +1,36 @@
 # Design System
 
 Description of the **implemented** visual system as of commit `5f43933`, plus the
-**uncommitted** working-tree deltas (clearly marked). The proposed municipal identity is
-described only to compare against; **it has not been approved and is not implemented**.
+**uncommitted** working-tree deltas (clearly marked).
+
 Runtime pass 2026-10-15: the F6 token divergence and the F1/F5 defects are confirmed
 ([VERIFICATION.md](VERIFICATION.md)); the full visual review is still pending.
+
+**Update 2026-10-16 — direction confirmed:** the site must follow the **Municipalidad de
+Arauco** visual identity (§0, §2.5). The coral/teal system documented below is **no longer the
+authoritative design system**; it is kept as the *technical baseline* only. The colour roles
+are verified against the live municipal site (§2.5); the token mapping itself is **pending
+UX/UI approval** and **not implemented**. The full token/cascade audit is persisted in
+[DESIGN_TOKENS_AUDIT.md](DESIGN_TOKENS_AUDIT.md).
+
+## 0. Confirmed direction (2026-10-16)
+
+The client confirmed that **Observatorio Turístico de Arauco must follow the Municipalidad de
+Arauco visual identity**. The coral/teal palette described in §2 is therefore **not the
+authoritative design system** any more; it is retained here as the *implemented baseline* until
+the consolidated municipal tokens are approved and applied.
+
+- **Verified** municipal foundation (palette roles, typography, geometry): §2.5.
+- **Pending UX/UI approval**: the token mapping (existing token → municipal token) and the
+  colours that have **no** verified municipal source (§2.5.3). **Nothing is implemented yet.**
+- Technical baseline (full token, cascade, specificity and hardcoded-value inventory):
+  [DESIGN_TOKENS_AUDIT.md](DESIGN_TOKENS_AUDIT.md).
 
 ## 1. Sources of truth — and their gaps
 
 - Code comments reference `docs/design-tokens.md` (`style.css:11`) but that file does not
-  exist anywhere in the repository (F15).
+  exist anywhere in the repository (F15). A separate, current token/cascade audit **does**
+  exist: [DESIGN_TOKENS_AUDIT.md](DESIGN_TOKENS_AUDIT.md).
 - Three token layers currently coexist (F6):
   1. `style.css:16-25` — global `:root` tokens (committed values; see §2).
   2. `assets/css/otrn-arauco.css:17-46` — `--aru-*` tokens scoped to `.otrn.home`,
@@ -61,12 +82,65 @@ are identical to the system, which is not the case — this is issue F6.
 **Runtime (2026-10-15)**: on `/`, `:root` resolves `--aru-terra:#C0392B` while `.otrn.home`
 resolves `#DF8056` — both live simultaneously (confirmed).
 
-### 2.4 Proposed municipal palette — **not implemented**
+### 2.4 Municipal palette in the brief — **direction confirmed, mapping pending**
 
-The brief's proposed colors `#0070FF`, `#41BCFF`, `#DE232B`, `#0C1434`, `#0C0D0E`,
-`#D6D5D5` do not appear anywhere in the theme (grep). Only `#F7F7F7` survives, as the
-landing footer neutral (§2.2). No evidence of formal approval exists in the repository;
-treat this palette as **proposed only** (F2).
+The six colours carried in the brief are `#0070FF`, `#41BCFF`, `#DE232B`, `#0C1434`,
+`#0C0D0E`, `#D6D5D5`. None of them exists in the theme (grep); only `#F7F7F7` survives
+(the landing footer neutral, §2.2).
+
+**2026-10-16:** the direction is **confirmed** — the site adopts the Municipalidad de Arauco
+identity. The three colours verified against the live municipal site are in §2.5; the other
+three (`#0C1434`, `#0C0D0E`, `#D6D5D5`) have **no verified municipal source** and must not be
+adopted as brand tokens without approval (§2.5.3). The token mapping is **not implemented**.
+
+### 2.5 Municipal foundation — verified 2026-10-16
+
+Verified against the live municipal site **`muniarauco.cl`** (identified via search; the site
+runs WordPress + Elementor; its global palette is the Elementor **kit**,
+`wp-content/uploads/elementor/css/post-5.css`). All 44 stylesheets the municipal home page
+loads were downloaded and searched; the in-repo institutional logos were histogrammed as a
+cross-check. Full evidence: [DESIGN_TOKENS_AUDIT.md](DESIGN_TOKENS_AUDIT.md) §12.
+
+#### 2.5.1 Verified palette and semantic roles
+
+| Elementor global | Hex | Semantic role (verified) | Measured usage |
+| --- | --- | --- | --- |
+| `primary` | **`#0070FF`** | Brand blue — actions, links, active state, header/footer fills | footer 11 · home 7 · header/footer backgrounds · 5 buttons · events accent |
+| `secondary` | **`#DE232B`** | Brand red — emphasis/highlights | footer 8 · home 6 · 2 buttons · footer links 7 |
+| `accent` | **`#41BCFF`** | Light blue — surfaces/highlight | home 17 · footer 3 · header 2 · 5 buttons |
+| `text` | **`#000000`** | Body text | footer 15 · home 11 · header 3 |
+| (white) | `#FFFFFF` | Surfaces | home 27 · footer 9 · header 11 |
+| kit background | `#F8F8F8` | Page background | kit `background-color` |
+
+**Roles do not follow the brief's order:** in the municipal kit the **red `#DE232B` is the
+global *secondary*** and the **light blue `#41BCFF` is the global *accent*** — the first colour
+(`#0070FF`) *is* the global primary, but not because it is listed first.
+
+#### 2.5.2 Verified typography, geometry and other properties
+
+- Fonts: **Montserrat** (primary + text) and **Poppins** (secondary) — both already available
+  in spirit (the child theme self-hosts Montserrat; Poppins is not shipped here).
+- Weights: primary 600, text 400, accent 500, secondary 400; in-page 700 (19×), 800 (7×),
+  500 (7×), 600 (2×). Home heading sizes 32/24/29/20/18/16 px.
+- Container: **1200 px** (desktop) / 1024 px (≤1024) / **767 px** (≤767); widget spacing 20 px.
+- Radii: **30 px** dominant (pill, 17×), plus 3 px and 10 px.
+- Shadows: none on the templates (flat).
+
+#### 2.5.3 Not verified as municipal — approval required
+
+| Colour | Finding |
+| --- | --- |
+| `#0C1434` | **Absent from every stylesheet and from the home HTML** of the municipal site. Coincides with the escudo navy family (`#002868`) but has no verified municipal source. |
+| `#0C0D0E` | Only in Elementor's generic `base-desktop.css` and `widget-divider.min.css` — **Elementor defaults**, not the municipal kit. |
+| `#D6D5D5` | Only in Elementor's generic `base-desktop.css` — **Elementor default**, not the municipal kit. |
+
+Additional site colours (page-level, not kit-level): `#304A83` (header bg), `#0050B8` (dark
+blue text on the accent surface), `#707070`/`#706F6F` (grey text), `#FF7E24`, `#10B981`,
+`#004D69`.
+
+The proposed **token mapping** (which existing global token adopts which municipal colour, and
+what happens to the tokens with no municipal equivalent) is presented in the handoff message
+and is **pending UX/UI approval before any CSS change**.
 
 ## 3. Typography
 
@@ -98,8 +172,10 @@ treat this palette as **proposed only** (F2).
 
 ## 5. Responsive behavior (static analysis)
 
-Breakpoints present in the CSS: 1440 (wrap), 1280, 980, 768, 600, 480, plus a
-`prefers-reduced-motion` block (`otrn-landing.css:205-248`).
+Breakpoints present in the CSS: 1440 (wrap), 1280, 992, 980, **782** (admin bar), 768, 720,
+640, 600, 480, plus the navigation thresholds **1152/1151/910/909/680/679** (§V16) and a
+`prefers-reduced-motion` block (`otrn-landing.css:205-248`). The list is not aligned (992 vs
+980; 720 vs 768 vs 679/680) — see [DESIGN_TOKENS_AUDIT.md](DESIGN_TOKENS_AUDIT.md) §3.
 
 - **≤600 px**: `.otrn-nav{display:none}` (`style.css:508-509`). The intended replacement
   (burger + sliding panel) is defined **only** in `otrn-landing.css` (`:194, :213-224`),
@@ -131,7 +207,7 @@ Breakpoints present in the CSS: 1440 (wrap), 1280, 980, 768, 600, 480, plus a
 
 | Aspect | Implemented | Proposed | Status |
 | --- | --- | --- | --- |
-| Palette | Teal/terracotta derived from photos (`--aru-*`, §2.2), explicitly "pending confirmation" | Blue/red municipal palette (§2.4) | Not implemented; approval unknown (F2) |
+| Palette | Teal/terracotta derived from photos (`--aru-*`, §2.2) — **baseline only** | Municipal identity (§2.5), verified against `muniarauco.cl` | **Direction confirmed 2026-10-16**; token mapping pending UX/UI approval, not implemented (F2) |
 | Token layering | Three overlapping systems (§2.1–2.3) | One system | Conflict (F6) |
 | Typography | Montserrat + IBM Plex Mono (matches brief) | Montserrat + IBM Plex Mono | Aligned |
 | Institutional logos | 3 Arauco logos in footer; GORE low-res; RAU absent | Full quality set | Sourcing pending (F13) |
