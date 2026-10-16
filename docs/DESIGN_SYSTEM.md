@@ -188,6 +188,15 @@ These must not be adopted as brand tokens without explicit approval. The brief's
   (`.otrn-dato-lite`) are flat data blocks (no background, border, radius or shadow; a 2 px
   `--primary` top rule) — an affordance rule, kept after the client's home review
   ([VERIFICATION.md](VERIFICATION.md) §V19.1, F20).
+- **Glass panel over photographs (`649b01f`)**: on mobile the scene text block (eyebrow, title,
+  lead, CTA) and the hero's scroll cue are read on a translucent frosted panel —
+  `rgba(48,74,131,.65)` + `backdrop-filter:blur(16px) saturate(1.15)`, `--radius` (pill for the
+  cue), tint 0.82 where `backdrop-filter` is unsupported. It is a **legibility device, not an
+  affordance surface**: it is translucent, it sits on photography and it carries no border,
+  no shadow and no hover, so it does not compete with the rule above. The scene eyebrow is full
+  white (`--paper`) and the ghost CTA's border over the panel is `rgba(255,255,255,.8)`
+  (WCAG 1.4.11). Rationale and measurements:
+  [VERIFICATION.md](VERIFICATION.md) §V20.2/§V20.4.
 
 ## 5. Responsive behaviour
 
@@ -201,9 +210,9 @@ These must not be adopted as brand tokens without explicit approval. The brief's
   overflow**, burger/panel thresholds identical on the front page and on internal pages, and
   the token pass did not change any of it ([VERIFICATION.md](VERIFICATION.md) §V17).
 - ≤600 px: footer logos drop to 40 px.
-- ≤768 px: the landing switches to static mode (scenes stack full-bleed) and the rail is
-  hidden; grids collapse (data/news grids to 2 columns at 768, 1 at 480); head layouts stack at
-  980.
+- ≤768 px: the landing switches to static mode (scenes stack full-bleed), the rail is hidden,
+  the scene text moves onto the glass panel and the veil drops to a gauze (§6); grids collapse
+  (data/news grids to 2 columns at 768, 1 at 480); head layouts stack at 980.
 - `prefers-reduced-motion`: animations neutralised, reveals forced visible, nav transition off
   (`otrn-landing.css`).
 - Unverified: real-device behaviour and touch/keyboard interaction.
@@ -218,23 +227,34 @@ These must not be adopted as brand tokens without explicit approval. The brief's
 - Reveal system: IntersectionObserver adds `.is-visible`; CSS pre-hides with
   `.otrn-reveal{opacity:0}`. **With JS fully disabled and no reduced-motion preference, revealed
   content stays invisible** (F5, confirmed at runtime).
-- **Text over the photographs — now measured, not assumed (`e2c3a9f`).** Two veils, both
-  institutional blue:
-  - **Static** (no JS / reduced motion / ≤768 px): one **vertical** veil per act,
+- **Text over the photographs — now measured, not assumed (`e2c3a9f`, revised for mobile in
+  `649b01f`).** Institutional blue, in two forms:
+  - **Static above 768 px** (no JS / reduced motion): one **vertical** veil per act,
     `rgba(48,74,131)` ramping 0.12 → 0.55 (10 %) → 0.88 (20 %) → 0.90 (62 %) → 0.92. The text
     band runs 21→84 % of the act height in the mobile layout and 23→77 % in the 88 vh static
     layout, so it always sits on ≥0.88.
+  - **Static at ≤768 px (`649b01f`)**: the veil drops to a **clear gauze** (0.06 → 0.24 at 26 %
+    → 0.34 at 58 % → 0.42) and the guarantee moves to a **glass panel** behind the text block
+    (tint 0.65 + `blur(16px)`); the panel is inset 8 px, the text 20 px, and because the inner is
+    a flex item with `width:auto` the panel hugs its content (575 px from 481 px up, leaving
+    photograph to its right). The photograph is now unveiled over **89-90 %** of the act height
+    (6.7-7.2 % before), and every element still passes AA at 320/375/400/480/768 px
+    (worst 4.68:1). The tier below — no `backdrop-filter` — raises the tint to 0.82, which holds
+    AA without any blur (≥5.90:1). The eyebrow and the title need the glass too, not only the
+    lead: on the light veil alone they measure below AA. §V20.
   - **Immersive**: one shared veil inside the photographic level (so it inherits the panel's
     `clip-path` and never tints the paper the hero is read on), with **pixel stops** — 0.92 at
     0 → 0.86 at 640 px → 0.34 at 900 px → 0 at 1160 px — matching the width of the text column
     at any window size, faded in at timeline 1.6 (before scene 2's text).
   - Contrast is computed by drawing the real photograph on a `<canvas>` with the CSS geometry
-    and compositing the veil per pixel: **all AA**, worst case 4.88:1 (immerse scene 3, 809 px)
-    and ≥5.07:1 in static mode. Method and tables:
-    [VERIFICATION.md](VERIFICATION.md) §V19.2.
-  - **Price of the guarantee**: AA against the *brightest* pixel of a photograph needs ≈0.87–0.88
-    opacity, so on mobile the photographs read as a blue-tinted backdrop with detail mainly in
-    the top ~20 %. How much photograph to keep is a client decision, not a code task.
+    and compositing the veil per pixel: **all AA**, worst case 4.88:1 (immerse scene 3, 809 px),
+    ≥5.07:1 in static mode above 768 px and ≥4.68:1 in static mode at ≤768 px. Method and
+    tables: [VERIFICATION.md](VERIFICATION.md) §V19.2 and §V20.
+  - **Price of the guarantee (above 768 px)**: AA against the *brightest* pixel of a photograph
+    needs ≈0.87–0.88 opacity, so on desktop the photographs read as a blue-tinted backdrop with
+    detail mainly in the top ~20 %. At ≤768 px the same worst case is now paid by the panel
+    instead: the trade there is ≈1.4-2.0 points of contrast for ≈82 points of visible photograph.
+    How much photograph to keep is still a client decision, not a code task.
 - Vendor: GSAP + ScrollTrigger self-hosted (`assets/vendor/`), loaded only on the front page
   (~115 KB noted in code comments).
 
@@ -248,7 +268,7 @@ These must not be adopted as brand tokens without explicit approval. The brief's
 | Typography | Montserrat + IBM Plex Mono, but Manrope requested | Montserrat + IBM Plex Mono via `--font-title`/`--font-mono` | Resolved (Manrope) |
 | Institutional logos | 3 Arauco logos, GORE low-res, RAU absent | Same 3 logos, now on white plates with one height | Source material still pending (F13) |
 | Rapa Nui leftovers | Present in copy/tokens/theme name | Tokens cleaned; **copy/theme name untouched** | Migration pending (F7–F10) |
-| Scene text over photographs | Veils that missed the text (F21) | Vertical static veil + pixel-stop immersive veil, measured ≥4.88:1 | Applied; client decision on veil weight open |
+| Scene text over photographs | Veils that missed the text (F21) | Vertical static veil above 768 px + pixel-stop immersive veil + **glass panel** at ≤768 px, measured ≥4.68:1 | Applied; client decision on veil/panel weight open |
 
 ## 8. Before → after token mapping
 
@@ -269,12 +289,18 @@ remapping of tiers/scales, the literal replacements and the deleted dead CSS is 
 ## 9. Open items for the client
 
 1. **Visual sign-off** of the token pass (and of the F1 navigation) — nothing here is approved.
-   Two review rounds have landed: the drawer contrast (`9142179`) and the home page
-   (**F20/F21**, `e2c3a9f`).
+   Three review rounds have landed: the drawer contrast (`9142179`), the home page
+   (**F20/F21**, `e2c3a9f`) and the mobile scenes (**F21 third round**, `649b01f`).
 2. ~~**Non-text contrast** of form-control borders~~: **decided 2026-10-16 — left as is**, kept
-   as a documented gap (§2.3).
+   as a documented gap (§2.3). (The *scene* ghost CTA's border over the glass panel is a
+   different case and was raised to 0.8: 1.4.11, §V20.4.)
 3. ~~**Poppins**~~: **decided 2026-10-16 — not shipped** (Montserrat + IBM Plex Mono only, §3);
    the municipal site's secondary family is dropped from the parity list.
-4. ~~**How much photograph to keep under the mobile scene text (§6)**~~: **decided 2026-10-16 —
-   keep 0.88-0.92** (AA guaranteed against the brightest pixel; the photograph stays as a
-   blue-tinted backdrop with detail in the top strip).
+4. ~~**How much photograph to keep under the mobile scene text (§6)**~~: decided 2026-10-16
+   (**keep 0.88-0.92**), and **reversed for mobile on the same day** (third round, `649b01f`):
+   after seeing the result the client asked for the photograph to be visible and for glass on
+   the leads. Above 768 px the 0.88-0.92 veils stand.
+5. **Weight and coverage of the mobile glass panel (§6, §V20)** — how much of each scene the
+   panel may cover (now ≈48-70 % of the act area, with the photograph unveiled in ≈89-90 %) and
+   how dark the tint should be (0.65 today; below ≈0.62 AA breaks at the hero's brightest spot).
+   A client decision; the panel, the veil and the tint are single knobs.

@@ -1,9 +1,11 @@
-# Issue Register (F1–F21)
+# Issue Register (F1–F22)
 
 Persistent register of every finding from the static audit (commit `5f43933` + working
 tree), **preserving the original finding IDs** (including the F11b sub-finding). Keep these
 IDs in branches, commits, PRs and future updates. **F19** was registered later (2026-10-16)
-as a new Arauco functional requirement — documentation only, not implemented. Severities:
+as a new Arauco functional requirement — documentation only, not implemented. **F22** was
+registered on 2026-10-16 too, while verifying the mobile glass pass: pre-existing, not requested,
+not introduced by that commit. Severities:
 **P0** critical, **P1** high, **P2** medium, **P3** low. No P0 was found statically.
 
 Status values: *Open* (needs work), *Open — verify at runtime* (needs a runtime/browser/DB
@@ -55,6 +57,7 @@ without touching tokens, PHP, routes or data: [VERIFICATION.md](VERIFICATION.md)
 | F19 | Self-assessment location search (OSM geocoding) | P2 | Migration | 6 |
 | F20 | Home informative KPIs read as clickable cards | P2 | UX/Affordance | 3 |
 | F21 | Home scene text illegible over the photographs | P1 | Accessibility/UX | 3 |
+| F22 | Home page has no print styles (scene copy lost on paper) | P3 | Resilience/A11y | 3 |
 
 ---
 
@@ -553,3 +556,37 @@ explicit UX/UI approval of the visuals**. Files: `header.php`, `functions.php`,
   scenes stay a blue-tinted backdrop whose detail survives mainly in the top ~20 %. A lighter
   veil would show more photograph and give up that worst case — deliberately rejected.
   [HANDOFF.md](HANDOFF.md) eighth round.
+- **Third round — 2026-10-16, superseded for mobile** (`649b01f`, local, not pushed). The client
+  saw the result and reversed the trade for the phone: *"En mobile no se alcanzan a ver las
+  imágenes de fondo debido al degradado. El problema es específicamente con las bajadas de texto
+  que no se leen bien en mobile. ¿Podrías probar con efecto glass en las bajadas de texto?"*.
+  The eighth-round decision (a veil heavy enough to make the photograph's brightest pixel safe)
+  **still holds above 768 px**; at ≤768 px the legibility guarantee moves from the veil to a
+  **glass panel** behind the text block (tint 0.65 + `backdrop-filter:blur(16px)`), the veil drops
+  to a clear gauze (0.42 maximum) and the photograph goes from unveiled in 6.7-7.2 % of the act
+  height to **89-90 %**. The glass had to cover the eyebrow and the title too, not only the lead:
+  measured, the 12 px eyebrow over the light veil (or over the panel, if left at white 85 %) and
+  the title over a bright sky fall below AA on their own. The scene eyebrows therefore move to
+  `--paper` (both modes), the scroll cue gets the same glass as a pill, the ghost CTA's border
+  rises to 0.8 (1.4.11: 2,72 → 3,92) and a `@supports not` branch raises the tint to 0.82 for
+  browsers without `backdrop-filter`. Measured 320-768 px: every element ≥ 4,68:1, no AA failure,
+  0 px overflow. Detail and limits: [VERIFICATION.md](VERIFICATION.md) §V20.
+
+### F22 — Home page has no print styles: the scene copy disappears on paper
+
+- **Severity**: P3 · **Status**: **Open — recorded while verifying `649b01f`, not requested and
+  not introduced by it** (pre-existing) · **Category**: Resilience/Accessibility.
+- **Evidence**: `grep -rn '@media print'` over `wp-content/themes/otrn/` returns **nothing**. The
+  three scenes are built as `background-image` (`--scene` photograph) plus a veil built from
+  `linear-gradient`, with **light text** on top (`.otrn-act__titulo` = `--paper`, eyebrow = white,
+  lead = white 90 %); in the immersive mode the same is true of scenes 2-3. Browsers do not print
+  background images or background colours by default.
+- **Impact**: printing the home page drops the photographs and the veils, leaving light text on
+  white paper — the scene copy, and therefore most of the story, is lost on paper. The "Datos" and
+  "Explora" sections (dark text on white) print fine.
+- **Proposed fix (not approved)**: an `@media print` block that (a) forces the scene text to
+  `--dark`, (b) drops the veil and the glass panel, and (c) optionally prints the hero photograph
+  as an `<img>` or inlines a light plate behind the scene text. Decide first whether the home page
+  is meant to be printed at all.
+- **Verification**: static (grep + the colour declarations above). Not exercised in a print
+  preview or a print-to-PDF run.

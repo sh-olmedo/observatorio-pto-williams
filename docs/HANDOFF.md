@@ -112,8 +112,8 @@ database change):
 | Item | Value |
 | --- | --- |
 | Branch | `main` (remote `origin` configured; no remote refs fetched locally) |
-| HEAD | `e2c3a9f` — `fix(otrn): legibilidad de las escenas y cifras sin aspecto de botón en la portada (F20, F21)` (local, not pushed; this documentation commit follows it) |
-| History | `99092d1` repo init → `70b22a7` "portada scrollytelling inmersiva + branding Arauco (ETAPA A+B+C)" → `5f43933` "modo dual estatico/inmersivo" → `f506104` docs baseline → `bb38d8b` runtime record → `8d3d40b` F11b protections → `d4fa738` F19 docs → `0dd2de4` F1 nav → `e727756` F1 regression fix → `932986b` F1 docs → `5f17b38` F1 grouped navigation → `57e09a8` F1 redesign docs → `510e981` F1 dropdown spacing fix → `cd9fd09` F1 spacing docs → `9aeaa82` design-token audit docs → `52a7d4d` municipal token consolidation → `d691f03` token docs → `3dbfbc6` dropdown hover fix (F1) → `9142179` drawer contrast fix (F2) → `0d35f84` client-review docs → `e2c3a9f` home legibility + KPI affordance fix (F20, F21) (last local, not pushed) |
+| HEAD | `649b01f` — `fix(otrn): velo liviano y bloque de texto en vidrio en las escenas móviles (F21)` (local, not pushed; this documentation commit follows it) |
+| History | `99092d1` repo init → `70b22a7` "portada scrollytelling inmersiva + branding Arauco (ETAPA A+B+C)" → `5f43933` "modo dual estatico/inmersivo" → `f506104` docs baseline → `bb38d8b` runtime record → `8d3d40b` F11b protections → `d4fa738` F19 docs → `0dd2de4` F1 nav → `e727756` F1 regression fix → `932986b` F1 docs → `5f17b38` F1 grouped navigation → `57e09a8` F1 redesign docs → `510e981` F1 dropdown spacing fix → `cd9fd09` F1 spacing docs → `9aeaa82` design-token audit docs → `52a7d4d` municipal token consolidation → `d691f03` token docs → `3dbfbc6` dropdown hover fix (F1) → `9142179` drawer contrast fix (F2) → `0d35f84` client-review docs → `e2c3a9f` home legibility + KPI affordance fix (F20, F21) → `f40cb52` home-review docs → `ce9a093` four decisions closed (docs) → `649b01f` mobile glass pass (F21) (last local, not pushed) |
 | Remote | `https://github.com/sh-olmedo/observatorio-arauco.git` |
 | Tracked files | 803 (`bb38d8b` added `docs/VERIFICATION.md`; `8d3d40b` added `wp-content/mu-plugins/otrn-privacidad-seccion.php`; `52a7d4d` added/removed no files) |
 
@@ -151,7 +151,9 @@ loader remains.
 | Operator/role model for evaluation submission | F3 | Client/team (Phase 1) |
 | Palette | **Implemented 2026-10-16**: the Municipalidad de Arauco identity was verified (primary `#0070FF`, secondary `#DE232B`, accent `#41BCFF`, text `#000000`) and applied in `52a7d4d`. Pending: **the client's visual sign-off** of the rendered result | F2, F6 | Client (review) |
 | Token mapping and the fate of the colours with no municipal source (`#0C1434`, `#0C0D0E`, `#D6D5D5`) | **Applied** ([DESIGN_TOKENS_AUDIT.md](DESIGN_TOKENS_AUDIT.md) §13); the three unverified colours were **not** adopted | F2, F6 | Client (review) |
-| **Visual sign-off of the municipal token pass (`52a7d4d`)** plus the review rounds (`3dbfbc6`, `9142179`, `e2c3a9f`) — brand blue/red/navy applied to headers, buttons, links, cards, tables, filters, forms and the footer, on the homepage and on internal pages. **First review round found a drawer contrast defect (fixed); second round, two home-page defects (F20/F21, fixed). Screenshots are possible again (harness window visible), so the rendered result has been looked at by the team — but the client's sign-off is still pending** | F2, F6, F20, F21 | Client/team |
+| **Visual sign-off of the municipal token pass (`52a7d4d`)** plus the review rounds (`3dbfbc6`, `9142179`, `e2c3a9f`, `649b01f`) — brand blue/red/navy applied to headers, buttons, links, cards, tables, filters, forms and the footer, on the homepage and on internal pages. **First review round found a drawer contrast defect (fixed); second round, two home-page defects (F20/F21, fixed); third round, the mobile scenes (photograph hidden by the veil → clear gauze + glass panel on the text, fixed). Screenshots are possible again (harness window visible), so the rendered result has been looked at by the team — but the client's sign-off is still pending** | F2, F6, F20, F21 | Client/team |
+| Weight of the mobile glass panel (tint 0.65, ≈48-70 % of each act covered, photograph unveiled in ≈89-90 %): how much glass is acceptable, and whether the panel should cover the lead only (the ask) or the whole text block (what AA needs, measured) | F21, F2 | Client (review) |
+| `@media print` for the home page: the scene copy is lost on paper (pre-existing, recorded 2026-10-16 while verifying `649b01f`) | F22 | Client/team (low priority) |
 | Arauco geography: sector list + coordinates | F8 | Client (Phase 4) |
 | Geoportal StoryMap URL (scope unknown) | F9 | Client (Phase 4) |
 | Survey embed fate | F10 | Client (Phase 4) |
@@ -159,7 +161,7 @@ loader remains.
 | DB content inventoried at count level (2026-10-15): pages, 74 criteria, 10 sectors, 6 evaluations, 3 data cards; copy migration still pending | F18 | Team (Phase 4) |
 | Geocoding provider + usage policy for the location search (rate limits, attribution, caching; browser-direct vs server proxy) | F19 | Client/team (before Phase 6) |
 | Fate of the curated sector list and of the location metas under the new search picker | F8 ↔ F19 | Client/team (Phase 4/6) |
-| Push/deploy decision for the local commits (from `8d3d40b` to `e2c3a9f` and the docs commit of this round) | F14 | User |
+| Push/deploy decision for the local commits (from `8d3d40b` to `649b01f` and the docs commit of this round) | F14 | User |
 | **Explicit UX/UI sign-off of the grouped navigation (F1 redesign, `5f17b38`)** — colours, wording, chevrons, «Más» behaviour; nothing else should change until it is reviewed | F1 | Client/team |
 | **Visual confirmation of the dropdown spacing (`510e981`)** — 12 px rows / 2 px gap / inset highlight, and the account-menu row. **The client's review found that the 12 px gap made the panel unreachable with the mouse; the mouse bridge in `3dbfbc6` fixes it and the confirmation is pending again** (screenshots are possible again, so it can now be captured) | F1 | Client/team |
 | Real authenticated-session pass for the F1 nav (login writes session tokens to the DB; the 2026-10-16 pass used a temporary `wp_set_current_user()` mu-plugin, since deleted) | F1, F17 | Team (needs a disposable environment) |
@@ -255,6 +257,34 @@ documentation only:
 With these four closed, the only thing outstanding on the identity work is the **client's visual
 sign-off** of `52a7d4d` + `3dbfbc6` + `9142179` + `e2c3a9f` (and of the F1 navigation).
 
+**Update 2026-10-16 (ninth round — mobile scenes: photograph visible + glass on the text):** the
+client went back to the **home page on mobile** and reversed the eighth round's trade **for the
+phone only**: *"En mobile no se alcanzan a ver las imágenes de fondo debido al degradado. El
+problema es específicamente con las bajadas de texto que no se leen bien en mobile. ¿Podrías
+probar con efecto glass en las bajadas de texto?"*. Fixed in **`649b01f`** — one file,
+`assets/css/otrn-landing.css` (the `@media (max-width:768px)` block plus the scene eyebrow
+colour): no PHP, markup, content, route or database change, and nothing above 768 px except the
+eyebrows.
+
+- The veil drops to a **clear gauze** (0.06 → 0.42) so the photograph is unveiled over **89-90 %**
+  of each act (6.7-7.2 % before), and the text block is read on a **glass panel**
+  (`rgba(48,74,131,.65)` + `backdrop-filter:blur(16px)`) that goes **inside** the act's inner
+  container, so no new element and no template change. The panel hugs its content (575 px from
+  481 px up, leaving photograph to its right) and is inset 8 px.
+- The glass covers the eyebrow and the title too, not only the lead: measured, the 12 px eyebrow
+  and the title over a bright sky are below AA on the light veil alone — that is why the ask
+  ("glass on the leads") becomes a panel for the whole text block. The scene eyebrow moves to
+  `--paper`, the hero's scroll cue gets the same glass as a pill, the ghost CTA's border rises to
+  0.8 (1.4.11: 2,72 → 3,92) and `@supports not (backdrop-filter)` raises the tint to 0.82.
+- Measured 320/375/400/480/768 px: **every element ≥ 4,68:1, no AA failure, 0 px overflow**.
+  The trade against the previous veil is ≈1.4-2.0 points of contrast for ≈82 points of visible
+  photograph — [VERIFICATION.md](VERIFICATION.md) §V20.
+- **New finding F22** (recorded, not fixed, not requested): the theme has no `@media print` rules,
+  so the scene's light text over the photographs is lost on paper — pre-existing.
+- **What is open for the client**: the *weight* of the panel (how dark, how much of the act it may
+  cover) and, as before, the visual sign-off of the whole identity work. Nothing in this round is
+  claimed as approved; a developer look at the rendered result (375/768 px) is not a sign-off.
+
 ## How to run the site (reference only — not executed in this task)
 
 - Current local site (2026-10-15): `http://localhost:8895/`, WordPress 7.1.3, PHP 8.3 —
@@ -291,6 +321,11 @@ sign-off** of `52a7d4d` + `3dbfbc6` + `9142179` + `e2c3a9f` (and of the F1 navig
   (home page only) is committed as **`e2c3a9f`** (application code: `assets/css/otrn-landing.css`
   and `assets/otrn-landing.js` — one veil rule, one panel-width variable, one hero clamp, one
   rail colour and one timeline position; no markup, logic, content, route or new file).
+  The client's third review round (mobile scenes) is committed as **`649b01f`** (application code:
+  `assets/css/otrn-landing.css` — the `@media (max-width:768px)` block: one lighter veil, one glass
+  panel on the text container, one glass pill for the scroll cue and one ghost-CTA border, plus two
+  scene eyebrow colour declarations outside the query; no markup, logic, content, route or new
+  file).
   All of them are local and unpushed.
   The visual result of `52a7d4d` is **not** claimed as approved: the client's reviews found
   defects and the final sign-off is pending.

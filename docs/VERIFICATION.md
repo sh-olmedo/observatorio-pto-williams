@@ -685,3 +685,165 @@ decision, not a code task); scene 3's immersive veil is the same element as scen
 was measured at 809 px; the reduced-motion *preference* could not be emulated in the harness (the
 layout is the measured forced-static one, but the media-query path itself is reasoned); and real
 touch devices, iOS dynamic viewport and real keyboard modality stay as recorded in §V13/§V18.
+
+## V20 — Client review, third round: mobile scenes, photograph visibility and glass on the text (2026-10-16)
+
+The client went back to the **home page on mobile** (a screenshot came with the note): *"En mobile
+no se alcanzan a ver las imágenes de fondo debido al degradado. El problema es específicamente con
+las bajadas de texto que no se leen bien en mobile. ¿Podrías probar con efecto glass en las bajadas
+de texto?"* — i.e. the veil solved legibility at the price of hiding the photograph, and the ask is
+to try a **glass effect on the lead paragraphs**.
+
+Fixed in **`649b01f`** — one file, `assets/css/otrn-landing.css`: the mobile block of the
+`@media (max-width:768px)` query plus two colour rules outside it. **No PHP, no markup, no
+content, no route and no database change**, nothing outside the front page, and nothing above
+768 px except the scene eyebrows (§V20.5).
+
+This **supersedes, for mobile only, the eighth round's decision** (*"velo 0.88-0.92: se mantiene"*,
+[ISSUES.md](ISSUES.md) F21, commit `ce9a093`): the same client, after seeing the result, now asks
+for the photograph to be visible. Desktop (immersive and static) keeps the measured 0.88-0.92
+veils.
+
+### V20.1 Method (and its limits)
+
+The static/mobile layout was measured between **320 and 768 px** with a temporary harness
+(not versioned) that reproduces, for every text element of the three scenes:
+
+1. the **photograph**, drawn on a canvas with the same framing as the CSS (`cover` + `center`);
+2. the **veil**, rebuilt from the element's computed gradient and evaluated at the text's own
+   y position;
+3. the **glass panel**, modelled as the **box average** of the (photo + veil) underneath, with
+   radius = the CSS `blur()` radius, then the panel tint composited over that average — a
+   **conservative lower bound**, because the real filter is a Gaussian (σ = radius) that averages
+   a much wider neighbourhood and therefore flattens bright specks further;
+4. the **text colour** (alpha included) composited over the resulting background, and the WCAG
+   2.1 contrast ratio.
+
+Two deliberate refinements over the §V19 method: the sample area is now the **real text line
+boxes** (`Range.getClientRects()` per text node), not the element box — a short eyebrow was
+previously judged over the ~360 px of its `<p>` including empty space — and **no assumption is
+made about the image**: the actual asset is drawn, so the bright top band of each photograph (the
+part that forces the veil) is measured as it is, not estimated from a mid-tone. The photograph is
+the real asset (`.webp`/`.jpg`) at the real layout size, and the panel geometry is read from the
+live page.
+
+### V20.2 What changed
+
+| Item | Before (`ce9a093`) | Now (`649b01f`, ≤768 px) |
+| --- | --- | --- |
+| Veil over the scene | one vertical veil, 0.12 / 0.55 at 10 % / 0.88 at 20 % / 0.90 at 62 % / 0.92 | clear gauze: 0.06 / 0.24 at 26 % / 0.34 at 58 % / 0.42 |
+| Text surface | none (text sat on the veil) | **glass panel**: `rgba(48,74,131,.65)` + `backdrop-filter:blur(16px) saturate(1.15)`, `--radius`, covering eyebrow + title + lead + CTA |
+| Scroll cue (hero) | white 85 % text over the veil | same glass in **pill** form, text at full white |
+| Scene eyebrow (12 px) | white 85 % | `--paper` (also above 768 px: an increase there) |
+| Ghost CTA border | `rgba(255,255,255,.55)` | `rgba(255,255,255,.8)` (WCAG 1.4.11, see V20.4) |
+| No `backdrop-filter` | — | `@supports not (...)`: tint raised to **0.82**, which holds AA without any blur |
+
+Panel geometry: `.otrn-act .wrap.otrn-act__inner` — `width:auto; margin:0 8px; padding:20px 12px`,
+so the text sits 20 px from the viewport edge and the panel 8 px. Because the inner is a flex item
+with `width:auto`, the panel **hugs its content**: full width (viewport − 16 px) up to 480 px, and
+from 481 px the width of the lead's `max-width:52ch` + padding (**575 px** in Montserrat at 16 px)
+— at 768 px that leaves **185 px** of photograph to the right of the panel. Nothing in the
+desktop paths changed: at 1200 px the inner has no background and no `backdrop-filter`, the act's
+veil declaration is still the base 0.12-0.92 profile (hidden by the immersive mode, as before), the
+cue is `--text2` without glass and the hero eyebrow stays `--primary-dark` (it is read on paper).
+The glass rules live inside the `@media (max-width:768px)` query, so neither the desktop static
+path (no JS / reduced motion) nor the immersive path can reach them.
+
+### V20.3 Measured contrast — final state (minimum / mean per element)
+
+Photograph visibility is the share of the act's height where the veil is below 0.40, i.e. where
+the photograph is seen essentially unveiled: **89.0 / 89.6 / 89.2 %** (hero / territorio / costa)
+at 400 px, versus **6.8 / 7.2 / 6.7 %** with the previous veil. Horizontal overflow: **0 px** at
+all five widths measured.
+
+| Width | Scene | eyebrow 12 px | title 30-41 px | lead 16 px | CTA | cue 11 px |
+| --- | --- | --- | --- | --- | --- | --- |
+| 320 | hero | 4,78 / 5,20 | 4,83 / 6,16 | **4,70** / 6,57 | 6,67 / 8,47 | 6,88 / 7,76 |
+| 320 | territorio | 5,51 / 6,05 | 5,70 / 5,97 | 4,95 / 5,56 | 7,75 / 8,19 | — |
+| 320 | costa | 5,58 / 5,96 | 4,91 / 6,16 | 4,92 / 6,91 | 7,86 / 9,02 | — |
+| 375 | hero | 4,87 / 5,51 | 5,16 / 6,62 | 4,85 / 6,59 | 6,45 / 8,25 | 6,95 / 8,03 |
+| 375 | territorio | 5,59 / 5,99 | 5,74 / 6,01 | 4,88 / 5,61 | 7,08 / 8,11 | — |
+| 375 | costa | 5,53 / 5,93 | 4,98 / 6,32 | 5,03 / 6,82 | 8,05 / 9,36 | — |
+| 400 | hero | 4,86 / 5,56 | 5,22 / 6,70 | 4,82 / 6,65 | 6,32 / 8,08 | 7,04 / 8,35 |
+| 400 | territorio | 5,74 / 5,97 | 5,75 / 6,02 | 4,93 / 5,58 | 6,83 / 8,16 | — |
+| 400 | costa | 5,53 / 5,93 | 4,88 / 6,41 | 5,04 / 6,82 | 8,09 / 9,38 | — |
+| 480 | hero | **4,68** / 5,61 | 5,21 / 6,87 | 4,72 / 6,63 | 6,12 / 7,93 | 6,85 / 8,43 |
+| 480 | territorio | 5,95 / 6,01 | 5,77 / 6,07 | 4,80 / 5,57 | 6,00 / 8,38 | — |
+| 480 | costa | 5,55 / 5,93 | 4,72 / 6,82 | 5,03 / 6,80 | 8,28 / 9,37 | — |
+| 768 | hero | 6,88 / 7,55 | 5,46 / 7,79 | 4,97 / 6,77 | 8,50 / 8,80 | 8,47 / 8,70 |
+| 768 | territorio | 5,95 / 6,03 | 5,83 / 6,15 | 4,94 / 5,45 | 5,93 / 6,48 | — |
+| 768 | costa | 5,32 / 5,99 | 5,52 / 7,51 | 4,98 / 6,32 | 7,51 / 8,53 | — |
+
+**Every element passes AA at every width** (small text ≥4,5:1, large text ≥3:1); the worst figure
+of the pass is the hero eyebrow at 480 px (**4,68**), and no element shows any sampled pixel below
+its threshold. The glass panel covers **68 % / 64 % / 62 %** of the act area at 400 px and
+**51 % / 49 % / 48 %** at 768 px; the rest of the act is photograph, and the photograph is also
+visible **through** the panel (blurred).
+
+The 0.65 tint is not arbitrary: at **0.62** the hero eyebrow at 480 px measured 4,45 (below AA) and
+at **0.65 with the same blur** it measures 4,68. Two alternatives measured the same 480 px worst
+case — `blur(20px)` with a 0.62 tint (4,52) and `blur(24px)` with 0.62 (4,66) — both rejected in
+favour of the smaller blur, which keeps the photograph's shapes readable through the glass (the
+client's stated goal) instead of dissolving them.
+
+### V20.4 What the glass costs, and the other two measurements
+
+| Scene at 400 px | eyebrow | title | lead | CTA | cue | photograph unveiled |
+| --- | --- | --- | --- | --- | --- | --- |
+| hero | 6,69 → **4,86** | 6,91 → **5,22** | 6,22 → **4,82** | 7,57 → **6,32** | 7,96 → **7,04** | 6,8 % → **89,0 %** |
+| territorio | 7,22 → **5,74** | 7,21 → **5,75** | 6,16 → **4,93** | 7,83 → **6,83** | — | 7,2 % → **89,6 %** |
+| costa | 7,10 → **5,53** | 6,70 → **4,88** | 6,23 → **5,04** | 8,40 → **8,09** | — | 6,7 % → **89,2 %** |
+
+The "before" column is the previous veil (0.88-0.92) with **no glass**, measured with the same
+harness on the same geometry: the trade is **≈1,4-2,0 points of contrast for ≈82 points of visible
+photograph**, with AA held in both columns.
+
+**Without `backdrop-filter`** (the `@supports not` branch: tint 0,82, no blur), measured by
+neutralising the filter in the harness: minimum **5,90** (territorio lead at 480 px), maximum
+8,57 — the fallback is *more* contrast, because the tint alone has to carry the whole guarantee.
+
+**Ghost CTA border** (WCAG 1.4.11, boundary of the control over the panel, sampled along the
+border box perimeter with the same model): `rgba(255,255,255,.55)` → minimum **2,72** / mean 3,69
+(**below** the 3:1 required); `rgba(255,255,255,.8)` → minimum **3,92** / mean 5,84. The change is
+a fix for a regression this round would otherwise have introduced: over the previous dark veil the
+0.55 border measured 4,07.
+
+### V20.5 Regression checks in the same pass
+
+- **Five widths, 320 / 375 / 400 / 480 / 768 px: 0 px horizontal overflow** (`scrollWidth` ==
+  viewport). Above 768 px the change cannot apply (the rules are inside the mobile query); the
+  computed styles were nonetheless read at 1200 px to confirm the desktop paths (glass absent,
+  base veil intact, cue without glass, hero eyebrow on paper).
+- The scene eyebrows are now `--paper` **in both modes**. That is the only change above 768 px:
+  in the immersive mode the territorio/costa eyebrows rise from white 85 % (measured 5,06 minimum
+  in §V19.2) to full white, and the hero eyebrow (read on paper, `--primary-dark`) is untouched.
+  Scenes 2-3 immersive leads/titles keep their exact previous values (no rule of theirs changed).
+- **No PHP file, template, route, menu asset or database record was touched.** Navigation,
+  dropdowns, the account control and the private-section gate are untouched by this commit.
+- The rendered mobile result was **looked at** (developer look, not client sign-off): hero,
+  territorio and costa at 375 px and at 768 px, where the panels sit over clearly readable
+  photographs and leave 185 px of open photograph to their right.
+
+### V20.6 NOT VERIFIED / open
+
+- **The client's judgement of the panel's weight** — how much glass is acceptable is a client
+  decision, not a code task: the tint (0.65) and the veil (0.42 maximum) are single knobs, and
+  the panel covers roughly half to two thirds of each mobile act. The look is a **developer
+  look**, not a sign-off (F2 stays open).
+- **`backdrop-filter` cost on real hardware.** Three panels of ≤575×330 px are blurred, and the
+  blur is recomputed while the page scrolls. No real phone or tablet was available, so there is
+  no frame-time measurement and no iOS Safari check (the prefixed property is present; Safari
+  support is from 15.4). This is the main way the change could fail in the field.
+- **Model deviations:** the blur is modelled as a box average rather than a Gaussian (a lower
+  bound), `saturate(1.15)` is not modelled at all, device pixel ratios are not varied, and the
+  "photograph unveiled" figure uses the veil only (not the panel's own pixels). A pass here is a
+  pass on a conservative model, not a screenshot-pixel measurement.
+- **The panel's width depends on content**: it hugs the lead's `52ch`, so a future change to the
+  lead's copy or `max-width` moves the panel's right edge (it can never overflow: as a flex item
+  with `width:auto` it shrinks to the available width).
+- **Print** (F22, pre-existing, *not* introduced here): the theme has **no `@media print` rules**,
+  and browsers drop background images/colours by default, so the scene's light text over the
+  photographs disappears on paper. The same is true before this commit; recorded now because it
+  surfaced while measuring this round.
+- Real touch, iOS dynamic viewport, reduced-motion *as a browser preference* and real keyboard
+  modality: unchanged from §V13/§V18.

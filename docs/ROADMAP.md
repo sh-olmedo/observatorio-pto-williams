@@ -65,10 +65,11 @@ mapping, and both items were **executed ahead of this plan** in `52a7d4d` (singl
 in `style.css :root`; the landing fallback block deleted). The acceptance criteria above are
 met at the **measured** level (contrast + responsive passes, [VERIFICATION.md](VERIFICATION.md)
 §V17); the **visual spot-check by the client is still pending**, so this phase is implemented
-but **not closed**. Two client review rounds have since produced three fixes (`3dbfbc6`,
-`9142179`, `e2c3a9f` — the latter closing **F20/F21** on the home page, §V18–§V19); neither
-round was a sign-off, and one new client decision is open (how much photograph to keep under
-the mobile scene text).
+but **not closed**. Three client review rounds have since produced four fixes (`3dbfbc6`,
+`9142179`, `e2c3a9f` — the latter closing **F20/F21** on the home page, §V18–§V19 — and
+`649b01f`, the mobile glass pass of §V20, which reverses the earlier veil decision **for mobile
+only**); none of the rounds was a sign-off. Two client decisions are open: the weight of the
+mobile glass panel (§V20.6) and the fate of the pre-existing print gap (**F22**).
 
 ## Phase 4 — Content & data migration
 

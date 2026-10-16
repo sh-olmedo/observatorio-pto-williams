@@ -526,3 +526,25 @@ in [VERIFICATION.md](VERIFICATION.md) §V19):
 - **Over-photograph text is dark or white, never brand mid-tones.** The rail's active number moved
   from `--primary-dark` (2.33:1 measured) to `--dark`; on photographs, `--primary-dark` and
   `--primary` cannot be assumed legible (they are tuned for white and `--primary-soft`).
+
+### 13.9 Mobile scene round — glass panel, still no token change (`649b01f`)
+
+The client's third review round (mobile scenes, [VERIFICATION.md](VERIFICATION.md) §V20) added a
+second legibility device over the photographs and **again changed no token**:
+
+- **The glass panel and its pill use the same literal navy as the veils:** `rgba(48,74,131,.65)`
+  plus `backdrop-filter:blur(16px) saturate(1.15)` for the panel, and the same tint in pill form
+  for the hero's scroll cue (`--radius` / `--radius-pill` for geometry). Same rationale as §13.8:
+  the alpha has to be per-use, and the RGB is `--blue-dark`'s; the 0.65 value is measured, not
+  decorative (0.62 fails AA at the hero's brightest spot, §V20.3). The `@supports not
+  (backdrop-filter)` branch uses 0.82. **If a second glass surface ever appears, this is the point
+  at which a `--glass-*` token family should be created** — the audit's "hardcoded values that
+  bypass tokens" list (§13.4) is otherwise unchanged by this round.
+- **One literal retired:** the scene eyebrows passed from `rgba(255,255,255,.85)` to
+  `var(--paper)` (measured 4.1:1 over the panel vs 4.7:1), i.e. one more hardcoded white replaced
+  by a token — the direction §13.4 asks for. The same applies to the scroll cue (to `--paper`) and
+  to the ghost CTA's border over the panel (`rgba(255,255,255,.8)`, kept literal as a
+  non-token UI boundary; §13.6 records the client's decision on form-control borders).
+- **Geometry added:** panel inset 8 px / text 20 px, `--radius`; cue pill `--radius-pill`. Nothing
+  else in the component inventory (`DESIGN_SYSTEM.md` §4) changed, and no file outside
+  `assets/css/otrn-landing.css` was touched.
