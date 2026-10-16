@@ -259,6 +259,33 @@ function otrn_seccion_autoevaluacion_privada() {
 add_action( 'template_redirect', 'otrn_seccion_autoevaluacion_privada', 1 );
 
 /**
+ * La guía de usuario es privada: exige sesión iniciada.
+ *
+ * Cubre el centro de ayuda `/guias/`, la ficha de cada guía `/guias/<slug>/` y
+ * su feed. Al público se le manda al login y se le devuelve a la misma URL tras
+ * entrar (igual que la sección de autoevaluación), de modo que abrir un enlace
+ * de la guía sin sesión y volver tras entrar no pierde el destino.
+ *
+ * Es un gate de *sesión*, no de capacidad: la guía la puede leer cualquier
+ * usuario autenticado, sin roles. El enlace de nav se oculta con la misma
+ * condición (`otrn_nav_estructura()`) y las superficies que no pasan por aquí
+ * (REST, búsqueda, oEmbed, sitemap) las cierra
+ * `mu-plugins/otrn-privacidad-guias.php`.
+ */
+function otrn_guia_usuario_privada() {
+	if ( is_user_logged_in() ) {
+		return;
+	}
+	if ( ! is_post_type_archive( 'guia' ) && ! is_singular( 'guia' ) ) {
+		return;
+	}
+	$destino = home_url( add_query_arg( array() ) );
+	wp_safe_redirect( wp_login_url( $destino ), 302 );
+	exit;
+}
+add_action( 'template_redirect', 'otrn_guia_usuario_privada', 1 );
+
+/**
  * Una evaluación en borrador no tiene vista de resultados: lleva a continuarla.
  *
  * Solo la alcanzan usuarios con permisos (WordPress ya devuelve 404 a los demás
@@ -467,6 +494,30 @@ function otrn_enqueue_assets() {
 		array( 'otrn-style' ),
 		$otrn_menu_css_ver
 	);
+
+	// Centro de ayuda de la guía de usuario (`/guias/`): la hoja y el script solo
+	// se encolan en esa vista, igual que `otrn-landing.css` en la portada. El
+	// contenido de la guía vive en `guias-contenido.php`, así que editar la guía
+	// no obliga a tocar esta hoja.
+	if ( is_post_type_archive( 'guia' ) ) {
+		$otrn_guias_css     = get_stylesheet_directory() . '/assets/css/otrn-guias.css';
+		$otrn_guias_js      = get_stylesheet_directory() . '/assets/otrn-guias.js';
+		$otrn_guias_css_ver = file_exists( $otrn_guias_css ) ? (string) filemtime( $otrn_guias_css ) : '0.1.0';
+		$otrn_guias_js_ver  = file_exists( $otrn_guias_js ) ? (string) filemtime( $otrn_guias_js ) : '0.1.0';
+		wp_enqueue_style(
+			'otrn-guias',
+			get_stylesheet_directory_uri() . '/assets/css/otrn-guias.css',
+			array( 'otrn-menu-css' ),
+			$otrn_guias_css_ver
+		);
+		wp_enqueue_script(
+			'otrn-guias',
+			get_stylesheet_directory_uri() . '/assets/otrn-guias.js',
+			array(),
+			$otrn_guias_js_ver,
+			true
+		);
+	}
 }
 add_action( 'wp_enqueue_scripts', 'otrn_enqueue_assets' );
 
@@ -723,17 +774,23 @@ function otrn_nav_estructura() {
 		),
 	);
 
-	// Material de apoyo: la guía de usuario (CPT `guia`) y los dos tipos de
-	// material (`tipo_material`). Si la taxonomía aún no existe se cae al archivo
-	// del CPT para no dejar el grupo vacío.
-	$material_hijos  = array(
-		array(
+	// Material de apoyo: la guía de usuario (CPT `guia`, privada) y los dos tipos
+	// de material (`tipo_material`). Si la taxonomía aún no existe se cae al
+	// archivo del CPT para no dejar el grupo vacío.
+	//
+	// La guía exige sesión iniciada (`otrn_guia_usuario_privada()`), así que su
+	// enlace solo se anuncia con la sesión abierta: el enlace que no lleva a
+	// ningún sitio no debe verse desde fuera.
+	$material_hijos  = array();
+	$material_activo = false;
+	if ( is_user_logged_in() ) {
+		$material_hijos[] = array(
 			'etiqueta' => 'Guía de usuario',
 			'url'      => get_post_type_archive_link( 'guia' ),
 			'activo'   => is_post_type_archive( 'guia' ) || is_singular( 'guia' ),
-		),
-	);
-	$material_activo = is_post_type_archive( 'guia' ) || is_singular( 'guia' );
+		);
+		$material_activo  = is_post_type_archive( 'guia' ) || is_singular( 'guia' );
+	}
 	foreach ( otrn_material_secciones() as $otrn_slug => $otrn_sec ) {
 		$material_hijos[] = array(
 			'etiqueta' => $otrn_sec['nav'],

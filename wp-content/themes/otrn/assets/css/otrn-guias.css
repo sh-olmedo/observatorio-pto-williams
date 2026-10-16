@@ -1,0 +1,236 @@
+/* ======================================================================
+   Guía de usuario — centro de ayuda (`/guias/`)
+   ----------------------------------------------------------------------
+   Hoja exclusiva del archivo del CPT `guia` (se encola solo ahí, ver
+   `otrn_enqueue_assets()` en functions.php). No introduce ningún color
+   nuevo: usa los tokens de `style.css :root` — marca para los acentos,
+   `--primary-dark` para el texto pequeño sobre blanco, neutros para las
+   superficies y `--neutral-soft` + `--neutral` para el sello de «requiere
+   sesión iniciada», que es un estado, no una marca.
+
+   Estructura: dos columnas (índice fijo + artículos). Bajo 980 px el
+   índice se convierte en un desplegable nativo (`<details>`, sin
+   JavaScript) que vive en la columna del contenido, y el buscador sube
+   arriba con él. El texto del contenido lleva un máximo de lectura de
+   820 px para que las líneas no se estiren.
+
+   El tema no trae utilidad de «solo lectores de pantalla»; esta hoja
+   define `.otrn-guia-sr` para el aviso del sello privado.
+   ====================================================================== */
+
+/* ---- Caja general ---------------------------------------------------- */
+.otrn-guia{
+  display:grid;
+  grid-template-columns:280px minmax(0,1fr);
+  gap:48px;
+  align-items:start;
+  padding-bottom:64px;
+}
+.otrn-guia-sr{
+  position:absolute;width:1px;height:1px;padding:0;margin:-1px;
+  overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0;
+}
+
+/* ---- Columna del índice ---------------------------------------------- */
+.otrn-guia__lado{
+  position:sticky;
+  /* La barra de administración desplaza el documento (html{margin-top:32px})
+     y publica su alto en --wp-admin--admin-bar--height; se descuenta para que
+     el índice no quede debajo de ella. Sin barra, el respaldo es 0. */
+  top:calc(24px + var(--wp-admin--admin-bar--height,0px));
+  max-height:calc(100vh - var(--wp-admin--admin-bar--height,0px) - 48px);
+  overflow-y:auto;
+}
+
+.otrn-guia__buscador{display:flex;flex-direction:column;gap:6px;margin-bottom:24px;}
+.otrn-guia__buscador label{
+  font-size:11px;color:var(--text2);font-weight:700;
+  text-transform:uppercase;letter-spacing:.04em;
+}
+.otrn-guia__buscador input{
+  width:100%;border:1px solid var(--grey);border-radius:var(--radius);
+  padding:11px 12px;font-family:inherit;font-size:13.5px;
+  background:var(--paper);color:var(--dark);
+}
+.otrn-guia__resultado{font-size:12px;color:var(--text2);margin:0;}
+.otrn-guia__resultado:empty{display:none;}
+
+.otrn-guia__indice-tit{
+  font-size:11px;font-weight:800;color:var(--text2);
+  text-transform:uppercase;letter-spacing:.06em;margin:0 0 12px;
+}
+.otrn-guia-lista{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px;}
+.otrn-guia-lista a{
+  display:grid;grid-template-columns:24px minmax(0,1fr) auto;gap:10px;
+  align-items:baseline;padding:9px 10px;border-radius:var(--radius-sm);
+  font-size:13.5px;font-weight:600;color:var(--text2);
+  border-left:2px solid transparent;
+}
+.otrn-guia-lista a:hover{background:var(--lgrey);color:var(--dark);}
+.otrn-guia-lista .n{font-family:var(--font-mono);font-size:11px;color:var(--text2);}
+.otrn-guia-lista .candado{color:var(--primary-dark);font-weight:800;line-height:1;}
+/* Tema actual: lo pone el resaltado de `otrn-guias.js` (aria-current). */
+.otrn-guia-lista a[aria-current="true"]{
+  background:var(--primary-soft);color:var(--primary-dark);font-weight:800;
+  border-left-color:var(--primary-dark);
+}
+.otrn-guia-lista a[aria-current="true"] .n{color:var(--primary-dark);}
+
+.otrn-guia__nota-lado{margin:20px 0 0;font-size:12px;color:var(--text2);line-height:1.55;}
+.otrn-guia__nota-lado span{color:var(--primary-dark);font-weight:800;}
+
+/* ---- Desplegable de temas (pantalla pequeña) ------------------------- */
+.otrn-guia__temas-movil{display:none;margin:0 0 26px;border:1px solid var(--grey);border-radius:var(--radius);}
+.otrn-guia__temas-movil summary{
+  cursor:pointer;padding:14px 16px;font-weight:800;font-size:14px;
+  list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px;
+}
+.otrn-guia__temas-movil summary::-webkit-details-marker{display:none;}
+.otrn-guia__temas-movil summary::after{
+  content:"";width:9px;height:9px;flex:0 0 auto;
+  border-right:2px solid var(--primary-dark);border-bottom:2px solid var(--primary-dark);
+  transform:rotate(45deg);transition:transform .15s ease;
+}
+.otrn-guia__temas-movil[open] summary::after{transform:rotate(-135deg);}
+.otrn-guia__temas-movil .otrn-guia-lista{padding:0 10px 12px;}
+
+/* ---- Columna del contenido ------------------------------------------ */
+.otrn-guia__cuerpo{max-width:820px;}
+.otrn-guia__vacio{
+  margin:0 0 20px;padding:14px 16px;border-radius:var(--radius);
+  background:var(--lgrey);color:var(--text2);font-size:14px;
+}
+
+.otrn-guia-tema{padding:38px 0 0;border-top:1px solid var(--grey);}
+.otrn-guia-tema:first-of-type{border-top:none;padding-top:0;}
+
+.otrn-guia-tema__head{margin-bottom:6px;}
+.otrn-guia-tema__eyebrow{margin:0 0 8px;}
+.otrn-guia-tema__eyebrow .mono{
+  font-size:11px;font-weight:700;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--primary-dark);
+}
+.otrn-guia-tema h2{font-size:27px;line-height:1.15;}
+.otrn-guia-tema__resumen{margin:10px 0 0;font-size:15px;color:var(--text2);line-height:1.6;}
+.otrn-guia-sello{
+  display:inline-block;margin:14px 0 0;padding:4px 11px;border-radius:var(--radius-pill);
+  background:var(--neutral-soft);color:var(--neutral);
+  font-size:11.5px;font-weight:800;
+}
+
+/* ---- Bloques de texto ----------------------------------------------- */
+.otrn-guia-p{margin:18px 0 0;font-size:15.5px;line-height:1.72;}
+.otrn-guia-h{margin:30px 0 0;font-size:18px;line-height:1.3;}
+
+.otrn-guia-lista{margin:14px 0 0;padding-left:22px;font-size:15.5px;line-height:1.7;}
+.otrn-guia-lista li{margin-bottom:8px;}
+.otrn-guia-lista li:last-child{margin-bottom:0;}
+
+.otrn-guia-pasos{
+  margin:16px 0 0;padding:0;list-style:none;
+  display:flex;flex-direction:column;gap:12px;counter-reset:otrn-paso;
+}
+.otrn-guia-pasos li{position:relative;padding-left:44px;font-size:15.5px;line-height:1.65;}
+.otrn-guia-pasos li::before{
+  counter-increment:otrn-paso;content:counter(otrn-paso);
+  position:absolute;left:0;top:1px;width:28px;height:28px;border-radius:50%;
+  background:var(--primary-soft);color:var(--primary-dark);
+  font-family:var(--font-mono);font-size:12.5px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+}
+
+.otrn-guia-claves,
+.otrn-guia-faq{display:grid;grid-template-columns:200px minmax(0,1fr);gap:12px 22px;margin:18px 0 0;}
+.otrn-guia-claves dt,.otrn-guia-faq dt{font-size:14.5px;font-weight:800;line-height:1.5;}
+.otrn-guia-claves dd,.otrn-guia-faq dd{margin:0;font-size:14.5px;line-height:1.65;color:var(--dark);}
+.otrn-guia-faq{gap:18px 22px;}
+
+.otrn-guia-nota{
+  margin:18px 0 0;padding:14px 16px;
+  border-left:3px solid var(--primary-dark);border-radius:0 var(--radius-sm) var(--radius-sm) 0;
+  background:var(--primary-soft);font-size:14.5px;line-height:1.65;
+}
+.otrn-guia-nota .mono{font-size:13px;}
+
+.otrn-guia-enlaces{margin:16px 0 0;padding-left:22px;font-size:15px;}
+.otrn-guia-enlaces li{margin-bottom:6px;}
+.otrn-guia-enlaces a{color:var(--primary-dark);font-weight:700;text-decoration:underline;text-underline-offset:3px;}
+
+/* ---- Tablas ---------------------------------------------------------- */
+.otrn-guia-tablawrap{
+  margin:18px 0 0;overflow-x:auto;
+  border:1px solid var(--grey);border-radius:var(--radius);
+}
+.otrn-guia-tabla{width:100%;border-collapse:collapse;font-size:13.5px;min-width:520px;}
+.otrn-guia-tabla th,.otrn-guia-tabla td{
+  text-align:left;padding:12px 14px;border-top:1px solid var(--grey);vertical-align:top;
+}
+.otrn-guia-tabla thead th{
+  border-top:none;background:var(--lgrey);white-space:nowrap;
+  font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;
+}
+.otrn-guia-tabla tbody th{font-weight:700;}
+.otrn-guia-tabla tbody td{color:var(--dark);line-height:1.6;}
+
+/* ---- Capturas -------------------------------------------------------- */
+.otrn-guia-fig{margin:24px 0 0;}
+.otrn-guia-fig img{
+  display:block;width:100%;height:auto;
+  border:1px solid var(--grey);border-radius:var(--radius);background:var(--lgrey);
+}
+.otrn-guia-fig figcaption{margin-top:9px;font-size:12.5px;color:var(--text2);line-height:1.55;}
+
+/* ---- Navegación entre temas ----------------------------------------- */
+.otrn-guia-nav{
+  display:grid;grid-template-columns:1fr 1fr;gap:14px;
+  margin:38px 0 0;padding-top:24px;border-top:1px solid var(--grey);
+}
+.otrn-guia-nav a{display:flex;flex-direction:column;gap:3px;padding:14px 16px;border:1px solid var(--grey);border-radius:var(--radius);}
+.otrn-guia-nav a:hover{border-color:var(--primary-dark);background:var(--primary-soft);}
+.otrn-guia-nav .k{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--text2);}
+.otrn-guia-nav .t{font-size:14px;font-weight:700;color:var(--primary-dark);line-height:1.35;}
+.otrn-guia-nav__next{text-align:right;align-items:flex-end;}
+.otrn-guia-nav__hueco{display:block;}
+
+.otrn-guia-arriba{margin:18px 0 0;font-size:13px;}
+.otrn-guia-arriba a{color:var(--primary-dark);font-weight:700;}
+
+/* ---- Guías publicadas (anexo) --------------------------------------- */
+.otrn-guia-anexos{display:grid;gap:12px;margin-top:20px;}
+.otrn-guia-anexo{
+  display:flex;flex-direction:column;gap:6px;
+  padding:16px 18px;border:1px solid var(--grey);border-radius:var(--radius);
+}
+.otrn-guia-anexo:hover{border-color:var(--primary-dark);}
+.otrn-guia-anexo .t{font-size:16px;font-weight:800;}
+.otrn-guia-anexo .r{font-size:13.5px;color:var(--text2);line-height:1.6;}
+.otrn-guia-anexo .m{font-size:13px;font-weight:700;color:var(--primary-dark);}
+
+/* ---- Foco visible ---------------------------------------------------- */
+.otrn-guia a:focus-visible,
+.otrn-guia input:focus-visible,
+.otrn-guia summary:focus-visible{
+  outline:2px solid var(--primary-dark);outline-offset:2px;border-radius:var(--radius-sm);
+}
+
+/* ---- Pantallas intermedias y pequeñas ------------------------------- */
+@media (max-width:979px){
+  .otrn-guia{grid-template-columns:minmax(0,1fr);gap:0;}
+  .otrn-guia__lado{position:static;max-height:none;overflow:visible;margin-bottom:4px;}
+  .otrn-guia__indice{display:none;}
+  .otrn-guia__nota-lado{margin-top:16px;}
+  .otrn-guia__temas-movil{display:block;}
+  .otrn-guia__cuerpo{max-width:none;}
+}
+@media (max-width:679px){
+  .otrn-guia-tema h2{font-size:23px;}
+  .otrn-guia-claves,
+  .otrn-guia-faq{grid-template-columns:minmax(0,1fr);gap:4px 0;}
+  .otrn-guia-claves dd,
+  .otrn-guia-faq dd{margin-bottom:14px;}
+  .otrn-guia-faq{gap:0;}
+  .otrn-guia-nav{grid-template-columns:minmax(0,1fr);}
+  .otrn-guia-nav__next{text-align:left;align-items:flex-start;}
+  .otrn-guia-nav__hueco{display:none;}
+  .otrn-guia-pasos li{padding-left:40px;}
+}
