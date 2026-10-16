@@ -267,11 +267,19 @@
      que el blanco se mide contra ese promedio. Los márgenes negativos devuelven
      el texto a su sitio y dejan que la lámina sobresalga 14 px por lado (queda a
      6 px del canto); el padding vertical se compensa en el margen
-     (18 + 12 = 30 px, el mismo ritmo que el margen base de la bajada). */
+     (18 + 12 = 30 px, el mismo ritmo que el margen base de la bajada).
+
+     Valores del cliente (16.10.2026, quinta ronda): tinte 0,35 y desenfoque 9 px.
+     Venía como `rgba(48,74,131,-0.35)` —el alfa no admite negativos, la
+     declaración es inválida y el navegador la descarta, dejando la bajada sin
+     tinte— y con dos desenfoques distintos (16 px en el prefijo, 9 px en la
+     propiedad estándar): se aplica 0,35 y se normaliza a 9 px. Medido: la bajada
+     queda en 4,12-4,44:1 en su peor píxel (media 5,35-6,65), 0,06-0,38 por debajo
+     del 4,5:1 de AA; con 0,45 sube a 4,88-5,11. docs/VERIFICATION.md §V22. */
   .otrn-act .otrn-act__lead{
-    background:rgba(48,74,131,.65);
-    -webkit-backdrop-filter:blur(16px) saturate(1.15);
-    backdrop-filter:blur(16px) saturate(1.15);
+    background:rgba(48,74,131,.35);
+    -webkit-backdrop-filter:blur(9px) saturate(1.15);
+    backdrop-filter:blur(9px) saturate(1.15);
     border-radius:var(--radius);
     padding:12px 14px; margin:0 -14px 18px;
   }
