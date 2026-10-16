@@ -548,3 +548,23 @@ second legibility device over the photographs and **again changed no token**:
 - **Geometry added:** panel inset 8 px / text 20 px, `--radius`; cue pill `--radius-pill`. Nothing
   else in the component inventory (`DESIGN_SYSTEM.md` §4) changed, and no file outside
   `assets/css/otrn-landing.css` was touched.
+
+### 13.10 Fourth round — the plate moves to the lead, and one non-token treatment appears (`05d2ecb`)
+
+The client's fourth review round ([VERIFICATION.md](VERIFICATION.md) §V21) kept the glass but
+narrowed it to the lead and put the rest of the scene copy back on the photograph:
+
+- **Still no token change.** The plate's tint is the same literal navy at the same alpha
+  (`rgba(48,74,131,.65)` + `blur(16px) saturate(1.15)`, 0,82 without `backdrop-filter`), now applied
+  to `.otrn-act__lead` instead of the `.otrn-act__inner`; the geometry (`--radius`) is unchanged.
+  The §13.9 note stands: **a second glass surface, or a third, is the point at which a `--glass-*`
+  token family should be created** rather than repeating the literal.
+- **A new treatment that is deliberately not a token: `text-shadow`.** The eyebrow, the title and
+  the CTAs of scenes 2-3 are separated from the photograph with `0 1px 2px rgba(0,0,0,.9)` (small
+  type) and `0 2px 8px rgba(0,0,0,.75)` (title). It is a per-use legibility device over
+  photography — like the veils and the plate — not a design token, and it is scoped to the three
+  scene acts so the light sections that reuse the same classes stay untouched. It is also the
+  reason those elements no longer meet AA on paper: recorded as a client-accepted gap in §V21, not
+  a token problem.
+- **Files changed:** `assets/css/otrn-landing.css` only (the `@media (max-width:768px)` block).
+  No file outside it was touched.

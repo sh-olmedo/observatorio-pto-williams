@@ -1,11 +1,12 @@
-# Issue Register (F1–F22)
+# Issue Register (F1–F23)
 
 Persistent register of every finding from the static audit (commit `5f43933` + working
 tree), **preserving the original finding IDs** (including the F11b sub-finding). Keep these
 IDs in branches, commits, PRs and future updates. **F19** was registered later (2026-10-16)
 as a new Arauco functional requirement — documentation only, not implemented. **F22** was
 registered on 2026-10-16 too, while verifying the mobile glass pass: pre-existing, not requested,
-not introduced by that commit. Severities:
+not introduced by that commit. **F23** was registered later the same day, on the client's fourth
+round: a regression that round introduced deliberately (see F21). Severities:
 **P0** critical, **P1** high, **P2** medium, **P3** low. No P0 was found statically.
 
 Status values: *Open* (needs work), *Open — verify at runtime* (needs a runtime/browser/DB
@@ -58,6 +59,7 @@ without touching tokens, PHP, routes or data: [VERIFICATION.md](VERIFICATION.md)
 | F20 | Home informative KPIs read as clickable cards | P2 | UX/Affordance | 3 |
 | F21 | Home scene text illegible over the photographs | P1 | Accessibility/UX | 3 |
 | F22 | Home page has no print styles (scene copy lost on paper) | P3 | Resilience/A11y | 3 |
+| F23 | Ghost CTA boundary over photography (&lt;3:1, WCAG 1.4.11) | P2 | Accessibility | 4 |
 
 ---
 
@@ -571,6 +573,18 @@ explicit UX/UI approval of the visuals**. Files: `header.php`, `functions.php`,
   rises to 0.8 (1.4.11: 2,72 → 3,92) and a `@supports not` branch raises the tint to 0.82 for
   browsers without `backdrop-filter`. Measured 320-768 px: every element ≥ 4,68:1, no AA failure,
   0 px overflow. Detail and limits: [VERIFICATION.md](VERIFICATION.md) §V20.
+- **Fourth round — 2026-10-16, same day** (`05d2ecb`, local, not pushed). The client answered with a
+  marked-up screenshot of scene 3, the lead boxed in red: *«El efecto glass es solo para el texto
+  demarcado con rojo. Así se podrá ver la imagen de fondo»*. The plate is reduced to the **lead
+  only** (it now runs 6 px from the viewport edge and covers 14,8-32,8 % of each act, against
+  62-84 % before); the eyebrow, the title and the CTA of scenes 2-3 return to the photograph and are
+  separated from it by a **text-shadow** (tight on the small type, wide on the title). The veil, the
+  cue pill and the hero's solid CTA are unchanged, and the photograph stays unveiled over 89-90 % of
+  each act. Measured: the lead on the plate 6,32-6,51:1, the hero CTA 7,40:1 and the cue 6,34-7,20:1
+  pass AA at 320-768 px; the copy that left the plate measures 1,49-2,73:1 raw (a shadow is not
+  counted by WCAG 1.4.3), so it is a **client-accepted, documented gap** — the §V20 block plate
+  remains the compliant alternative. This round also **reintroduces a 1.4.11 gap** on the ghost
+  CTA's border over photography: registered as **F23**. Detail: §V21.
 
 ### F22 — Home page has no print styles: the scene copy disappears on paper
 
@@ -585,8 +599,33 @@ explicit UX/UI approval of the visuals**. Files: `header.php`, `functions.php`,
   white paper — the scene copy, and therefore most of the story, is lost on paper. The "Datos" and
   "Explora" sections (dark text on white) print fine.
 - **Proposed fix (not approved)**: an `@media print` block that (a) forces the scene text to
-  `--dark`, (b) drops the veil and the glass panel, and (c) optionally prints the hero photograph
+  `--dark`, (b) drops the veil and the glass plate, and (c) optionally prints the hero photograph
   as an `<img>` or inlines a light plate behind the scene text. Decide first whether the home page
   is meant to be printed at all.
 - **Verification**: static (grep + the colour declarations above). Not exercised in a print
   preview or a print-to-PDF run.
+
+### F23 — Ghost CTA over photography: its boundary does not reach 3:1 (WCAG 1.4.11)
+
+- **Severity**: P2 · **Status**: **Open — introduced by the client's fourth-round decision
+  (`05d2ecb`), measured, not fixed** · **Category**: Accessibility.
+- **Evidence**: with the plate reduced to the lead, the outline CTA of scene 2
+  (`.otrn-act__cta--outline`, 1.5 px `rgba(255,255,255,.8)` border, transparent fill) sits directly
+  on the photograph. Measuring the border box against the photographed background: minimum
+  **1,80-1,81:1**, mean 3,53-5,47:1, at 375/400/480/768 px. WCAG 1.4.11 requires 3:1 for the visual
+  information that identifies a control. The same border measured **3,92:1** over the §V20 plate, so
+  this is a regression of the fourth round, not a pre-existing gap.
+- **Impact**: on the mobile scenes the ghost CTA's outline can be hard to see and the control reads
+  mainly through its label (which this round separates with a text-shadow). The other two scene CTAs
+  are unaffected: the hero's is a solid `--primary-dark` fill (7,40:1 text) and scene 3's is a plain
+  text link, identified by its words rather than by a boundary.
+- **Why it is not simply fixed**: over arbitrary photography **no translucent white border reaches
+  3:1** — on a bright sky even an opaque white border measures ≈1,4:1. A 1.4.11-safe control needs
+  its own surface (as in `649b01f`) or an opaque contrasting fill; both are visible surfaces, which
+  is what the client asked to reduce.
+- **Proposed fix (not approved)**: give `.otrn-act__cta--outline` a glass pill of its own on mobile
+  (same tint as the lead's plate, `--radius-pill`), which restores the boundary without touching the
+  scene copy; or accept the gap as a documented client decision, like the form-control border gap of
+  §2.3 of [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md).
+- **Verification**: measured with the temporary harness (§V21.3, method in §V20.1) at four widths;
+  no real-device check.

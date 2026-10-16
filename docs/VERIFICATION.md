@@ -699,6 +699,13 @@ Fixed in **`649b01f`** — one file, `assets/css/otrn-landing.css`: the mobile b
 content, no route and no database change**, nothing outside the front page, and nothing above
 768 px except the scene eyebrows (§V20.5).
 
+**Revised the same day — fourth round, `05d2ecb` (§V21):** the client came back with a marked-up
+screenshot of scene 3 — *«El efecto glass es solo para el texto demarcado con rojo. Así se podrá ver
+la imagen de fondo»*, the red box drawn around **the lead only** — so the plate was reduced to the
+lead and the eyebrow, the title and the CTAs returned to the photograph with a text-shadow. §V21
+**supersedes §V20.2-§V20.4 for mobile**; the method (§V20.1), the fallback and the desktop notes
+still stand.
+
 This **supersedes, for mobile only, the eighth round's decision** (*"velo 0.88-0.92: se mantiene"*,
 [ISSUES.md](ISSUES.md) F21, commit `ce9a093`): the same client, after seeing the result, now asks
 for the photograph to be visible. Desktop (immersive and static) keeps the measured 0.88-0.92
@@ -846,4 +853,121 @@ a fix for a regression this round would otherwise have introduced: over the prev
   photographs disappears on paper. The same is true before this commit; recorded now because it
   surfaced while measuring this round.
 - Real touch, iOS dynamic viewport, reduced-motion *as a browser preference* and real keyboard
+  modality: unchanged from §V13/§V18.
+
+## V21 — Client review, fourth round: the glass moves to the lead only (2026-10-16)
+
+The client replied with the **mobile scene 3 marked up**: the lead paragraph encircled in red and
+*«El efecto glass es solo para el texto demarcado con rojo. Así se podrá ver la imagen de fondo»*.
+The plate of §V20 covered the whole text block, so the photograph was only visible around it; the
+ask is a plate **on the lead only**, with the eyebrow, the title and the CTA read directly on the
+photograph.
+
+Fixed in **`05d2ecb`** — one file again, `assets/css/otrn-landing.css`, inside the same
+`@media (max-width:768px)` block. **No PHP, no markup, no content, no route, no database change**,
+and nothing above 768 px (§V21.4).
+
+### V21.1 What changed, and the trade it reopens
+
+| Item (≤768 px) | §V20 / `649b01f` | Now / `05d2ecb` |
+| --- | --- | --- |
+| Plate | `.otrn-act__inner` (eyebrow + title + lead + CTA) | **`.otrn-act__lead` only** (14 px wider than the text, 6 px from the edge) |
+| Eyebrow, title, CTA (scenes 2-3) | on the plate | **on the photograph**, separated by a **text-shadow** (tight on the 12 px eyebrow and the CTA labels, wide on the title) |
+| Veil, cue pill, hero CTA | gasa 0,42 / glass pill / solid fill | unchanged |
+| Plate coverage of the act | 62-84 % | **14,8-32,8 %** |
+
+§V20 documented *why* the plate covered the whole block: at 12 px, white over a bright sky measures
+≈1,5-2,6:1, and white needs a veil of ≈0,85 there to reach AA. The client's instruction is to show
+the photograph, so this round **accepts that trade explicitly** — the plate is smaller, the
+photograph is visible, and the copy that leaves the plate is separated from the background by a
+text-shadow instead of by a surface.
+
+### V21.2 Measured contrast (minimum / mean, 320→768 px)
+
+**Passing AA** (all five widths, no sampled pixel below its threshold):
+
+| Element | 320 px | 375 px | 400 px | 480 px | 768 px |
+| --- | --- | --- | --- | --- | --- |
+| Lead on the plate (16 px, ≥4,5:1) | 6,46-6,41-6,35 | 6,49-6,39-6,41 | 6,48-6,36-6,40 | 6,43-6,32-6,42 | 6,51-6,48-6,35 |
+| Hero CTA, solid fill (13 px) | 7,40 | 7,40 | 7,40 | 7,40 | 7,40 |
+| Scroll cue, glass pill (11 px) | 6,34 | 6,56 | 6,80 | 6,66 | 7,20 |
+
+(Three figures = hero / territorio / costa. The lead moves by ±0,16 across widths; it never drops
+below 6,32.)
+
+**Over the photograph** — the three elements the client asked to lift off the plate (each row is
+the range over the 15 measurements: 5 widths × 3 scenes):
+
+| Element | Raw min | Raw mean | Pixels below AA (raw) | Min over the shadow |
+| --- | --- | --- | --- | --- |
+| Eyebrow (12 px, needs 4,5:1) | 1,49-2,99 | 2,62-6,90 | 19,8-100 % (below 25 % only once: hero at 768 px) | **18,2-19,2** |
+| Title (30-41 px, needs 3:1) | 1,55-2,73 | 3,30-6,78 | 7,3-40,9 % | **12,5-15,0** |
+| CTA of scenes 2-3 (12,5-13 px, needs 4,5:1) | 1,96-4,70 | 4,13-11,68 | 0,1-90,2 % | **18,6-19,6** |
+
+**The raw figures are below AA, and the shadow does not change the WCAG measurement.** The
+`text-shadow` column models the shadow as fully covering the glyph's immediate surround — an upper
+bound; at the glyph edge the real contrast lies between the raw figure and the shadow figure. WCAG
+1.4.3 measures the text against its background and does not count a shadow, so this is a
+**mitigation, not compliance**: with the plate reduced to the lead, the eyebrow, the title and the
+CTA labels of scenes 2-3 are a **documented, client-accepted gap** (F21, fourth round). The
+`649b01f` layout — one plate behind the whole block — remains the compliant alternative.
+
+Why the *tight* shadow on the small type and the *wide* one on the title: a 2 px shadow on 34 px
+type is invisible, and a 6-8 px halo on a 12 px uppercase eyebrow smears it; each column above is
+what the rendered result showed (developer look at 375 and 768 px, §V21.4).
+
+### V21.3 The rest of the measurements
+
+- **Photograph visibility**: the veil is untouched, so the photograph is unveiled (veil < 0,40) over
+  **89,4-89,6 %** of each act, as in §V20. What changed is how much the plate covers: **14,8-32,8 %**
+  (hero 25,7-32,8 %, scenes 2-3 14,8-28,4 %) against 62-84 % before.
+- **Plate geometry**: `padding:12px 14px; margin:0 -14px 18px` — the text keeps its 20 px inset and
+  the plate runs 6 px from the viewport edge to 6 px on the other side; the vertical padding is
+  compensated in the margin (18 + 12 = 30 px, the base rhythm). At 768 px the plate is 551 px wide
+  and the photograph stays open to its right, as before.
+- **Without `backdrop-filter`** (`@supports not`, tint 0,82, now applied to the lead): lead minimum
+  **5,42** / 5,60 / 5,55 — AA holds without any blur. Neutralising the plate entirely would take the
+  lead to 1,66 (scene 2), which is what the plate is for.
+- **Ghost CTA border (WCAG 1.4.11)**: over the photograph it measures minimum **1,80-1,81** (mean
+  3,53-5,47) at 375-768 px — below the 3:1 required. This is a **regression of this round** (the
+  same border measured 3,92 over the §V20 plate) and is registered as **F23**: over arbitrary
+  photography no translucent white border can reach 3:1, so the control needs a surface of its own
+  (the §V20 plate) or an opaque fill.
+- **Horizontal overflow: 0 px** at 320/375/400/480/768 px.
+
+### V21.4 Regression checks and method
+
+- Above 768 px nothing changed: the plate, the shadows and the new geometry live inside the
+  `@media (max-width:768px)` query. Read back at 809 px: the `.otrn-act__inner` has no background
+  and no `backdrop-filter`, the lead has `background:transparent`, no shadow and its base
+  `margin:0 0 30px`, the hero eyebrow is still `--primary-dark` on paper, and the **"Datos" and
+  "Explora" sections — which reuse `.otrn-act__titulo`/`.otrn-act__lead` on paper — keep
+  `text-shadow:none` and no plate** (the new rules are scoped to the three scene acts for exactly
+  this reason).
+- **No PHP file, template, route, menu asset or database record was touched.** Navigation,
+  dropdowns, the account control and the private-section gate are untouched.
+- The rendered mobile result was **looked at** (developer look, not client sign-off): hero,
+  territorio and costa at 375 px, and hero at 768 px — the photograph reads behind the text and the
+  copy holds on the shadow.
+- **The harness was rebuilt** (the temporary measurement file is not versioned and was deleted at
+  the end of the previous round). Two changes: it now also composites the **element's own
+  background** along the ancestor chain (that is how the hero's solid CTA is measured as a button
+  rather than as white text over the photo), and it reports a **`text-shadow`** column. Against
+  §V20's numbers on the §V20 layout it reproduces the same state within **±0,2** (hero at 400 px:
+  eyebrow 4,77 vs 4,86, title 5,22 vs 5,22, lead 4,81 vs 4,82, cue 6,88 vs 7,04), so the rebuilt
+  model is the same conservative lower bound (box blur of radius = `blur()`, `saturate` not
+  modelled, one sample per pixel of the real text line boxes).
+
+### V21.5 NOT VERIFIED / open
+
+- **The client's judgement** — whether the shadowed eyebrow and title read well enough on a real
+  phone is the client's call, and the round exists because the previous answer changed. The
+  alternatives, all measured: the `649b01f` block plate (AA everywhere, photograph covered 62-84 %),
+  or a plate behind the eyebrow + title only (AA for the copy, photograph covered ≈45-60 %).
+- **Readability of the shadowed type is a subjective call**, not a measurement: the model brackets
+  it (raw → shadow) and the rendered screenshots were inspected by the developer only.
+- **`backdrop-filter` cost on real hardware** (one plate of ≤551×156 px now, three in the page) and
+  **iOS Safari** remain unmeasured, as in §V20.6.
+- **F23** (the ghost CTA's boundary over photography, §V21.3) is registered, not fixed.
+- Real touch, iOS dynamic viewport, reduced-motion as a browser preference and real keyboard
   modality: unchanged from §V13/§V18.

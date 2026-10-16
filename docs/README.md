@@ -28,7 +28,7 @@ status of every Rapa Nui element still present here is inventoried in
 | [DESIGN_TOKENS_AUDIT.md](DESIGN_TOKENS_AUDIT.md) | Full token/cascade/specificity audit (baseline) + municipal verification (§12) + as-built mapping (§13) | Design, frontend |
 | [ARAUCO_MIGRATION.md](ARAUCO_MIGRATION.md) | Rapa Nui → Arauco inventory: completed, pending, provisional, unverified | PM, client, developers |
 | [SECURITY_AUDIT.md](SECURITY_AUDIT.md) | Security/privacy findings with evidence, severity, impact and verification procedures | Developers, client |
-| [ISSUES.md](ISSUES.md) | The persistent register of findings F1–F22 (including F11b) with priorities | Everyone |
+| [ISSUES.md](ISSUES.md) | The persistent register of findings F1–F23 (including F11b) with priorities | Everyone |
 | [ROADMAP.md](ROADMAP.md) | Proposed implementation phases, dependencies, acceptance criteria (not approved) | PM, client, developers |
 | [HANDOFF.md](HANDOFF.md) | Git baseline, uncommitted changes, blockers, pending decisions, recommended next task | Everyone |
 | [VERIFICATION.md](VERIFICATION.md) | Phase 0 runtime pass: environment, counts, gates, REST, browser checks — PASS/FAIL/NOT VERIFIED per finding | Developers, PM |
@@ -58,7 +58,7 @@ findings F1, F3, F11, F14, F17 (the current high-priority set) with their runtim
   - *Unverified*: requires runtime/browser/DB checks that were not performed.
   - *Provisional*: intentionally temporary, pending client data or decisions.
   - *Pending/decision pending*: blocked on a client or team decision.
-- **Issue IDs (F1–F22, F11b)** are stable; keep them in branches, commits and PRs.
+- **Issue IDs (F1–F23, F11b)** are stable; keep them in branches, commits and PRs.
 - **Do not invent** configuration, database contents, client decisions, or test results.
   Where something is unknown, the documents say so and describe how to verify it.
 

@@ -65,11 +65,13 @@ mapping, and both items were **executed ahead of this plan** in `52a7d4d` (singl
 in `style.css :root`; the landing fallback block deleted). The acceptance criteria above are
 met at the **measured** level (contrast + responsive passes, [VERIFICATION.md](VERIFICATION.md)
 §V17); the **visual spot-check by the client is still pending**, so this phase is implemented
-but **not closed**. Three client review rounds have since produced four fixes (`3dbfbc6`,
-`9142179`, `e2c3a9f` — the latter closing **F20/F21** on the home page, §V18–§V19 — and
-`649b01f`, the mobile glass pass of §V20, which reverses the earlier veil decision **for mobile
-only**); none of the rounds was a sign-off. Two client decisions are open: the weight of the
-mobile glass panel (§V20.6) and the fate of the pre-existing print gap (**F22**).
+but **not closed**. **Four** client review rounds on the same day have produced five fixes
+(`3dbfbc6`, `9142179`, `e2c3a9f` — the latter closing **F20/F21** on the home page, §V18–§V19 —
+`649b01f`, the mobile glass pass of §V20, and `05d2ecb`, which narrows that plate to the lead and
+puts the rest of the scene copy on a text-shadow with a documented AA gap, §V21); none of the
+rounds was a sign-off. Open client decisions: whether the shadowed eyebrow and title read well
+enough (or the plate comes back, wholly or behind the eyebrow + title), the ghost CTA's boundary
+over photography (**F23**) and the fate of the pre-existing print gap (**F22**).
 
 ## Phase 4 — Content & data migration
 
