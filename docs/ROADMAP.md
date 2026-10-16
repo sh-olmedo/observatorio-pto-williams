@@ -69,12 +69,15 @@ but **not closed**. **Five** client review rounds on the same day have produced 
 (`3dbfbc6`, `9142179`, `e2c3a9f` — the latter closing **F20/F21** on the home page, §V18–§V19 —
 `649b01f`, the mobile glass pass of §V20, `05d2ecb`, which narrows that plate to the lead and
 puts the rest of the scene copy on a text-shadow with a documented AA gap, §V21, and `bef8332`,
-the client's own plate values as the fifth round, §V22); none of the rounds was a sign-off. Open
+the client's own plate values as the fifth round, §V22); none of the rounds was a sign-off. A
+sixth client request, outside the identity work but landing in this phase, was the **sticky
+footer** (`90bf739`, **F24**, §V23): the page shell anchors the footer to the bottom edge when
+the content is shorter than the screen and lets it be pushed when the content grows. Open
 client decisions: whether the shadowed eyebrow and title read well enough (or the plate comes back,
 wholly or behind the eyebrow + title), whether the lead's tint stays at 0,35 or goes to the AA-safe
-0,45, the ghost CTA's boundary over photography (**F23**) and the fate of the pre-existing print gap
-(**F22**). A `--glass-*` token family is due ([DESIGN_TOKENS_AUDIT.md](DESIGN_TOKENS_AUDIT.md)
-§13.11), proposed and not approved.
+0,45, the ghost CTA's boundary over photography (**F23**), the fate of the pre-existing print gap
+(**F22**) and the visual confirmation of the sticky footer (**F24**). A `--glass-*` token family is
+due ([DESIGN_TOKENS_AUDIT.md](DESIGN_TOKENS_AUDIT.md) §13.11), proposed and not approved.
 
 ## Phase 4 — Content & data migration
 

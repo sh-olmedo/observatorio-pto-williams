@@ -585,3 +585,21 @@ is invalid CSS and would have dropped the tint entirely, and two mismatched blur
 - **One value set by the client lives in the code as a comment**, including the measured consequence
   (4,12-4,44:1 worst pixel), so the next reader does not "fix" it back to 0,65 by accident.
 - **Files changed:** `assets/css/otrn-landing.css` only (the `@media (max-width:768px)` block).
+
+### 13.12 Twelfth round — the sticky footer: a shell rule, still no token change (`90bf739`)
+
+A separate client request (**F24**, [VERIFICATION.md](VERIFICATION.md) §V23), not a review round of
+the identity: the footer had to sit on the bottom edge of short pages. Applied in
+`wp-content/themes/otrn/style.css` (new "Estructura de página" block, 8 declarations) — **the first
+time this file is touched since the consolidation, and no token value moved**:
+
+- **No new token, and no new literal of ours.** The shell is three layout properties
+  (`display:flex`, `flex-direction:column`, `min-height`) plus WordPress's own
+  `--wp-admin--admin-bar--height` — a **core variable**, not a project token: it exists because core
+  offsets the document with `html{margin-top:32px !important}` (`wp-includes/admin-bar.php:1393`) and
+  publishes the same height in `wp-includes/css/admin-bar.css:2/791`. The `0px` fallback covers
+  anonymous visitors, and `100vh`/`100dvh` are viewport units, not palette or geometry values.
+  Nothing here belongs in `:root`.
+- **The §13.11 `--glass-*` proposal is untouched** by this round and still open.
+- **Files changed:** `style.css` only (plus the documentation of the round). No token, component,
+  route or content change; the private gate, the DB and the landing file are untouched.

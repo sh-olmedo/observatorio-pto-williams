@@ -112,8 +112,8 @@ database change):
 | Item | Value |
 | --- | --- |
 | Branch | `main` (remote `origin` configured; no remote refs fetched locally) |
-| HEAD | `bef8332` — `fix(otrn): lámina de la bajada con los valores del cliente (F21)` (local, not pushed; this documentation commit follows it) |
-| History | `99092d1` repo init → `70b22a7` "portada scrollytelling inmersiva + branding Arauco (ETAPA A+B+C)" → `5f43933` "modo dual estatico/inmersivo" → `f506104` docs baseline → `bb38d8b` runtime record → `8d3d40b` F11b protections → `d4fa738` F19 docs → `0dd2de4` F1 nav → `e727756` F1 regression fix → `932986b` F1 docs → `5f17b38` F1 grouped navigation → `57e09a8` F1 redesign docs → `510e981` F1 dropdown spacing fix → `cd9fd09` F1 spacing docs → `9aeaa82` design-token audit docs → `52a7d4d` municipal token consolidation → `d691f03` token docs → `3dbfbc6` dropdown hover fix (F1) → `9142179` drawer contrast fix (F2) → `0d35f84` client-review docs → `e2c3a9f` home legibility + KPI affordance fix (F20, F21) → `f40cb52` home-review docs → `ce9a093` four decisions closed (docs) → `649b01f` mobile glass pass (F21) → `94714ff` mobile glass docs → `05d2ecb` glass on the lead only (F21) → `7f93114` fourth-round docs → `bef8332` plate values set by the client (F21) (last local, not pushed) |
+| HEAD | `90bf739` — `fix(otrn): anclar el pie al borde inferior de la ventana (F24)` (local, not pushed; this documentation commit follows it) |
+| History | `99092d1` repo init → `70b22a7` "portada scrollytelling inmersiva + branding Arauco (ETAPA A+B+C)" → `5f43933` "modo dual estatico/inmersivo" → `f506104` docs baseline → `bb38d8b` runtime record → `8d3d40b` F11b protections → `d4fa738` F19 docs → `0dd2de4` F1 nav → `e727756` F1 regression fix → `932986b` F1 docs → `5f17b38` F1 grouped navigation → `57e09a8` F1 redesign docs → `510e981` F1 dropdown spacing fix → `cd9fd09` F1 spacing docs → `9aeaa82` design-token audit docs → `52a7d4d` municipal token consolidation → `d691f03` token docs → `3dbfbc6` dropdown hover fix (F1) → `9142179` drawer contrast fix (F2) → `0d35f84` client-review docs → `e2c3a9f` home legibility + KPI affordance fix (F20, F21) → `f40cb52` home-review docs → `ce9a093` four decisions closed (docs) → `649b01f` mobile glass pass (F21) → `94714ff` mobile glass docs → `05d2ecb` glass on the lead only (F21) → `7f93114` fourth-round docs → `bef8332` plate values set by the client (F21) → `90bf739` sticky footer (F24) (last local, not pushed) |
 | Remote | `https://github.com/sh-olmedo/observatorio-arauco.git` |
 | Tracked files | 803 (`bb38d8b` added `docs/VERIFICATION.md`; `8d3d40b` added `wp-content/mu-plugins/otrn-privacidad-seccion.php`; `52a7d4d` added/removed no files) |
 
@@ -162,7 +162,8 @@ loader remains.
 | DB content inventoried at count level (2026-10-15): pages, 74 criteria, 10 sectors, 6 evaluations, 3 data cards; copy migration still pending | F18 | Team (Phase 4) |
 | Geocoding provider + usage policy for the location search (rate limits, attribution, caching; browser-direct vs server proxy) | F19 | Client/team (before Phase 6) |
 | Fate of the curated sector list and of the location metas under the new search picker | F8 ↔ F19 | Client/team (Phase 4/6) |
-| Push/deploy decision for the local commits (from `8d3d40b` to `bef8332` and the docs commit of this round) | F14 | User |
+| Push/deploy decision for the local commits (from `8d3d40b` to `90bf739` and the docs commit of this round) | F14 | User |
+| Sticky footer (`90bf739`, **F24**): the footer now sits on the bottom edge of short pages and is pushed by the content otherwise. Pending **the client's visual confirmation**, ideally on a real phone (`dvh` + dynamic toolbars are not verifiable in the harness) | F24 | Client/team |
 | **Explicit UX/UI sign-off of the grouped navigation (F1 redesign, `5f17b38`)** — colours, wording, chevrons, «Más» behaviour; nothing else should change until it is reviewed | F1 | Client/team |
 | **Visual confirmation of the dropdown spacing (`510e981`)** — 12 px rows / 2 px gap / inset highlight, and the account-menu row. **The client's review found that the 12 px gap made the panel unreachable with the mouse; the mouse bridge in `3dbfbc6` fixes it and the confirmation is pending again** (screenshots are possible again, so it can now be captured) | F1 | Client/team |
 | Real authenticated-session pass for the F1 nav (login writes session tokens to the DB; the 2026-10-16 pass used a temporary `wp_set_current_user()` mu-plugin, since deleted) | F1, F17 | Team (needs a disposable environment) |
@@ -328,6 +329,35 @@ wins), so both were normalised to **9 px**. The radius, padding and margins alre
   not only around it. Detail: [VERIFICATION.md](VERIFICATION.md) §V22.
 - **Open for the client**: whether 4,12-4,44:1 on the lead's brightest pixel is acceptable or the
   tint goes to 0,45; the §V21 shadow trade; **F23**; and the visual sign-off.
+
+**Update 2026-10-16 (twelfth round — sticky footer, F24):** the client asked for the classic
+sticky footer (*"cuando el contenido sea menor a la altura de la pantalla se posicione al final de
+esta y si el contenido crece más allá, el footer sea empujado con el contenido"*, with a screenshot
+of `/guias/` where the footer floated mid-screen). Registered as **F24** and fixed in **`90bf739`** —
+one file, `wp-content/themes/otrn/style.css` (new "Estructura de página" block): **no PHP, markup,
+content, route or database change, and no token touched**.
+
+- The page shell is now a column flex box: `body.otrn` takes
+  `min-height:calc(100vh - var(--wp-admin--admin-bar--height,0px))` (with a `dvh` variant inside
+  `@supports`), `main` absorbs the free space (`flex:1 0 auto`) and the footer keeps its natural
+  height. Short content → the footer sits on the bottom edge of the window; long content → the
+  footer is pushed with the document, exactly as before.
+- **The admin-bar term is not decorative**: WordPress offsets the document with
+  `html{margin-top:32px !important}` (46 px ≤782 px) and publishes the height in
+  `--wp-admin--admin-bar--height`. Without subtracting it the shell is one bar taller than the
+  visible area, i.e. the page gains a scroll of exactly the bar's height for logged-in authors.
+- Measured (real tab, 809×804, 11 theme URLs): **the footer's bottom edge equals the document height
+  everywhere** and horizontal overflow is 0 px; `/guias/` — the short page of the screenshot —
+  collapses to exactly the viewport (804/804) with no scrollbar, and the element at the bottom edge
+  is the footer itself. The admin bar (simulated with core's own CSS and variable) keeps the footer
+  flush at 32/46 px. The **front page is unchanged**: same 6091 px document, same 3055 px ScrollTrigger
+  pin spacer and the same scrollytelling sequence with the shell on and off. Detail:
+  [VERIFICATION.md](VERIFICATION.md) §V23.
+- **Not verified**: real devices and iOS dynamic toolbars (`dvh`), a real logged-in session, and
+  `/evaluar/` (the only template with the sticky `.otrn-formbar`, a private route — its bar is
+  contained by the `<form>`, so the shell does not move it, but it was not measured).
+- **Open for the client**: the visual confirmation of this behaviour, and everything still pending
+  from the previous rounds (the §V22 plate tint, the §V21 shadow trade, F23, F22).
 
 ## How to run the site (reference only — not executed in this task)
 

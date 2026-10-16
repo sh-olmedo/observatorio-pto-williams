@@ -1,4 +1,4 @@
-# Issue Register (F1–F23)
+# Issue Register (F1–F24)
 
 Persistent register of every finding from the static audit (commit `5f43933` + working
 tree), **preserving the original finding IDs** (including the F11b sub-finding). Keep these
@@ -6,7 +6,8 @@ IDs in branches, commits, PRs and future updates. **F19** was registered later (
 as a new Arauco functional requirement — documentation only, not implemented. **F22** was
 registered on 2026-10-16 too, while verifying the mobile glass pass: pre-existing, not requested,
 not introduced by that commit. **F23** was registered later the same day, on the client's fourth
-round: a regression that round introduced deliberately (see F21). Severities:
+round: a regression that round introduced deliberately (see F21). **F24** was registered later
+the same day from a direct client request (sticky footer) and fixed in `90bf739`. Severities:
 **P0** critical, **P1** high, **P2** medium, **P3** low. No P0 was found statically.
 
 Status values: *Open* (needs work), *Open — verify at runtime* (needs a runtime/browser/DB
@@ -34,6 +35,13 @@ screenshots — **F20** (informative KPIs read as clickable cards) and **F21** (
 illegible over the photographs) — were fixed in `e2c3a9f`, still inside the front page and
 without touching tokens, PHP, routes or data: [VERIFICATION.md](VERIFICATION.md) §V19.
 
+**Update 2026-10-16 (client request — sticky footer):** the client asked for the classic sticky
+footer — the footer at the bottom of the screen when the content is shorter than the viewport,
+pushed by the content when it grows. Registered as **F24** and fixed the same day in `90bf739`
+(one file, `style.css`: the page shell becomes a column flex box with a viewport-based
+`min-height`): [VERIFICATION.md](VERIFICATION.md) §V23. **Pending the client's visual
+confirmation**; like every other round in this phase, not a sign-off.
+
 | ID | Title | Sev | Category | Phase |
 | --- | --- | --- | --- | --- |
 | F1 | Mobile navigation unusable on internal pages | P1 | Accessibility/UX | 2 |
@@ -60,6 +68,7 @@ without touching tokens, PHP, routes or data: [VERIFICATION.md](VERIFICATION.md)
 | F21 | Home scene text illegible over the photographs | P1 | Accessibility/UX | 3 |
 | F22 | Home page has no print styles (scene copy lost on paper) | P3 | Resilience/A11y | 3 |
 | F23 | Ghost CTA boundary over photography (&lt;3:1, WCAG 1.4.11) | P2 | Accessibility | 4 |
+| F24 | Footer left mid-screen on pages shorter than the viewport | P2 | Layout/UX | 3 |
 
 ---
 
@@ -641,3 +650,39 @@ explicit UX/UI approval of the visuals**. Files: `header.php`, `functions.php`,
   §2.3 of [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md).
 - **Verification**: measured with the temporary harness (§V21.3, method in §V20.1) at four widths;
   no real-device check.
+
+### F24 — Footer left mid-screen on pages shorter than the viewport
+
+- **Severity**: P2 · **Status**: **Fixed in `90bf739`** (CSS only, 8 declarations), **pending the
+  client's visual confirmation** · **Category**: Layout/UX.
+- **How it was raised**: direct client request with a screenshot of `/guias/` — *"Modifica el sitio
+  para que se comporte con la técnica sticky footer: cuando el contenido sea menor a la altura de la
+  pantalla se posicione al final de esta y si el contenido crece más allá, el footer sea empujado con
+  el contenido"*.
+- **Evidence (before)**: the theme had no page shell. `header.php:125` opens `<main>` and
+  `footer.php:9` closes it, and `.otrn` (body) was a normal block box, so `main` was only as tall as
+  its content. On `/guias/` at 809×804 the content ended at 444 px, the footer ran 504-681 px and the
+  **last 123 px of the window were empty background**.
+- **Impact**: on every short page the institutional footer (the three Arauco logos) floated in the
+  middle of the screen with a blank band under it, which reads as a truncated or unfinished page.
+  The affected pages are the short document routes — `/guias/` is the only one in the current
+  content set at 809 px, but the shell is template-wide, so any new short page inherited the defect.
+- **Fix**: `style.css`, new "Estructura de página (sticky footer)" block —
+  `body.otrn{display:flex;flex-direction:column;min-height:calc(100vh - var(--wp-admin--admin-bar--height,0px))}`,
+  `body.otrn > main{flex:1 0 auto}`, `body.otrn > .otrn-footer{flex:0 0 auto}`, plus a
+  `@supports (min-height:100dvh)` variant. The admin-bar term is required because WordPress offsets
+  the document with `html{margin-top:32px !important}` (`wp-includes/admin-bar.php:1393`, 46 px
+  ≤782 px) and publishes the same height in `--wp-admin--admin-bar--height`; without it the shell
+  would be one bar taller than the visible area and the page would gain a scroll of exactly that
+  height. Anonymous visitors do not load the variable and the `0px` fallback applies.
+- **Verification**: real Chromium tab, 809×804: 11 theme URLs, **footer bottom == document height on
+  every one**, 0 px horizontal overflow; `/guias/` collapses to exactly the viewport (804/804) with
+  **no scrollbar**, and `elementFromPoint` at the bottom edge returns the footer, not a background
+  strip. Admin bar simulated with core's own CSS/variable: 772/804 (32 px) and 758/804 (46 px), no
+  phantom scroll. The front page is **unchanged** (same 6091 px document, same 3055 px pin spacer and
+  the same scrollytelling sequence with the shell on and off). A synthetic short document at 375×667
+  puts the footer on the bottom edge with no scroll. Detail: §V23.
+- **Open for the client**: the visual confirmation, ideally on a real phone (`dvh` and dynamic
+  toolbars cannot be exercised in the harness). `/evaluar/` — the only template with the sticky
+  `.otrn-formbar`, and a private route — was not measured (not logged in); its bar is contained by
+  the `<form>` inside `main`, so the shell does not move it.

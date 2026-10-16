@@ -1044,3 +1044,107 @@ The lead, on the plate, minimum / mean, at the five widths (hero / territorio / 
 - **F23** (the ghost CTA's boundary over photography) and the **F21 third/fourth-round gaps** are
   open as described in §V21.
 - `backdrop-filter` cost on real hardware and iOS Safari: unchanged from §V20.6.
+
+## V23 — Sticky footer: the page shell (F24, client request) — 2026-10-16
+
+The client asked for the classic sticky footer: *"cuando el contenido sea menor a la altura de
+la pantalla se posicione al final de esta y si el contenido crece más allá, el footer sea
+empujado con el contenido"*, with a screenshot of `/guias/` where the footer floated mid-screen.
+Fixed in **`90bf739`** — one file, `wp-content/themes/otrn/style.css` (new "Estructura de
+página" block, 8 declarations + the `@supports (min-height:100dvh)` variant): **no PHP, markup,
+content, route or database change**, and no token value touched.
+
+### V23.1 The defect, measured before the fix
+
+`/guias/` in the real tab (viewport **809×804**), with the shell disabled: the content of `main`
+ended at **444 px**, the footer ran **504-681 px** (its `margin-top:60px` included) and the
+**last 123 px of the window were empty paper**. `header.php` opens `<main>` and `footer.php`
+closes it, so the document was a plain block stack: `main` was only ever as tall as its content.
+The same page with the shell enabled fills the window exactly.
+
+### V23.2 After the fix — the whole theme navigation, real tab (809×804)
+
+Document height (docH), footer box and overflow, via the harness:
+
+| URL | docH | footer bottom | below the footer | scrolls | h-overflow |
+| --- | --- | --- | --- | --- | --- |
+| `/` (immersive home) | 6091 | 6091 | — | yes | 0 px |
+| `/guias/` (short) | **804** | **804** | **0 px** | **no** | 0 px |
+| `/material/documentacion-tecnica/` | 922 | 922 | — | yes | 0 px |
+| `/material/reportes/` | 920 | 920 | — | yes | 0 px |
+| `/acerca/` | 1157 | 1157 | — | yes | 0 px |
+| `/geoportal/` | 1254 | 1254 | — | yes | 0 px |
+| `/indicadores/` | 1418 | 1418 | — | yes | 0 px |
+| `/noticias/` | 1533 | 1533 | — | yes | 0 px |
+| `/estadisticas/` | 2991 | 2991 | — | yes | 0 px |
+| `/seguimiento-pladetur/` | 9145 | 9145 | — | yes | 0 px |
+| `/buenas-practicas/` | 11993 | 11993 | — | yes | 0 px |
+
+- **On every page the footer's bottom edge equals the document height**, i.e. the footer is the
+  last thing on the page and no background band is left under it. On the one page that is shorter
+  than the window, the document collapses to exactly the viewport (804 = 804) and **no scrollbar
+  appears**; the content pages scroll as before with the footer pushed behind them.
+- **What is actually at the bottom edge**: `document.elementFromPoint(centre, 803)` returns the
+  `footer` element (`closest('.otrn-footer')` true), not a background strip.
+- **0 px horizontal overflow** on all 11 pages.
+- The account control points at `/wp-login.php` for anonymous visitors: WordPress's own page, no
+  theme footer, not part of the shell.
+
+### V23.3 With the admin bar — simulated (the tab is anonymous)
+
+Core injects `html { margin-top: 32px !important }` (46 px ≤782 px) in
+`wp-includes/admin-bar.php:1393` and publishes the same height as
+`--wp-admin--admin-bar--height` (`wp-includes/css/admin-bar.css:2/791`). The tab has no session,
+so the condition was reproduced with core's own CSS and variable plus a fixed bar (no theme
+change):
+
+| Condition | body min-height | footer bottom | viewport | phantom scroll |
+| --- | --- | --- | --- | --- |
+| Anonymous (no bar) | 804 px | 804 | 804 | 0 |
+| Bar 32 px (desktop) | 772 px | 804 | 804 | 0 |
+| Bar 46 px (≤782 px) | 758 px | 804 | 804 | 0 |
+
+Without the subtraction the shell would have been 32/46 px taller than the visible area and the
+page would have gained a scroll of exactly the bar's height. `--wp-admin--admin-bar--height` is
+undefined for anonymous visitors, where the `0px` fallback applies.
+
+### V23.4 The front page is unchanged
+
+The home page is the one page that already exceeded the viewport, and it is the only one with a
+pinned (ScrollTrigger) element, so it was measured **with and without** the shell in the same
+document:
+
+| Metric | With the shell | Shell overridden to `display:block` |
+| --- | --- | --- |
+| Document height | 6091 px | 6091 px |
+| `main` height | 5914 px | 5914 px |
+| Pin spacers | 1 (3055 px) | 1 (3055 px) |
+| Immersive viewport | 804 px | 804 px |
+| h-overflow | 0 px | 0 px |
+
+The pinned element lives inside `main` (a block box), so the flex context of `body` never reaches
+it. The scrollytelling transitions were re-walked after the change (scroll 0 / 1600 / 2600):
+hero act 100 %, then territorio, then costa, matching the pre-change sequence.
+
+### V23.5 Narrow widths (same-origin iframes)
+
+- A **synthetic short document** inside `/guias/` at **375×667** (the card content replaced by
+  three lines): `body` min-height **667 px**, footer bottom **667 px**, 0 px below it, no scroll —
+  the mobile case works and the `dvh` variant resolves against the iframe viewport.
+- **No page in the current content set is shorter than a phone viewport**: at 375×667 the shortest
+  is still `/guias/` (873 px) because the footer stacks taller and the copy wraps. So mobile
+  "short page" behaviour is proven on a synthetic document, not on real content.
+- At 375/320 px every page kept **0 px horizontal overflow**.
+
+### V23.6 NOT VERIFIED
+
+- **Real devices**: iOS/Android dynamic toolbars (`dvh`) and touch scrolling; the harness window
+  is 809×804 and cannot be resized, so live widths/heights other than that one were not exercised
+  (mobile widths only through iframes).
+- **A real logged-in session** (the bar was simulated with core's own rules; see §V23.3), and any
+  browser whose admin bar offset differs.
+- **`/evaluar/`** (the only template with the sticky `.otrn-formbar`, and a private route): not
+  logged in, not measured. Its sticky bar's containing block is the `<form>` inside `main`, so the
+  shell does not move it; unverified in the browser.
+- **`@media print`** (F22) and `prefers-reduced-motion`: unchanged, not re-tested.
+- **The client's confirmation** that this is the behaviour asked for.

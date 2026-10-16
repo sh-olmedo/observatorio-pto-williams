@@ -58,7 +58,7 @@ findings F1, F3, F11, F14, F17 (the current high-priority set) with their runtim
   - *Unverified*: requires runtime/browser/DB checks that were not performed.
   - *Provisional*: intentionally temporary, pending client data or decisions.
   - *Pending/decision pending*: blocked on a client or team decision.
-- **Issue IDs (F1–F23, F11b)** are stable; keep them in branches, commits and PRs.
+- **Issue IDs (F1–F24, F11b)** are stable; keep them in branches, commits and PRs.
 - **Do not invent** configuration, database contents, client decisions, or test results.
   Where something is unknown, the documents say so and describe how to verify it.
 

@@ -168,6 +168,15 @@ These must not be adopted as brand tokens without explicit approval. The brief's
 - **One footer for both page families**: three institutional Arauco logos, each on a white
   "plate" (`--paper` + `--grey` border, no shadow) because two of the PNGs have an opaque light
   grey inner background, plus the copy line. The front page only overrides `margin-top:0`.
+- **Page shell / sticky footer (`90bf739`, F24)**: `body.otrn` is a column flex box with
+  `min-height:calc(100vh - var(--wp-admin--admin-bar--height,0px))` (a `dvh` variant inside
+  `@supports`), `main` takes the free space (`flex:1 0 auto`) and the footer keeps its natural
+  height (`flex:0 0 auto`). Intent: **the footer sits on the bottom edge of the window when the
+  content is shorter than the viewport, and is pushed by the content when it is longer** — it is
+  a shell rule, so it applies to every template (all of them open `<main>` in `header.php` and
+  close it in `footer.php`) and to every breakpoint. The admin-bar height is subtracted because
+  WordPress offsets the document with `html{margin-top:32px}` (46 px ≤782 px) when a session is
+  logged in; subtracting nothing else is needed. Detail: [VERIFICATION.md](VERIFICATION.md) §V23.
 - Reusables: page head with `.eyebrow` chip; stat boxes (`.otrn-stats`/`.otrn-stat`, plus an
   `.accent` variant on `--primary-soft`); cards (`.otrn-lin-card`, `.otrn-indexcard`, news
   cards); buttons (`.otrn-btn` — pill, `--primary-dark`; `.ghost` variant; the `.teal` variant
