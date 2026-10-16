@@ -50,6 +50,26 @@ Text Domain: otrn
 .otrn .mono{font-family:var(--font-mono);}
 .otrn .wrap{max-width:1440px;margin:0 auto;padding:0 32px;}
 
+/* ---- Estructura de página (sticky footer) -----------------------------
+   El pie se apoya siempre en el borde inferior de la ventana: si el
+   contenido de `main` es más corto que la pantalla, el espacio libre lo
+   absorbe `main` y el pie queda abajo; si el contenido crece, el pie se
+   empuja con él (comportamiento normal del documento). Sin esto, las
+   vistas cortas (p. ej. `/guias/`) dejaban el pie a media pantalla con una
+   franja de fondo vacía debajo.
+   La barra de administración de WordPress desplaza el documento con
+   `html{margin-top:32px}` (46 px hasta 782 px, `wp-includes/admin-bar.php`)
+   y publica el alto en `--wp-admin--admin-bar--height`; se descuenta ese
+   valor para no provocar un scroll fantasma del alto de la barra. En
+   visitantes anónimos la variable no existe y el respaldo es 0.
+   `dvh` corrige el alto en móviles con barra de direcciones dinámica. */
+body.otrn{display:flex;flex-direction:column;min-height:calc(100vh - var(--wp-admin--admin-bar--height,0px));}
+body.otrn > main{flex:1 0 auto;}
+body.otrn > .otrn-footer{flex:0 0 auto;}
+@supports (min-height:100dvh){
+  body.otrn{min-height:calc(100dvh - var(--wp-admin--admin-bar--height,0px));}
+}
+
 /* ---- Header ---------------------------------------------------------- */
 .otrn-header{border-bottom:1px solid var(--grey);}
 .otrn-header .wrap{display:flex;align-items:center;justify-content:space-between;height:72px;}
