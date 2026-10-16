@@ -1,4 +1,4 @@
-# Issue Register (F1–F19)
+# Issue Register (F1–F21)
 
 Persistent register of every finding from the static audit (commit `5f43933` + working
 tree), **preserving the original finding IDs** (including the F11b sub-finding). Keep these
@@ -26,6 +26,11 @@ was not modified by that pass and its rendered behaviour is unchanged (re-measur
 [VERIFICATION.md](VERIFICATION.md) §V17, mapping in
 [DESIGN_TOKENS_AUDIT.md](DESIGN_TOKENS_AUDIT.md) §13.
 
+**Update 2026-10-16 (client review of the home page):** two findings raised by the client from
+screenshots — **F20** (informative KPIs read as clickable cards) and **F21** (scene text
+illegible over the photographs) — were fixed in `e2c3a9f`, still inside the front page and
+without touching tokens, PHP, routes or data: [VERIFICATION.md](VERIFICATION.md) §V19.
+
 | ID | Title | Sev | Category | Phase |
 | --- | --- | --- | --- | --- |
 | F1 | Mobile navigation unusable on internal pages | P1 | Accessibility/UX | 2 |
@@ -48,6 +53,8 @@ was not modified by that pass and its rendered behaviour is unchanged (re-measur
 | F17 | No runtime verification performed yet | P1 | Verification gap | 0 |
 | F18 | Site content/bootstrap not reproducible from repo | P2 | Reproducibility | 5 |
 | F19 | Self-assessment location search (OSM geocoding) | P2 | Migration | 6 |
+| F20 | Home informative KPIs read as clickable cards | P2 | UX/Affordance | 3 |
+| F21 | Home scene text illegible over the photographs | P1 | Accessibility/UX | 3 |
 
 ---
 
@@ -215,9 +222,14 @@ explicit UX/UI approval of the visuals**. Files: `header.php`, `functions.php`,
   step with the indicator definition, which is black). Fixed in **`9142179`**: both now use
   `--dark`; the `.et` labels keep `--text2` for hierarchy. Measured: 19.43:1 and 21:1
   ([VERIFICATION.md](VERIFICATION.md) §V18.2). No other page was reported.
+- **Client review, second round (2026-10-16)**: two home-page notes — informative KPIs that look
+  clickable (**F20**) and poorly legible slides (**F21**) — fixed in **`e2c3a9f`**; no token
+  changed ([VERIFICATION.md](VERIFICATION.md) §V19). With the harness window visible again,
+  `browser.screenshot` worked for the first time, so the rendered result was **looked at** by the
+  team (immersive scenes and the static/mobile layout): that is a developer look, not the client's
+  sign-off.
 - **Verification**: rendered token diff before/after + contrast pass + responsive pass — done
-  ([VERIFICATION.md](VERIFICATION.md) §V17); visual confirmation by the client — **pending**
-  (no screenshot is possible while the harness window is not visible).
+  ([VERIFICATION.md](VERIFICATION.md) §V17); visual confirmation by the client — **pending**.
 
 ### F3 — Evaluation submission without capability check
 
@@ -481,3 +493,61 @@ explicit UX/UI approval of the visuals**. Files: `header.php`, `functions.php`,
   [ARAUCO_MIGRATION.md](ARAUCO_MIGRATION.md#8-new-arauco-requirement--self-assessment-location-search-f19)
   §8.3 + a browser pass on the private form (needs an authorized session, cf.
   [VERIFICATION.md](VERIFICATION.md) §V13).
+
+### F20 — Home informative KPIs read as clickable cards
+
+- **Severity**: P2 · **Status**: **Fixed in code 2026-10-16** (`e2c3a9f`, local, not pushed) ·
+  **Category**: UX/affordance. **Reported by the client** from a screenshot: *"los KPI que son
+  solo informativos se ven iguales a los elementos clicables"*.
+- **Evidence**: `.otrn-dato-lite` (`front-page.php:150`, the three figures of the "Datos" scene)
+  is an `<article>` that navigates nowhere, but carried the same surface as the actionable cards:
+  `--paper` background, `1px solid rgba(48,74,131,.14)` border, `--radius` and
+  `box-shadow:0 1px 3px rgba(0,0,0,.06)` (`assets/css/otrn-landing.css:161-163`), i.e. the same
+  treatment as `.otrn-indexcard` (indicator cards, `<a>`; `style.css:294` + landing override
+  `:193`) and `.otrn-card` (news cards; `style.css:225`). Both families are white cards.
+- **Impact**: an affordance defect — information and navigation look identical on the home page,
+  so users try to click figures that do not go anywhere (consistency/WCAG 3.2.4 expectations).
+- **Fix (applied)**: the informative figure loses the card chrome and becomes a flat data block:
+  no background, no enclosing border, no radius, no shadow, plus a `border-top:2px solid
+  var(--primary)` rule that orders the column. The actionable cards keep their card surface
+  (re-measured in the same run). No copy, markup or token changed.
+- **Verification**: computed styles before/after at 400 px and the actionable card re-check in
+  [VERIFICATION.md](VERIFICATION.md) §V19.1; 8 widths 375→1920 px with 0 px horizontal overflow.
+  The client's confirmation that the two families now read differently — **pending**.
+
+### F21 — Home scene text illegible over the photographs
+
+- **Severity**: P1 · **Status**: **Fixed in code 2026-10-16** (`e2c3a9f`, local, not pushed) ·
+  **Category**: Accessibility/UX. **Reported by the client** from a screenshot: *"los slides del
+  home tienen poca legibilidad"*.
+- **Evidence (three separate defects, both rendering modes)**:
+  - Static mode (≤768 px, no JS, `prefers-reduced-motion`): the hero used a weak vertical
+    gradient (0.18 → 0.34 → 0.74) starting exactly where the text begins, and scenes 2–3 a
+    **horizontal** gradient (0.82 at the left edge → 0.06 at 68 %) while the mobile text column
+    spans the full width, leaving the right half of each paragraph on unveil photograph
+    (`assets/css/otrn-landing.css:64-70`, pre-fix).
+  - Immersive mode (≥769 px + GSAP): scene 2's text had **no veil at all** — the shared veil was
+    faded in at timeline 5.8, with the coastal scene — and scene 3's veil ended at 42 % of the
+    window width while the text column reaches 620 px (`assets/otrn-landing.js:115-116`,
+    `otrn-landing.css:113-116`, pre-fix).
+  - Immersive hero: below ~1300 px window width the 640 px column extended under the
+    photographic panel (54 % of the window), leaving dark text over a bright photo.
+  - Scene rail (same family): the active 11 px number (`--primary-dark`) sat on the translucent
+    plate `rgba(255,255,255,.46)` over the photograph at **2,33:1** (measured at 1024 px), below
+    AA.
+- **Impact**: marketing copy, scene titles and calls to action were unreadable on the home page —
+  the page the client reviews and the most visible content of the site.
+- **Fix (applied)**: one vertical veil for the three static scenes (0.88 before the text band,
+  21→84 % of the act height); pixel-based immersive veil (0,92 → 0 at 1160 px) faded in at 1.6
+  (before scene 2's text appears at 3.0); the panel width declared once (`--panel-w`) and the hero
+  column limited to it; rail number in `--dark`. No token, PHP, route or data change.
+- **Verification** (new method: the real photograph is drawn on a `<canvas>` with the CSS
+  geometry, the veil composited per pixel and the actual text colour — alpha included — measured):
+  static 400 px all elements ≥ 5,07:1; static forced at 1440 px ≥ 5,29:1; immersive scene 2 at
+  809/1024/1440/1920 px ≥ 5,06:1; immersive scene 3 (darkest photo) ≥ 4,88:1; rail 6,62:1
+  minimum after the fix. Detail and the NOT VERIFIED list:
+  [VERIFICATION.md](VERIFICATION.md) §V19.2.
+- **Open (client decision, not a code task)**: the veil's visual weight. Guaranteeing AA against
+  the **brightest** pixel of each photograph needs ≈0.87–0.88 opacity, which leaves the mobile
+  scenes reading as a blue-tinted backdrop whose detail survives mainly in the top ~20 %; a
+  lighter veil shows more photograph and gives up that worst case.

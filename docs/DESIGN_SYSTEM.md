@@ -180,6 +180,12 @@ These must not be adopted as brand tokens without explicit approval. The brief's
 - Landing scene system: `.otrn-landing`, `.otrn-stage` (shared photographic level),
   `.otrn-act` scenes, `.otrn-rail` (01–05 indicator), `.otrn-reveal` (scroll reveal), burger
   classes for the mobile panel.
+- **Informative vs actionable (`e2c3a9f`)**: actionable elements are cards — white surface,
+  border, panel radius, soft shadow, hover on the border (`.otrn-indexcard`, `.otrn-card`,
+  link buttons). Informative content must **not** wear that surface: the home "Datos" figures
+  (`.otrn-dato-lite`) are flat data blocks (no background, border, radius or shadow; a 2 px
+  `--primary` top rule) — an affordance rule, kept after the client's home review
+  ([VERIFICATION.md](VERIFICATION.md) §V19.1, F20).
 
 ## 5. Responsive behaviour
 
@@ -210,10 +216,23 @@ These must not be adopted as brand tokens without explicit approval. The brief's
 - Reveal system: IntersectionObserver adds `.is-visible`; CSS pre-hides with
   `.otrn-reveal{opacity:0}`. **With JS fully disabled and no reduced-motion preference, revealed
   content stays invisible** (F5, confirmed at runtime).
-- **Unverifiable from computed styles**: text over the photographs. The scene veils are now the
-  institutional blue (`rgba(48,74,131,…)`) instead of the old dark teal, so the overlay
-  contrast changed; it still needs a human look at the rendered page
-  ([VERIFICATION.md](VERIFICATION.md) §V17).
+- **Text over the photographs — now measured, not assumed (`e2c3a9f`).** Two veils, both
+  institutional blue:
+  - **Static** (no JS / reduced motion / ≤768 px): one **vertical** veil per act,
+    `rgba(48,74,131)` ramping 0.12 → 0.55 (10 %) → 0.88 (20 %) → 0.90 (62 %) → 0.92. The text
+    band runs 21→84 % of the act height in the mobile layout and 23→77 % in the 88 vh static
+    layout, so it always sits on ≥0.88.
+  - **Immersive**: one shared veil inside the photographic level (so it inherits the panel's
+    `clip-path` and never tints the paper the hero is read on), with **pixel stops** — 0.92 at
+    0 → 0.86 at 640 px → 0.34 at 900 px → 0 at 1160 px — matching the width of the text column
+    at any window size, faded in at timeline 1.6 (before scene 2's text).
+  - Contrast is computed by drawing the real photograph on a `<canvas>` with the CSS geometry
+    and compositing the veil per pixel: **all AA**, worst case 4.88:1 (immerse scene 3, 809 px)
+    and ≥5.07:1 in static mode. Method and tables:
+    [VERIFICATION.md](VERIFICATION.md) §V19.2.
+  - **Price of the guarantee**: AA against the *brightest* pixel of a photograph needs ≈0.87–0.88
+    opacity, so on mobile the photographs read as a blue-tinted backdrop with detail mainly in
+    the top ~20 %. How much photograph to keep is a client decision, not a code task.
 - Vendor: GSAP + ScrollTrigger self-hosted (`assets/vendor/`), loaded only on the front page
   (~115 KB noted in code comments).
 
@@ -227,6 +246,7 @@ These must not be adopted as brand tokens without explicit approval. The brief's
 | Typography | Montserrat + IBM Plex Mono, but Manrope requested | Montserrat + IBM Plex Mono via `--font-title`/`--font-mono` | Resolved (Manrope) |
 | Institutional logos | 3 Arauco logos, GORE low-res, RAU absent | Same 3 logos, now on white plates with one height | Source material still pending (F13) |
 | Rapa Nui leftovers | Present in copy/tokens/theme name | Tokens cleaned; **copy/theme name untouched** | Migration pending (F7–F10) |
+| Scene text over photographs | Veils that missed the text (F21) | Vertical static veil + pixel-stop immersive veil, measured ≥4.88:1 | Applied; client decision on veil weight open |
 
 ## 8. Before → after token mapping
 
@@ -247,7 +267,9 @@ remapping of tiers/scales, the literal replacements and the deleted dead CSS is 
 ## 9. Open items for the client
 
 1. **Visual sign-off** of the token pass (and of the F1 navigation) — nothing here is approved.
+   Two review rounds have landed: the drawer contrast (`9142179`) and the home page
+   (**F20/F21**, `e2c3a9f`).
 2. **Non-text contrast** of form-control borders (§2.3) — needs a UX decision.
 3. **Poppins**: ship it or drop it from the municipal parity list (§3).
-4. Text over the landing photographs: the veil hue changed (teal → institutional blue) and the
-   rendered result was not measurable from computed styles (§6).
+4. **How much photograph to keep under the mobile scene text (§6)** — the veil is now measured
+   and passes AA; lightening it trades the worst-case ratio for photograph. Client decision.

@@ -500,3 +500,27 @@ mouse bridge arrived later, in `3dbfbc6`), `page-evaluar.php`,
 `single-guia.php`, `single-indicador.php`, `single-iniciativa_pladetur.php`, `single-post.php`,
 `template-parts/material-lista.php`, `template-parts/mapa-evaluaciones.php`,
 `template-parts/pladetur/chart-anual.php`.
+
+### 13.8 Home-page review round — component geometry, no token change (`e2c3a9f`)
+
+The client's second review round touched the home page only (F20, F21); **no token changed**, so
+this section records component-level decisions that a future token pass must respect (measurements
+in [VERIFICATION.md](VERIFICATION.md) §V19):
+
+- **Affordance rule.** Card chrome (white surface + border + `--radius` + shadow) is reserved for
+  **actionable** elements (`.otrn-indexcard`, `.otrn-card`, link buttons). Informative blocks do
+  not wear it: `.otrn-dato-lite` (the home "Datos" figures, an `<article>` that links nowhere) is
+  now flat — no background, no enclosing border, no radius, no shadow — and carries a
+  `border-top:2px solid var(--primary)` rule. This is the token system's first explicit
+  information-vs-navigation rule, so new "data" blocks should follow it.
+- **Veils are token-derived but alpha-literal.** The scene veils keep using
+  `rgba(48,74,131,…)` (the RGB of `--blue-dark`) with per-use alphas, because CSS cannot apply
+  alpha to a hex token without `color-mix()` and a fallback would reproduce the original legibility
+  defect. Two documented profiles: static `0.12 → 0.88 → 0.92` vertical; immersive
+  `0.92 → 0.86 @640px → 0 @1160px` horizontal (pixel stops, aligned with the text column).
+- **`--panel-w` is a layout variable, not a token.** The immersive photographic panel's width
+  (54 %) is declared once on `.otrn-stage.is-immersiva` and consumed by the media `clip-path` and
+  by the hero column clamp `min(640px, calc(var(--panel-w) - 56px))`, so the two cannot drift.
+- **Over-photograph text is dark or white, never brand mid-tones.** The rail's active number moved
+  from `--primary-dark` (2.33:1 measured) to `--dark`; on photographs, `--primary-dark` and
+  `--primary` cannot be assumed legible (they are tuned for white and `--primary-soft`).

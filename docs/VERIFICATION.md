@@ -552,3 +552,135 @@ styles): question **19.43:1**, answer descriptions **21:1** (18.42:1 on the high
 4.95:1 on white — AA) and the level chips `o0 4.85` / `o1 6.49` / `o2 5.06` / `o3 7.40` /
 `ona 7.15`. The labels were left in `--text2` on purpose to keep the hierarchy; if the client
 wants them darker it is a one-line change.
+
+## V19 — Client review, second round: home KPIs and slide legibility (2026-10-16)
+
+The client reviewed the **home page** and left two notes, both with a screenshot: *"los KPI que
+son solo informativos se ven iguales a los elementos clicables"* and *"los slides del home
+tienen poca legibilidad"*. Fixed in **`e2c3a9f`** — only `assets/css/otrn-landing.css` and
+`assets/otrn-landing.js`: **no PHP, no markup, no content, no route and no database change**,
+and nothing outside the front page.
+
+**Screenshots work again.** In this round the harness desktop window was visible, so
+`browser.screenshot` succeeded for the first time: the immersive scenes 2 and 3 were looked at
+in the real page, and the static (mobile) rendering was looked at through a same-origin iframe
+placed inside the visible viewport (400 px wide, real markup and CSS). This is a **developer
+look** at the rendered result — it does not replace the pending client sign-off, and it does not
+change the "unverifiable" wording of §V17/§V18 for the items listed at the end of this section.
+
+### New method — contrast of text over a photograph, pixel by pixel
+
+Text over the scene photographs could not be measured before ("unverifiable from computed
+styles", §V17 and DESIGN_SYSTEM.md §6). It is now measured deterministically: the scene image is
+loaded, drawn on a `<canvas>` with **the same geometry the CSS uses** (`cover` cropping, centred
+in static mode, `object-position:center 42%` in immersive mode), the veil is composited per
+pixel, and the contrast is computed against the **real text colour including its alpha**
+(`rgba(255,255,255,.85)` for eyebrows, `.9`/`.92` for leads). Per element the table reports the
+**minimum** over its glyph box (the worst pixel), the 5th percentile and the mean. The model
+ignores the rail's `backdrop-filter:blur(6px)`, which only averages the neighbourhood and
+therefore softens extremes.
+
+### V19.1 Informative KPIs read as clickable cards (F20) — `e2c3a9f`
+
+**Cause:** `.otrn-dato-lite` is an `<article>` — it links nowhere — yet it carried exactly the
+surface the actionable cards carry: `--paper` background, 1 px border, panel radius and a soft
+shadow, i.e. the same treatment as `.otrn-indexcard` (indicator cards, `<a>`) and the news cards
+(`.otrn-card`). **Fix:** the informative figure loses the card chrome and becomes a flat data
+block — no background, no enclosing border, no radius, no shadow, and a 2 px `--primary` rule on
+top that orders the column. The actionable cards were not touched.
+
+| `.otrn-dato-lite` at 400 px | Before | After |
+| --- | --- | --- |
+| `background-color` | `rgb(255,255,255)` | `rgba(0,0,0,0)` |
+| border | `1px solid rgba(48,74,131,.14)` | `border-top:2px solid rgb(0,112,255)` |
+| `border-radius` | `10px` | `0px` |
+| `box-shadow` | `rgba(0,0,0,.06) 0px 1px 3px` | `none` |
+| `padding` | `26px 24px 22px` | `20px 0px 0px` |
+
+Re-checked in the same run: `.otrn-indexcard` keeps `rgb(255,255,255)` background, a 1 px solid
+border, `10px` radius and the soft shadow, so the two families are now visually distinct. Figure
+text contrast is unchanged (number `--blue-dark` 8,63:1; label measured `#000000` because the
+`.otrn h3` rule wins over the label class → 21:1; year `--text2` 4,95:1 — all on white). Eight
+widths 375→1920 px: **0 px horizontal overflow**.
+
+### V19.2 Scene text over the photographs (F21) — `e2c3a9f`
+
+**Cause** — the veil never covered the text, in either mode:
+
+- **Static** (≤768 px, no JS, reduced motion): the hero's veil was a weak vertical gradient
+  (0.18 at the top, 0.34 at mid-height) exactly where the text starts, and scenes 2 and 3 used a
+  **horizontal** gradient (0.82 at the left edge, 0.46 at 38 %, 0.06 at 68 %) while on mobile the
+  text column spans the full width — so the right half of every paragraph sat on unveil
+  photograph.
+- **Immersive** (≥769 px + GSAP): scene 2's text had **no veil at all** (the shared veil was only
+  faded in at timeline 5.8, with the coastal scene) and scene 3's veil died at 42 % of the window
+  width while the text column reaches 620 px, so it too crossed into the photo.
+- **Immersive hero**: below ~1300 px window width the 640 px column extended past the
+  photographic panel (54 % of the window) and left dark text over a bright photo — measured at
+  809 px: the lead reached 575 px while the panel began at 437 px.
+
+**Fix:** (a) the static mode gets **one vertical veil for all three scenes** (0.12 → 0.55 at
+10 % → 0.88 at 20 % → 0.90 at 62 % → 0.92), i.e. 0.88 before the text band — which runs 21 %→84 %
+of the act height — keeping the top strip photographic; (b) the immersive veil takes **pixel
+stops** (0.92 at 0 → 0.86 at 640 px → 0.34 at 900 px → 0 at 1160 px, matching the widest text
+column at any window width) and the timeline fades it in at **1.6** instead of 5.8, before scene
+2's text appears at 3.0; (c) the panel width is declared once (`--panel-w` on
+`.otrn-stage.is-immersiva`, consumed by the clip-path *and* by the hero column) and the hero
+column is `min(640px, calc(var(--panel-w) - 56px))`; (d) the rail's active 11 px number moves
+from `--primary-dark` to `--dark`.
+
+**Measured — static mode, 400 px** (minimum / 5th percentile / mean per element):
+
+| Scene | eyebrow 12 px | title 34 px | lead 16 px | CTA |
+| --- | --- | --- | --- | --- |
+| hero | 5,09 / 5,13 / 5,50 | 6,43 / 6,72 / 7,60 | 5,84 / 6,11 / 7,23 | 7,21 / 7,35 / 8,48 |
+| territorio | 5,23 / 5,44 / 5,86 | 6,49 / 7,01 / 7,27 | 5,66 / 5,97 / 6,57 | 6,82 / 7,09 / 8,37 |
+| costa | 5,07 / 5,08 / 5,63 | 6,36 / 6,58 / 7,45 | 5,81 / 6,21 / 7,23 | 7,93 / 8,06 / 8,84 |
+
+**Measured — static mode forced at 1440 px** (immersive class removed and inline styles cleared,
+i.e. the no-JS / reduced-motion layout; minimum only, text bands as % of the act height):
+
+| Scene | text band | eyebrow | title | lead | CTA |
+| --- | --- | --- | --- | --- | --- |
+| hero | 28,8→71,2 % | 5,34 | 6,52 | 6,08 | 7,43 |
+| territorio | 26,5→73,5 % | 5,65 | 7,20 | 6,04 | 7,13 |
+| costa | 22,9→76,5 % | 5,29 | 6,45 | 5,78 | 7,69 |
+
+**Measured — immersive scene 2** (minimum per element, four window widths):
+
+| Width | eyebrow | title | lead | CTA |
+| --- | --- | --- | --- | --- |
+| 809 px | 5,06 | 6,84 | 5,76 | 6,58 |
+| 1024 px | 5,56 | 6,71 | 6,00 | 7,19 |
+| 1440 px | 5,69 | 6,88 | 6,09 | 7,32 |
+| 1920 px | 5,69 | 6,91 | 6,15 | 7,47 |
+
+Scene 3 (darkest photograph) at 809 px: **4,88** / 6,50 / 5,48 / 7,57 — the lowest figure of the
+pass, still above AA. Scene 1 is read on paper (dark text on white), not on the photo.
+
+**Measured — hero column vs photographic panel** (text right edge / panel left edge): 359/415 at
+769 px, 430/486 at 900, 497/553 at 1024, 592/648 at 1200, 635/691 at 1280, 640/778 at 1440 — the
+text stays inside the paper at every width, and from ~1300 px up the column is the approved
+640 px.
+
+**Measured — scene rail** (active 11 px number on the translucent plate
+`rgba(255,255,255,.46)` over each photograph; minimum over the glyph box): before 3,83 / 3,60 /
+**2,33** (1024 px) and 3,80 / 3,45 / **2,44** (1440 px) — below AA; after (text `--dark`)
+10,89 / 10,24 / **6,62** (1024 px), 10,78 / 9,81 / **6,94** (1440 px) and 11,19 / 10,15 / 7,36
+(1920 px).
+
+**Regression checks in the same pass:** 8 widths 375→1920 px with **0 px horizontal overflow**;
+the static veil is a single unconditional rule, so it also applies to the no-JS and
+reduced-motion paths (the 1440 px forced-static run above); the immersive veil lives inside the
+photographic level, so it inherits the panel's `clip-path` and can never tint the "paper" the
+hero text is read on; no PHP file, template, route, menu asset or database record was touched
+(the menu/dropdown behaviour and the private gate are untouched by this commit).
+
+**NOT VERIFIED:** the client's judgement of the veil's visual weight — with 0.88-0.92 over the
+text band the mobile scene photographs read as a blue-tinted backdrop whose detail survives
+mainly in the top ~20 %; **AA against the brightest pixel of each photograph is what forces
+≈0.87-0.88**, so a lighter veil keeps more photograph and gives up that worst case (a client
+decision, not a code task); scene 3's immersive veil is the same element as scene 2's, so it only
+was measured at 809 px; the reduced-motion *preference* could not be emulated in the harness (the
+layout is the measured forced-static one, but the media-query path itself is reasoned); and real
+touch devices, iOS dynamic viewport and real keyboard modality stay as recorded in §V13/§V18.

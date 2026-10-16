@@ -84,13 +84,37 @@ No other page was reported. The client's **final visual sign-off is still pendin
 found these two things, it did not approve the pass); the non-text contrast of form borders and
 the Poppins decision remain open.
 
+**Update 2026-10-16 (seventh round — client review of the home page):** the client reviewed the
+**home page** and reported **two defects, both now fixed** in `e2c3a9f` (only
+`assets/css/otrn-landing.css` and `assets/otrn-landing.js`: no PHP, markup, content, route or
+database change):
+
+- **F20**: the "Datos" figures are informative but carried the same white card surface as the
+  clickable indicator and news cards, so they looked clickable. They are now flat data blocks
+  (no background, border, radius or shadow; a 2 px `--primary` rule on top) while the actionable
+  cards keep their surface — [VERIFICATION.md](VERIFICATION.md) §V19.1.
+- **F21**: scene text was hard to read over the photographs because the veil never covered the
+  text — the static hero's gradient was weakest exactly where the text starts, the static
+  scenes 2–3 used a horizontal veil while the mobile text spans the full width, the immersive
+  scene 2 had **no veil at all** and scene 3's died at 42 % of the window. One vertical static
+  veil, a pixel-stop immersive veil faded in before scene 2's text, the hero column clamped to
+  the photographic panel (`--panel-w`) and the rail number in `--dark` — §V19.2. The mobile
+  scenes now read as a blue-tinted backdrop whose detail survives mainly in the top ~20 %; AA
+  over the **brightest** pixel of each photograph is what forces ≈0.87–0.88, so how much
+  photograph to keep is a **client decision** (documented, not decided).
+- **Screenshots worked again** this round (the harness desktop window was visible), so the
+  rendered result was looked at by the team for the first time — immersive scenes 2–3 in the
+  real page and the static/mobile layout through a same-origin iframe. That is a **developer
+  look, not the client's sign-off**, and the F1 navigation, F2/F6 identity and this round all
+  remain **pending the client's visual review**.
+
 ## Git baseline
 
 | Item | Value |
 | --- | --- |
 | Branch | `main` (remote `origin` configured; no remote refs fetched locally) |
-| HEAD | `d691f03` — `docs(arauco): registrar la implementación de tokens municipales y su verificación (F2, F6)` (local, not pushed; the two client-review fixes `3dbfbc6`/`9142179` and their docs commit follow it) |
-| History | `99092d1` repo init → `70b22a7` "portada scrollytelling inmersiva + branding Arauco (ETAPA A+B+C)" → `5f43933` "modo dual estatico/inmersivo" → `f506104` docs baseline → `bb38d8b` runtime record → `8d3d40b` F11b protections → `d4fa738` F19 docs → `0dd2de4` F1 nav → `e727756` F1 regression fix → `932986b` F1 docs → `5f17b38` F1 grouped navigation → `57e09a8` F1 redesign docs → `510e981` F1 dropdown spacing fix → `cd9fd09` F1 spacing docs → `9aeaa82` design-token audit docs → `52a7d4d` municipal token consolidation → `d691f03` token docs → `3dbfbc6` dropdown hover fix (F1) → `9142179` drawer contrast fix (F2) (last eighteen local, not pushed) |
+| HEAD | `e2c3a9f` — `fix(otrn): legibilidad de las escenas y cifras sin aspecto de botón en la portada (F20, F21)` (local, not pushed; this documentation commit follows it) |
+| History | `99092d1` repo init → `70b22a7` "portada scrollytelling inmersiva + branding Arauco (ETAPA A+B+C)" → `5f43933` "modo dual estatico/inmersivo" → `f506104` docs baseline → `bb38d8b` runtime record → `8d3d40b` F11b protections → `d4fa738` F19 docs → `0dd2de4` F1 nav → `e727756` F1 regression fix → `932986b` F1 docs → `5f17b38` F1 grouped navigation → `57e09a8` F1 redesign docs → `510e981` F1 dropdown spacing fix → `cd9fd09` F1 spacing docs → `9aeaa82` design-token audit docs → `52a7d4d` municipal token consolidation → `d691f03` token docs → `3dbfbc6` dropdown hover fix (F1) → `9142179` drawer contrast fix (F2) → `0d35f84` client-review docs → `e2c3a9f` home legibility + KPI affordance fix (F20, F21) (last local, not pushed) |
 | Remote | `https://github.com/sh-olmedo/observatorio-arauco.git` |
 | Tracked files | 803 (`bb38d8b` added `docs/VERIFICATION.md`; `8d3d40b` added `wp-content/mu-plugins/otrn-privacidad-seccion.php`; `52a7d4d` added/removed no files) |
 
@@ -128,7 +152,7 @@ loader remains.
 | Operator/role model for evaluation submission | F3 | Client/team (Phase 1) |
 | Palette | **Implemented 2026-10-16**: the Municipalidad de Arauco identity was verified (primary `#0070FF`, secondary `#DE232B`, accent `#41BCFF`, text `#000000`) and applied in `52a7d4d`. Pending: **the client's visual sign-off** of the rendered result | F2, F6 | Client (review) |
 | Token mapping and the fate of the colours with no municipal source (`#0C1434`, `#0C0D0E`, `#D6D5D5`) | **Applied** ([DESIGN_TOKENS_AUDIT.md](DESIGN_TOKENS_AUDIT.md) §13); the three unverified colours were **not** adopted | F2, F6 | Client (review) |
-| **Visual sign-off of the municipal token pass (`52a7d4d`)** — brand blue/red/navy applied to headers, buttons, links, cards, tables, filters, forms and the footer, on the homepage and on internal pages. Measured, not seen: no screenshot is possible while the harness window is not visible. **First review round (2026-10-16) found one contrast defect in the evaluation drawer, fixed in `9142179`; final sign-off still pending** | F2, F6 | Client/team |
+| **Visual sign-off of the municipal token pass (`52a7d4d`)** plus the review rounds (`3dbfbc6`, `9142179`, `e2c3a9f`) — brand blue/red/navy applied to headers, buttons, links, cards, tables, filters, forms and the footer, on the homepage and on internal pages. **First review round found a drawer contrast defect (fixed); second round, two home-page defects (F20/F21, fixed). Screenshots are possible again (harness window visible), so the rendered result has been looked at by the team — but the client's sign-off is still pending** | F2, F6, F20, F21 | Client/team |
 | Arauco geography: sector list + coordinates | F8 | Client (Phase 4) |
 | Geoportal StoryMap URL (scope unknown) | F9 | Client (Phase 4) |
 | Survey embed fate | F10 | Client (Phase 4) |
@@ -136,11 +160,12 @@ loader remains.
 | DB content inventoried at count level (2026-10-15): pages, 74 criteria, 10 sectors, 6 evaluations, 3 data cards; copy migration still pending | F18 | Team (Phase 4) |
 | Geocoding provider + usage policy for the location search (rate limits, attribution, caching; browser-direct vs server proxy) | F19 | Client/team (before Phase 6) |
 | Fate of the curated sector list and of the location metas under the new search picker | F8 ↔ F19 | Client/team (Phase 4/6) |
-| Push/deploy decision for the local commits (`8d3d40b`, `d4fa738`, `0dd2de4`, `e727756`, `932986b`, `5f17b38`, `57e09a8`, `510e981`, `cd9fd09`, `9aeaa82`, `52a7d4d` and the docs commit of this round) | F14 | User |
+| Push/deploy decision for the local commits (from `8d3d40b` to `e2c3a9f` and the docs commit of this round) | F14 | User |
 | **Explicit UX/UI sign-off of the grouped navigation (F1 redesign, `5f17b38`)** — colours, wording, chevrons, «Más» behaviour; nothing else should change until it is reviewed | F1 | Client/team |
-| **Visual confirmation of the dropdown spacing (`510e981`)** — 12 px rows / 2 px gap / inset highlight, and the account-menu row. Measured, not seen: the harness window is not visible from here, so no screenshot could be taken. **The client's review found that the 12 px gap made the panel unreachable with the mouse; the mouse bridge in `3dbfbc6` fixes it and the confirmation is pending again** | F1 | Client/team |
+| **Visual confirmation of the dropdown spacing (`510e981`)** — 12 px rows / 2 px gap / inset highlight, and the account-menu row. **The client's review found that the 12 px gap made the panel unreachable with the mouse; the mouse bridge in `3dbfbc6` fixes it and the confirmation is pending again** (screenshots are possible again, so it can now be captured) | F1 | Client/team |
 | Real authenticated-session pass for the F1 nav (login writes session tokens to the DB; the 2026-10-16 pass used a temporary `wp_set_current_user()` mu-plugin, since deleted) | F1, F17 | Team (needs a disposable environment) |
 | Real-device pass: touch, iOS dynamic viewport, `prefers-reduced-motion` and the rendered focus ring (the harness could not deliver real key events while its window was hidden) | F1, F17 | Team |
+| **How much photograph to keep under the mobile scene text (F21)** — AA over the brightest pixel of each photo needs ≈0.87–0.88 veil opacity; a lighter veil wins back photograph and gives up that worst case | F21 | Client |
 
 ## Recommended next task (proposed, not approved)
 
@@ -200,6 +225,21 @@ found defects, it did not approve either. The open design decisions are unchange
 contrast of form borders; whether to ship Poppins). The proposed code order is still
 **F3 + F11b**, then **F5**.
 
+**2026-10-16 addition (seventh round — home-page review):** the client's second review round
+raised the home page only, and produced **F20** (informative KPIs read as clickable) and **F21**
+(scene text illegible over the photographs), both fixed in `e2c3a9f` and measured in
+[VERIFICATION.md](VERIFICATION.md) §V19. Two things follow for whoever picks this up:
+
+1. **The immediate next task is unchanged: the client's visual sign-off**, now of four things at
+   once — the F1 navigation, the municipal token pass (`52a7d4d`), the drawer contrast
+   (`9142179`) and this home-page round (`e2c3a9f`). The F21 evidence also adds a **client
+   decision**, not a code task: how much photograph to keep in the static (mobile) scenes
+   (AA over the brightest photo pixel needs ≈0.87–0.88 veil opacity).
+2. **A verification tool changed**: `browser.screenshot` worked this round (the harness window
+   was visible), and a **pixel-sampling method** for text-over-photograph contrast was added to
+   §V19. Re-run the contrast/overflow sweeps with them rather than trusting computed styles alone.
+   The proposed code order is otherwise unchanged: **F3 + F11b**, then **F5**.
+
 ## How to run the site (reference only — not executed in this task)
 
 - Current local site (2026-10-15): `http://localhost:8895/`, WordPress 7.1.3, PHP 8.3 —
@@ -232,8 +272,12 @@ contrast of form borders; whether to ship Poppins). The proposed code order is s
   **absorbs** the two pre-existing CSS working-tree deltas. The client's review of that pass
   produced two further fixes: **`3dbfbc6`** (`assets/css/otrn-menu.css`: a mouse bridge over the
   dropdown gap, plus one line of reasoning-only CSS for the account panel) and **`9142179`**
-  (`style.css`: two text colours in the evaluation drawer). All of them are local and unpushed.
-  The visual result of `52a7d4d` is **not** claimed as approved: the client's review found two
+  (`style.css`: two text colours in the evaluation drawer). The client's second review round
+  (home page only) is committed as **`e2c3a9f`** (application code: `assets/css/otrn-landing.css`
+  and `assets/otrn-landing.js` — one veil rule, one panel-width variable, one hero clamp, one
+  rail colour and one timeline position; no markup, logic, content, route or new file).
+  All of them are local and unpushed.
+  The visual result of `52a7d4d` is **not** claimed as approved: the client's reviews found
   defects and the final sign-off is pending.
 - Temporary files used to verify F1 (§V16) were deleted before committing: the simulation
   mu-plugin (`wp_set_current_user()`, re-created and deleted again for the `510e981` re-check)
