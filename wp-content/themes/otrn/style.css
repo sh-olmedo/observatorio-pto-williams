@@ -386,12 +386,22 @@ body.admin-bar .otrn-drawer{top:32px;}
 .otrn-drawer-body .et{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--text2);font-weight:700;margin-bottom:8px;}
 .otrn-drawer-ind{font-size:15px;font-weight:700;line-height:1.4;margin-bottom:16px;}
 .otrn-drawer-preg{background:var(--lgrey);border-radius:var(--radius);padding:14px 16px;margin-bottom:22px;}
-.otrn-drawer-preg p{font-size:13.5px;line-height:1.5;color:var(--text2);}
+/* La pregunta del criterio y las descripciones de cada nivel son el contenido
+   que el evaluador debe leer para responder: van en texto principal (`--dark`),
+   no en secundario. Con `--text2` quedaban en 4,58:1 sobre `--lgrey` (y 4,95:1
+   sobre blanco): cumplían AA por el mínimo, pero se leían desvaídas frente a la
+   definición del indicador, que sí va en negro. Las etiquetas `.et` siguen en
+   `--text2` (11 px, 700) para conservar la jerarquía. */
+.otrn-drawer-preg p{font-size:13.5px;line-height:1.5;color:var(--dark);}
 .otrn-drawer-nivel{display:flex;gap:12px;width:100%;text-align:left;align-items:flex-start;background:none;border:1.5px solid var(--grey);border-radius:var(--radius);padding:12px 14px;margin-bottom:8px;cursor:pointer;font-family:inherit;transition:border-color .12s,background .12s;}
 .otrn-drawer-nivel:hover{border-color:var(--primary);}
 .otrn-drawer-nivel.activo{border-color:var(--primary);background:var(--primary-soft);}
 .otrn-drawer-nivel .opt{flex:0 0 auto;min-width:34px;height:34px;}
-.otrn-drawer-nivel .txt{font-size:13px;line-height:1.5;color:var(--text2);padding-top:7px;}
+/* Misma razón que la pregunta del criterio: estos textos explican qué significa
+   cada nivel y se leen para decidir la respuesta, así que van en texto
+   principal. La etiqueta «Qué significa cada respuesta» (`.et`) se queda en
+   `--text2` para conservar la jerarquía. */
+.otrn-drawer-nivel .txt{font-size:13px;line-height:1.5;color:var(--dark);padding-top:7px;}
 .otrn-drawer-f{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 22px;border-top:1px solid var(--grey);background:var(--paper);}
 .otrn-drawer-f .mono{font-family:var(--font-mono);font-size:12px;color:var(--text2);}
 body.otrn-sin-scroll{overflow:hidden;}
