@@ -52,22 +52,34 @@ except F1). Status vocabulary:
 
 ## 2. Site chrome — `header.php` / `footer.php` / `assets/otrn-menu.js`
 
-- Header: brand logo, hardcoded nav (Inicio, Acerca de, Indicadores, Buenas prácticas,
-  [Evaluación de sostenibilidad — logged-in only], Planificación, Geoportal, Noticias,
-  Guía de usuario, dynamic Material links), login/logout button, burger button.
-- Menu JS: aria state, Escape/click-outside close, focus trap (`assets/otrn-menu.js:1-28`).
+- Header: brand logo, nav rendered from `otrn_nav_estructura()` (`functions.php`) — one
+  source of truth for labels, URLs, grouping, collapse priority and the current item — plus
+  the account control and the burger. Grouping (2026-10-16, pending UX/UI approval):
+  `Inicio · Observatorio ▾ (Acerca de, Noticias) · Datos ▾ (Indicadores, Geoportal) · Buenas
+  prácticas · Planificación ▾ (Iniciativas Pladetur, Estadísticas) · Material de apoyo ▾
+  (Guía de usuario, Documentación, Reportes) · Autoevaluación ▾ (Autoevaluaciones, Mapa,
+  Nueva autoevaluación — logged-in only)`. No destination or URL changed; the private gate is
+  untouched.
+- Account control: a 21 px person icon (44×44 px hit area) replaces the `Iniciar sesión` /
+  `Salir` button; logged out it links to the existing login, logged in it opens a small panel
+  with «Cerrar sesión». Inline SVG with the site's icon language — Material Icons is not
+  available in the project and no dependency was added.
+- Menu JS (`assets/otrn-menu.js`): disclosure dropdowns (`aria-expanded`/`aria-controls`,
+  `aria-current` for the current page), Escape/click-outside close with focus return, one
+  group open at a time, drawer accordions, focus trap and resize resync.
 - Menu behaviour is now defined once for every page type in `assets/css/otrn-menu.css`
-  (enqueued site-wide) and `assets/otrn-menu.js`: a compact single-line desktop row
-  (`gap:18px`, `nowrap`) and a full-height side panel. The panel engages at ≤1360 px without
-  a session; **with a session it is always the panel**, because the 11th link
-  («Evaluación de sostenibilidad») makes the row 1424 px while the header container leaves
-  1376 px usable. The front-page `fixed` header is offset below the WordPress admin bar
-  (32 px, 46 px at ≤782 px) like the panel.
-- Fixed 2026-10-16 (F1, commits `0dd2de4` + `e727756`, local): before, ≤600 px lost all
-  navigation on internal pages and the front page; at ≥1366 px the authenticated row wrapped
-  and, on the front page, the «Salir» button was clipped off-screen under the admin bar.
-  Evidence: [VERIFICATION.md](VERIFICATION.md) §V15. Landing copies in `otrn-landing.css`
-  remain duplicated (F5/F14 cleanup).
+  (enqueued site-wide) and `assets/otrn-menu.js`: a single-line desktop row (`gap:18px`,
+  `nowrap`) with dropdowns, a measured progressive collapse in tablet and a full-height side
+  panel on mobile. Breakpoints come from the measured row widths (§V16): full row ≥1152 px
+  (needs 1130 px with a session), 910–1151 px and 680–909 px keep a shrinking set of
+  primaries plus «Más», ≤679 px uses the drawer. Collapsed groups are offered inside «Más»
+  and each copy is shown only when its row original is hidden. The front-page `fixed` header
+  is offset below the WordPress admin bar (32 px, 46 px at ≤782 px) like the panel.
+- Fixed 2026-10-16 (F1, commits `0dd2de4` + `e727756` + the redesign commit, all local):
+  before, ≤600 px lost all navigation on internal pages and the front page; at ≥1366 px the
+  authenticated row wrapped and, on the front page, the «Salir» button was clipped off-screen
+  under the admin bar. Evidence: [VERIFICATION.md](VERIFICATION.md) §V15 and §V16. Landing
+  copies in `otrn-landing.css` remain duplicated (F5/F14 cleanup).
 
 ## 3. Autodiagnóstico form — `page-evaluar.php` + `otrn-autodiagnostico.php`
 

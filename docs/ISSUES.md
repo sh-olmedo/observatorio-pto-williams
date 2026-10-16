@@ -44,8 +44,9 @@ Runtime status (first pass, **2026-10-15**): measured results are in
 
 ### F1 — Mobile navigation unusable on internal pages
 
-- **Severity**: P1 · **Status**: **Fixed in code (2026-10-16), browser-verified — see the
-  limitation under *Verification* below** · **Evidence**:
+- **Severity**: P1 · **Status**: **Fixed in code (2026-10-16, two rounds) and
+  browser-verified, but the grouped-navigation redesign is _pending explicit UX/UI
+  sign-off_ — see *Redesign* and the limitations below** · **Evidence**:
   - `style.css:508-509` hides `.otrn-nav` under 600 px with no replacement rule elsewhere.
   - Burger and mobile-panel CSS exist only in `assets/css/otrn-landing.css:194, 213-224`,
     enqueued only on the front page (`functions.php:409-457`).
@@ -94,6 +95,56 @@ Runtime status (first pass, **2026-10-15**): measured results are in
   task forbids), so its 11th link and the admin bar were reproduced in the DOM with the real
   markup/CSS. A real authenticated session, real touch devices, the iOS dynamic viewport and
   `prefers-reduced-motion` emulation remain pending.
+
+#### F1 redesign — grouped navigation, account icon and measured breakpoints (2026-10-16)
+
+Client-approved information architecture (grouping only: no destination removed, no URL
+changed, private gate untouched), implemented locally on top of `e727756` and **awaiting
+explicit UX/UI approval of the visuals**. Files: `header.php`, `functions.php`,
+`assets/css/otrn-menu.css`, `assets/otrn-menu.js`.
+
+- **Single source of truth**: `otrn_nav_estructura()` in `functions.php` returns the ordered
+  tree (`tipo`, `etiqueta`, `url`, `hijos`, `prioridad`, `activo`, filter
+  `otrn_nav_estructura`). `header.php` renders it once for the row and once inside «Más»;
+  the `is_user_logged_in()` gate for the Autoevaluación group is unchanged.
+- **Groups**: Observatorio ▾ (Acerca de, Noticias) · Datos ▾ (Indicadores, Geoportal) ·
+  Planificación ▾ (Iniciativas Pladetur, Estadísticas) · Material de apoyo ▾ (Guía de
+  usuario, Documentación, Reportes) · Autoevaluación ▾ (Autoevaluaciones, Mapa, Nueva
+  autoevaluación, only with session).
+- **Account control**: the prominent `Iniciar sesión` / `Salir` button is replaced by a
+  21 px inline person SVG (44×44 px hit area, no border/fill/pill/shadow, Material `person`
+  geometry, site's `stroke 1.7 / currentColor` language) with an accessible name; logged out
+  it links to the existing login, logged in it opens a small panel with «Cerrar sesión».
+  **Material Icons is not available in the project** (no icon font/library), so no new
+  dependency was added.
+- **Measured breakpoints** (worst case = front page brand; row width measured in-browser):
+  ≥1152 px full row (needs 1130 px with session) · 910–1151 px row keeps `Inicio,
+  Observatorio, Datos, Buenas prácticas, Planificación` + «Más» (needs 895 px) · 680–909 px
+  keeps `Inicio, Datos, Buenas prácticas` + «Más» (needs 654 px) · ≤679 px accessible drawer
+  with accordions. Collapsed groups are duplicated inside «Más» and each copy is shown only
+  when its row original is hidden, so no destination ever appears twice.
+- **Fixed while verifying**: the closed «Más» panel (right-anchored now) added 99 px of
+  horizontal page overflow on internal pages, where the header is `static`; the «Más» item
+  leaked into the mobile drawer; `esFocable()` ignored `visibility:hidden`; focus return fell
+  back to `<body>` when the browser did not focus the burger.
+- **Contrast**: `--primary` (#DF8056) is only 2.6:1 on white, so active/hover text and focus
+  outlines use `--primary-dark` (#A05C3D, 5.1–5.4:1) — the same colour the front page already
+  used for `a.active`, which `style.css:41` had been overriding with the failing token ever
+  since it was written but never applied. «Más» headings moved from `--text3` (3.5:1) to
+  `--text2` (5.7:1). A per-element contrast scan of `.otrn-header` in nine states (row,
+  dropdowns open, tablet «Más», drawer, with/without session) reports **0 failures**.
+- **Verified**: see [VERIFICATION.md](VERIFICATION.md) §V16 — width matrix on `/` and
+  `/noticias/` (anonymous and authenticated) at 1920/1440/1366/1280/1152/1151/1024/960/910/
+  909/768/700/680/679/600/390/375 px with 0 px page overflow and single-line rows; real
+  admin-bar geometry (32 px, 46 px ≤782 px) on both page types; interaction pass with
+  synthetic events (open/close, one-at-a-time, hover, outside click, Escape + focus return,
+  drawer trap, resize resync, drawer ↔ account exclusivity).
+- **Pending (do not treat as approved)**: explicit UX/UI sign-off of the visuals; the focus
+  ring rendered state and real keyboard modality (the harness keyboard could not be driven
+  while the browser window was not visible); real touch devices, the iOS dynamic viewport and
+  `prefers-reduced-motion` emulation. Session states were produced with a temporary,
+  **deleted** mu-plugin (`wp_set_current_user()`, no DB write, no session token), not a real
+  login.
 
 ### F2 — Proposed Arauco palette not implemented
 

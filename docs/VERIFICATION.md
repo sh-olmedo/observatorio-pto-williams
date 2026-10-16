@@ -306,3 +306,85 @@ Resize 1361→1360→open→1361→1440 resyncs (`aria-hidden` in panel mode, re
 **Still NOT VERIFIED**: a real authenticated session (login), real touch devices, the iOS
 dynamic viewport, and `prefers-reduced-motion: reduce` emulation (the rule exists in CSS
 only).
+
+## V16 — F1 redesign: grouped navigation, account icon, measured breakpoints (2026-10-16)
+
+Second round on top of §V15: the client approved grouping the 11 destinations into primaries
+plus dropdowns and replacing the login/logout button with a person icon. Commits: local,
+listed in [HANDOFF.md](HANDOFF.md). Files: `header.php`, `functions.php`,
+`assets/css/otrn-menu.css`, `assets/otrn-menu.js`. **Status: pending explicit UX/UI approval
+of the visuals** — nothing here is signed off.
+
+**Method.** Same-origin iframes with a cache-buster at each width, so the media queries apply
+without touching the harness window (the real window is ≈1038×803 px). The authenticated
+state was produced by a **temporary mu-plugin** (`wp_set_current_user(1)` when
+`?otrn_sim_auth=1`), which renders the *real* server-side header, the real admin bar and the
+real `logged-in admin-bar` body classes **without a login and without writing any session
+token to the DB**; the file was deleted after the pass and `git status` confirms a clean
+tree. This supersedes the DOM-injection method of §V15.
+
+**Row width per collapse stage** (measured with `width:max-content`; worst case = front-page
+brand, 158 px; `.otrn .wrap` padding 64 px, capped at 1440 px):
+
+| Stage | Row advertises | Row width (anonymous) | Row width (session) | Minimum viewport | Threshold chosen (slack) |
+| --- | --- | --- | --- | --- | --- |
+| Full row | 6 / 7 primaries | 927 px | **1066 px** | 991 / **1130 px** | **≥1152 px** (+22) |
+| Narrow row | 5 primaries + «Más» | 831 px | 831 px | 895 px | **910–1151 px** (+15) |
+| Compact row | 3 primaries + «Más» | 590 px | 590 px | 654 px | **680–909 px** (+26) |
+| Drawer | all destinations | — | — | — | **≤679 px** |
+
+The thresholds are derived from those measurements, not from device categories. The
+session-only Autoevaluación group costs 139 px, which is why the full row is only offered
+from 1152 px even though the anonymous row would fit from 991 px.
+
+**Width matrix** (`/` and `/noticias/`, anonymous and authenticated, 1920/1440/1366/1280/
+1152/1151/1024/960/910/909/768/700/680/679/600/390/375 px): **0 px horizontal page
+overflow at every width on both pages**, single-line rows (nav list height 18 px), 0 collapsed
+labels, brand-to-row clearance ≥86 px at the tightest point, and the expected contents per
+stage. Admin bar: 32 px above 782 px and 46 px at/below it, with the header top matching
+exactly on the front page (`fixed`) and on internal pages (`static`) — the §V15 defect does
+not come back. Drawer lists all destinations and never «Más».
+
+**Interaction pass** (synthetic `click`/`mouseenter`/`keydown` in the iframes; real clicks
+were not possible while the browser window was not visible):
+
+| Check | Result |
+| --- | --- |
+| Group dropdown open/close, `aria-expanded`, panel 12 px below the trigger, inside the viewport | pass |
+| Only one group open at a time | pass |
+| Hover opens / leaving closes (fine pointer) | pass |
+| Click outside closes | pass |
+| Escape closes and returns focus to the trigger button | pass |
+| Choosing a link closes the panel (click default prevented in the test) | pass |
+| Drawer: burger → `otrn-menu-abierto`, `aria-expanded`, drawer in view, focus on the first link | pass |
+| Drawer: accordions open/close, several open at once, links focusable (2/2 for Datos) | pass |
+| Drawer: Tab from the last focusable wraps to the first; Shift+Tab from the first to the last (9 focusables) | pass |
+| Drawer: Escape closes an open accordion first, then the drawer, and focus returns to the burger | pass |
+| Drawer ↔ account menu mutual exclusion (opening one closes the other) | pass |
+| Account menu: opens, `aria-expanded`, «Cerrar sesión» → `/wp-login.php?action=logout`, Escape returns focus to the icon, outside click closes, panel inside the viewport at 390 and 1440 px | pass |
+| Account icon: 44×44 px box, 21 px glyph, `border:0`, transparent background, no shadow, `z-index:61` above the drawer (hit-tested with `elementFromPoint`) | pass |
+| Resize resync (drawer → row and back): no stale `aria-hidden` or open panels | pass |
+| Console errors on the authenticated page | none |
+
+**Contrast.** A per-element scan of `.otrn-header` in nine states (front page anonymous, a
+dropdown open, authenticated, account menu open, `/noticias/` and `/indicadores/` with the
+current child visible, tablet «Más» panel, mobile drawer with an accordion open) reports **0
+WCAG AA failures**. `--primary` (#DF8056, 2.6:1) was replaced by `--primary-dark` (#A05C3D,
+5.1–5.4:1) for active/hover text and focus outlines, and the «Más» headings moved from
+`--text3` (3.5:1) to `--text2` (5.7:1). Lighthouse accessibility on the front page: 0.92, with
+the only contrast failure in pre-existing landing content (`.otrn-stage__cue`, `.otrn-act__*`
+over images), not in the header.
+
+**Defects found and fixed during this pass**: (1) the closed «Más» panel added 99 px of
+horizontal page overflow on internal pages (the header is `static` there, so an absolutely
+positioned panel extends the document) — the panel is now right-anchored; (2) the «Más» item
+leaked into the mobile drawer; (3) `esFocable()` treated `visibility:hidden` panels as
+focusable; (4) Escape could return focus to `<body>` when the browser had not focused the
+burger, so the burger is used as the fallback target.
+
+**NOT VERIFIED in this pass**: the rendered focus ring and real keyboard modality (the
+harness refuses key events while its window is hidden — the `:focus-visible` rules are read
+from the stylesheet, not exercised); real touch devices and the iOS dynamic viewport;
+`prefers-reduced-motion: reduce` emulation; a real login (the session was simulated
+server-side). Also untouched by design: the landing/internal page content, the private gates
+(re-confirmed 302/302/302 and `/criterio/` 301) and the orphan routes.
