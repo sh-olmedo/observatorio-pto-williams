@@ -112,10 +112,10 @@ database change):
 | Item | Value |
 | --- | --- |
 | Branch | `main` (remote `origin` configured; no remote refs fetched locally) |
-| HEAD | `90bf739` — `fix(otrn): anclar el pie al borde inferior de la ventana (F24)` (local, not pushed; this documentation commit follows it) |
-| History | `99092d1` repo init → `70b22a7` "portada scrollytelling inmersiva + branding Arauco (ETAPA A+B+C)" → `5f43933` "modo dual estatico/inmersivo" → `f506104` docs baseline → `bb38d8b` runtime record → `8d3d40b` F11b protections → `d4fa738` F19 docs → `0dd2de4` F1 nav → `e727756` F1 regression fix → `932986b` F1 docs → `5f17b38` F1 grouped navigation → `57e09a8` F1 redesign docs → `510e981` F1 dropdown spacing fix → `cd9fd09` F1 spacing docs → `9aeaa82` design-token audit docs → `52a7d4d` municipal token consolidation → `d691f03` token docs → `3dbfbc6` dropdown hover fix (F1) → `9142179` drawer contrast fix (F2) → `0d35f84` client-review docs → `e2c3a9f` home legibility + KPI affordance fix (F20, F21) → `f40cb52` home-review docs → `ce9a093` four decisions closed (docs) → `649b01f` mobile glass pass (F21) → `94714ff` mobile glass docs → `05d2ecb` glass on the lead only (F21) → `7f93114` fourth-round docs → `bef8332` plate values set by the client (F21) → `90bf739` sticky footer (F24) (last local, not pushed) |
+| HEAD | `d706872` — `feat(otrn): guía de usuario en /guias/ restringida a la sesión (F25-F27)` (local, not pushed; this documentation commit follows it) |
+| History | `99092d1` repo init → `70b22a7` "portada scrollytelling inmersiva + branding Arauco (ETAPA A+B+C)" → `5f43933` "modo dual estatico/inmersivo" → `f506104` docs baseline → `bb38d8b` runtime record → `8d3d40b` F11b protections → `d4fa738` F19 docs → `0dd2de4` F1 nav → `e727756` F1 regression fix → `932986b` F1 docs → `5f17b38` F1 grouped navigation → `57e09a8` F1 redesign docs → `510e981` F1 dropdown spacing fix → `cd9fd09` F1 spacing docs → `9aeaa82` design-token audit docs → `52a7d4d` municipal token consolidation → `d691f03` token docs → `3dbfbc6` dropdown hover fix (F1) → `9142179` drawer contrast fix (F2) → `0d35f84` client-review docs → `e2c3a9f` home legibility + KPI affordance fix (F20, F21) → `f40cb52` home-review docs → `ce9a093` four decisions closed (docs) → `649b01f` mobile glass pass (F21) → `94714ff` mobile glass docs → `05d2ecb` glass on the lead only (F21) → `7f93114` fourth-round docs → `bef8332` plate values set by the client (F21) → `90bf739` sticky footer (F24) → `a360fcc` sticky-footer docs → `d706872` user guide (F25-F27) → this documentation commit (last local, not pushed) |
 | Remote | `https://github.com/sh-olmedo/observatorio-arauco.git` |
-| Tracked files | 803 (`bb38d8b` added `docs/VERIFICATION.md`; `8d3d40b` added `wp-content/mu-plugins/otrn-privacidad-seccion.php`; `52a7d4d` added/removed no files) |
+| Tracked files | 821 at `d706872` (805 at `a360fcc`; `d706872` added 16 — `guias-contenido.php`, `assets/css/otrn-guias.css`, `assets/otrn-guias.js`, the 12 screenshots under `assets/guias/` and `mu-plugins/otrn-privacidad-guias.php`) |
 
 ## Working tree — 1 remaining file (do not commit)
 
@@ -135,8 +135,9 @@ loader remains.
 
 - Working, statically verified structure: immersive landing (dual mode), classic chrome,
   autodiagnóstico (form with drafts, archive/map, results), indicators (+Excel drawer),
-  good practices, support material, guides, Pladetur follow-up + statistics, news,
-  Geoportal embed, About page. Details and per-module status: [FEATURES.md](FEATURES.md).
+  good practices, support material, the **session-gated user guide** (`/guias/`, §V24),
+  Pladetur follow-up + statistics, news, Geoportal embed, About page. Details and per-module
+  status: [FEATURES.md](FEATURES.md).
 - Architecture and data flows: [ARCHITECTURE.md](ARCHITECTURE.md).
 - Design system: [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md).
 - Security posture: [SECURITY_AUDIT.md](SECURITY_AUDIT.md).
@@ -164,6 +165,10 @@ loader remains.
 | Fate of the curated sector list and of the location metas under the new search picker | F8 ↔ F19 | Client/team (Phase 4/6) |
 | Push/deploy decision for the local commits (from `8d3d40b` to `90bf739` and the docs commit of this round) | F14 | User |
 | Sticky footer (`90bf739`, **F24**): the footer now sits on the bottom edge of short pages and is pushed by the content otherwise. Pending **the client's visual confirmation**, ideally on a real phone (`dvh` + dynamic toolbars are not verifiable in the harness) | F24 | Client/team |
+| **UX/UI review of the user guide** (`d706872`): its look (index, article, figures) and its Spanish copy for non-technical readers. The guide is a deliverable, **not a signed-off design** | §V24 | Client/team |
+| Fate of the sample `guia` post that the guide's appendix now surfaces (*"Nueva giua de usuario"*, ID 409): delete it, rewrite it or unpublish it. **The database is not editable from this repository** | F27 | Client (content) |
+| `<title>` on every route (the theme never declares `title-tag`) and the language of WordPress's own screens (the site locale is `it_IT`): both wait on the site name and the locale being decided — the DB still says *"Observatorio Turístico Rapa Nui"* | F25, F26 | Client/team |
+| Real authenticated pass for the guide: the login → return trip and a **non-admin** logged-in account (only the administrator account exists), neither available in the harness | §V24.6 | Team (needs a disposable environment) |
 | **Explicit UX/UI sign-off of the grouped navigation (F1 redesign, `5f17b38`)** — colours, wording, chevrons, «Más» behaviour; nothing else should change until it is reviewed | F1 | Client/team |
 | **Visual confirmation of the dropdown spacing (`510e981`)** — 12 px rows / 2 px gap / inset highlight, and the account-menu row. **The client's review found that the 12 px gap made the panel unreachable with the mouse; the mouse bridge in `3dbfbc6` fixes it and the confirmation is pending again** (screenshots are possible again, so it can now be captured) | F1 | Client/team |
 | Real authenticated-session pass for the F1 nav (login writes session tokens to the DB; the 2026-10-16 pass used a temporary `wp_set_current_user()` mu-plugin, since deleted) | F1, F17 | Team (needs a disposable environment) |
@@ -241,6 +246,12 @@ raised the home page only, and produced **F20** (informative KPIs read as clicka
    was visible), and a **pixel-sampling method** for text-over-photograph contrast was added to
    §V19. Re-run the contrast/overflow sweeps with them rather than trusting computed styles alone.
    The proposed code order is otherwise unchanged: **F3 + F11b**, then **F5**.
+
+**2026-10-16 note (user guide, delivered outside this order):** the client asked for a user guide
+of the site itself, and it landed ahead of the plan — `/guias/`, `d706872`, evidence in §V24. It is
+**delivered and awaiting the client's UX/UI review**, and it leaves three small decisions behind it
+(F27 the sample post, F25 the missing `<title>`, F26 the Italian locale). None of them displaces the
+proposed code order above: **F3 + F11b**, then **F5**.
 
 **Update 2026-10-16 (eighth round — four decisions closed, no code change):** the client answered
 the open design questions raised after the seventh round. **No file changed**, so this is
@@ -359,6 +370,45 @@ content, route or database change, and no token touched**.
 - **Open for the client**: the visual confirmation of this behaviour, and everything still pending
   from the previous rounds (the §V22 plate tint, the §V21 shadow trade, F23, F22).
 
+**Update 2026-10-16 (thirteenth round — user guide for the site itself):** the client asked for a
+**user guide of the real site**. It is implemented at the existing route `/guias/` and committed
+locally as **`d706872`** (code + 12 real screenshots, 16 new files). The route, the post type, the
+database, the options and the dependency list are unchanged: the guide's copy lives in a new PHP
+data file, and no other page, URL, user or content is touched.
+
+- **What it is**: a help centre with 10 topics — getting started; navigation and account;
+  indicators; charts, filters and views; geoportal; good practices; PlAdetur planning and
+  monitoring; sustainability self-assessments; reports and material; FAQ — plus an appendix that
+  lists the published `guia` posts. Every label quoted in the copy (e.g. «Buscar»,
+  «Ver evolución →», «← Volver a Planificación») was taken from the rendered interface, and the
+  copy is Spanish for non-technical readers.
+- **Private, server-side** (the part that had to be right): the guide requires a **session**, not a
+  role. `otrn_guia_usuario_privada()` (`functions.php`, priority 1 on `template_redirect`) covers
+  the archive, the single and the feed, and a new mu-plugin (`otrn-privacidad-guias.php`) closes
+  REST, both searches, oEmbed and the sitemap. Measured anonymously: every HTML route 302s to the
+  login with its `redirect_to` intact, REST answers **401**, the REST search answers `[]`,
+  `/?s=guia` and `/wp-sitemap.xml` show nothing, oEmbed 404s. The guide is deliberately **not** in
+  `otrn_privado_tipos()` — that list demands `read_private_guias` and would 403 logged-in
+  non-admins — so the existing private-section rules stay exactly as they were.
+- **Layout and behaviour**: sticky index plus article on desktop, one column with a `<details>`
+  index at ≤979 px; the JS only adds the text filter and the current-topic highlight over a
+  server-rendered baseline (verified with scripts blocked: all 10 topics, the anchors and the
+  figures are there). 375→1920 px with **0 px horizontal overflow**; the keyboard tab order and
+  the visible focus ring were checked with real key events. Detail: §V24.
+- **What it deliberately does not ship**: a figure of the private evaluation **listing or map** —
+  a theme image is a static file served without a session and those views carry territorial
+  results, so the guide states the limitation in its own text instead. The figures that do ship
+  show public views, public data or an *empty* form.
+- **Findings it surfaced instead of fixing** (each is a client decision or a site-wide change, so
+  none was applied silently): **F25** — no route emits a `<title>` (`title-tag` is never
+  declared); **F26** — the site locale is `it_IT`, so WordPress's own screens (login, password
+  reset, admin) are Italian while the site copy is Spanish; **F27** — the only published `guia`
+  post is the WordPress sample *"Nueva giua de usuario"*, which the guide's appendix now surfaces
+  to logged-in readers.
+- **Open for the client**: the **UX/UI review of the guide's look and copy** (it is a deliverable,
+  not a signed-off design), the fate of the sample post (F27), and whether a non-admin account
+  should reach the guide at all (§V24.6: only the administrator account exists today).
+
 ## How to run the site (reference only — not executed in this task)
 
 - Current local site (2026-10-15): `http://localhost:8895/`, WordPress 7.1.3, PHP 8.3 —
@@ -408,9 +458,18 @@ content, route or database change, and no token touched**.
   All of them are local and unpushed.
   The visual result of `52a7d4d` is **not** claimed as approved: the client's reviews found
   defects and the final sign-off is pending.
+  The **user guide** is **`d706872`**: application code `functions.php` (one session gate, one
+  conditional enqueue and one nav condition), `archive-guia.php`, the new `guias-contenido.php`,
+  the new `assets/css/otrn-guias.css` and `assets/otrn-guias.js`, the 12 new screenshots under
+  `assets/guias/` and the new `mu-plugins/otrn-privacidad-guias.php` — 16 new files, with no
+  route, post type, database row, option or dependency added and no other page, URL, user or
+  content touched. It is local and unpushed too, and its rendered result is **not** claimed as
+  approved either.
 - Temporary files used to verify F1 (§V16) were deleted before committing: the simulation
   mu-plugin (`wp_set_current_user()`, re-created and deleted again for the `510e981` re-check)
-  and the local evidence pages. The token pass (§V17) created **no** files: it measured
+  and the local evidence pages. The guide's pass (§V24) used the same device — a temporary
+  `determine_current_user` mu-plugin — **deleted before `d706872`**, after which every anonymous
+  probe of §V24.1 was re-run. The token pass (§V17) created **no** files: it measured
   computed styles in same-origin iframes and injected a throwaway lab fragment into an iframe
   body only. `git status` lists no new files, and the database was never written to (no login,
   no post/meta/option change; the private-gate check was anonymous `curl`).

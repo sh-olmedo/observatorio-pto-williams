@@ -197,6 +197,15 @@ These must not be adopted as brand tokens without explicit approval. The brief's
   (`.otrn-dato-lite`) are flat data blocks (no background, border, radius or shadow; a 2 px
   `--primary` top rule) — an affordance rule, kept after the client's home review
   ([VERIFICATION.md](VERIFICATION.md) §V19.1, F20).
+- **Guide components (`d706872`, no new token)**: the `/guias/` help centre composes the existing
+  system only — `.otrn-guia__indice` (index panel on `--paper` with the panel border and radius),
+  `.otrn-guia-tema__eyebrow` (the `.eyebrow` chip language), numbered steps (`.otrn-guia-pasos`,
+  `--primary-dark` counters on `--primary-soft`), notes on `--primary-soft` with `--dark` text,
+  the FAQ as `<dl>`, the same `.otrn-table` table markup inside a scroll wrapper, and figures on
+  the card surface at the article's reading width. The article column is capped at **820 px**; the
+  guide adds a single utility (`.otrn-guia-sr`, a visually hidden label for the search field) and
+  no palette, no radius and no shadow of its own. Its private marker uses the existing
+  `--neutral`/`--neutral-soft` pair (the AA-safe status pairing), not a brand colour.
 - **Glass on the lead (`05d2ecb`, values set by the client in `bef8332`)**: on mobile the scene's lead
   paragraph is read on a translucent frosted plate — `rgba(48,74,131,.35)` +
   `backdrop-filter:blur(9px) saturate(1.15)` (the client's numbers, with the invalid negative alpha
@@ -225,6 +234,11 @@ These must not be adopted as brand tokens without explicit approval. The brief's
   overflow**, burger/panel thresholds identical on the front page and on internal pages, and
   the token pass did not change any of it ([VERIFICATION.md](VERIFICATION.md) §V17).
 - ≤600 px: footer logos drop to 40 px.
+- **Guide (`d706872`)**: two columns (index + article) from **980 px**, one column at ≤979 px,
+  where the index is swapped for a native `<details>` summary (same destinations, one copy
+  visible at a time); the search field and the topic rows keep comfortable touch targets, and the
+  guide's own 2-column tables scroll inside their wrapper instead of the page
+  ([VERIFICATION.md](VERIFICATION.md) §V24.3).
 - ≤768 px: the landing switches to static mode (scenes stack full-bleed), the rail is hidden,
   the veil drops to a gauze and the lead moves onto its glass plate while the rest of the copy
   reads on the photograph with a text-shadow (§6); grids collapse (data/news grids to 2 columns at
@@ -330,3 +344,7 @@ remapping of tiers/scales, the literal replacements and the deleted dead CSS is 
    `649b01f` block plate (AA everywhere, photograph covered 62-84 %), a plate behind the eyebrow +
    title only, or the one-number change of the lead's tint to **0,45** (4,88-5,11:1). A client
    decision.
+6. **Visual review of the user guide** (`d706872`, `/guias/`) — the guide's look (index panel,
+   article column, figures, tables) and its Spanish copy for non-technical readers. It introduced
+   no token, palette or component of its own (see §4) but it is a deliverable in its own right and
+   nothing about it is approved; measurements in [VERIFICATION.md](VERIFICATION.md) §V24.

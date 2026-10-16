@@ -15,6 +15,7 @@ Related: [ISSUES.md](ISSUES.md), [ARCHITECTURE.md](ARCHITECTURE.md) §4, §8.
 | --- | --- | --- | --- |
 | [F3](#f3--evaluation-submission-without-capability-check) | Write endpoint authorization | P1 | Open |
 | [F11b](#f11b--rest-exposure-of-private-content-confirmed-at-runtime) | Private section vs REST | P1 | **Confirmed at runtime** (fix pending) |
+| [S-guia-1](#s-guia-1--guía-de-usuario-session-gated-surfaces) | New private route vs public surfaces | — | **Enforced and verified 2026-10-16** (§V24) |
 | [F4](#f4--acf-schemas-not-versioned) | Configuration integrity | P2 | Open |
 | [S-dep-1](#s-dep-1--third-party-cdn-without-sri) | Supply chain | P3 | Open |
 | [S-priv-1](#s-priv-1--form-answers-in-localstorage) | Privacy (device-local) | P3 | Informational |
@@ -24,7 +25,8 @@ Positive findings (verified static): nonce verification on both POST handlers
 (`otrn-autodiagnostico.php:386, 504`); draft tokens compared with `hash_equals()`
 (`otrn_borrador_valido()`); archive handler requires `delete_evaluacion`
 (`otrn-autodiagnostico.php:512`); no custom REST routes registered (grep); page-side gating
-of the whole private section (`functions.php:250-265`).
+of the whole private section (`functions.php:250-265`); and the user guide's own session gate
+plus its non-HTML closure (**added and verified at runtime 2026-10-16** — §S-guia-1).
 
 ## F3 — Evaluation submission without capability check
 
@@ -83,6 +85,45 @@ of the whole private section (`functions.php:250-265`).
 - **Proposed fix (not approved)**: set `show_in_rest => false` (or restrict via
   `rest_*` filters) for the private types (`evaluacion`, `criterio_autodiag`, `sector`),
   after confirming no block-editor workflow depends on REST.
+
+## S-guia-1 — "Guía de usuario": session-gated surfaces
+
+*Implemented 2026-10-16 · status: enforced · evidence [VERIFICATION.md](VERIFICATION.md) §V24*
+
+- **What it is**: the guide at `/guias/` is a new **private** route (a help centre for staff),
+  so it had to inherit the privacy standard of the section it documents rather than add a hole.
+  Nothing about the existing private-section rules was weakened; the guide only adds gating.
+- **Two layers**, mirroring the private section's shape:
+  - **HTML**: `otrn_guia_usuario_privada()` (`functions.php`, priority 1 on
+    `template_redirect`) covers the `guia` archive, its singles and its feed and redirects
+    anonymous visitors to `wp-login.php` with the destination preserved.
+  - **Non-HTML**: `wp-content/mu-plugins/otrn-privacidad-guias.php` — REST `401` for the type
+    (including its item route), the type's posts removed from the REST search and from the
+    front-end search (`pre_get_posts`), oEmbed refused, and the sitemap entry removed
+    unconditionally (crawler-facing).
+- **Semantics are deliberate**: the gate requires a **session**, not a capability. Routing the
+  type through `otrn_privado_tipos()` would have required `read_private_guias` (held by
+  administrators only) and returned 403 to every logged-in non-admin — the opposite of a help
+  centre. The type is *not* in `otrn_privado_tipos()`; the existing list is untouched.
+- **Measured anonymously** (no cookies, full table in §V24.1): archive/single/feed and both
+  query-string variants → **302 → login**; `/wp-json/wp/v2/guia` and `/wp-json/wp/v2/guia/409`
+  → **401**; REST search → **200 `[]`**; `/?s=guia` → no match; `/wp-sitemap.xml` → no `guia`
+  entry (the sub-sitemap 404s); oEmbed → **404**; the home page contains no trace of the guide.
+- **Caching**: the guide answers with WordPress's logged-in headers
+  (`no-cache, must-revalidate, max-age=0, no-store, private`, identical to `/evaluar/`), so a
+  shared cache cannot serve the HTML to an anonymous visitor.
+- **Residual, accepted (same shape as F11b)**: `/wp-json/wp/v2/types` still advertises the
+  `guia` type, exactly as it already advertises `evaluacion`, `criterio_autodiag` and `sector`.
+  No content is readable — the item routes answer 401 — and the advertisement was left alone
+  rather than special-cased for the guide.
+- **Assets carry a harder edge than HTML**: unlike a template, an image under
+  `wp-content/themes/otrn/assets/` is served by the web server with no WordPress involvement,
+  so its bytes are public to anyone who knows the URL. The guide therefore ships **no figure of
+  the private listing or its map** (territorial results) and states the limitation in its own
+  text; the figures that do ship show public views, public data or an *empty* form.
+- **Not verified**: the login → return round trip in a browser (no credentials in the harness),
+  and the behaviour with a **non-admin logged-in account** (only the administrator account
+  exists in the database): the "a session is enough" claim rests on the code path.
 
 ## F4 — ACF schemas not versioned
 

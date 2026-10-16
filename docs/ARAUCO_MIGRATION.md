@@ -30,6 +30,7 @@ Legend: ✅ Completed (static) · 🟡 Provisional · ⏳ Pending · ❓ Unverif
 | Arauco design layer for the front page | `assets/css/otrn-arauco.css` |
 | Provisional figures explicitly labeled as inherited from Rapa Nui | `front-page.php:140-142` |
 | Self-hosted fonts/logos directories prepared | `assets/fonts/`, `assets/logos/` |
+| User guide rewritten as the Arauco help centre: intro copy no longer names Rapa Nui, and the 10 topics are new Spanish copy written against the rendered interface | `archive-guia.php`, `guias-contenido.php` (`d706872`, [VERIFICATION.md](VERIFICATION.md) §V24) |
 
 ## 3. ⏳ Pending — user-visible Rapa Nui copy (F7)
 
@@ -38,7 +39,6 @@ Archive listing intros are hardcoded in the templates (not editorial content):
 | File:line | Current (Rapa Nui) text mentions |
 | --- | --- |
 | `wp-content/themes/otrn/page-noticias.php:36` | "…turismo en Rapa Nui" |
-| `wp-content/themes/otrn/archive-guia.php:24` | "Observatorio Turístico Rapa Nui" |
 | `wp-content/themes/otrn/archive-buena_practica.php:29` | "…patrimonio Rapa Nui" |
 | `wp-content/themes/otrn/archive-indicador.php:62` | "…turismo en Rapa Nui…" |
 | `wp-content/themes/otrn/archive-iniciativa_pladetur.php:61,192` | "Pladetur de Rapa Nui", "Fuente: Pladetur Rapa Nui" |
@@ -71,7 +71,7 @@ see §8.
 
 | Item | Evidence | Decision needed |
 | --- | --- | --- |
-| Geoportal ArcGIS StoryMaps URL (scope unknown) | `page-geoportal.php:15` | Replace with Arauco story, keep, or remove (F9) |
+| Geoportal ArcGIS StoryMaps URL (scope unknown) | `page-geoportal.php:15` | Replace with Arauco story, keep, or remove (F9). **The guide's figure `assets/guias/geoportal.webp` captures the current story** (another region's viewer), so it has to be re-captured when the URL is decided ([VERIFICATION.md](VERIFICATION.md) §V24.5) |
 | Survey dashboard "Percepción de Rapa Nui" (unreferenced) | `embeds/encuesta-percepcion-rapanui.html:6,20` | Reuse/adapt, replace, or delete (F10) |
 | Legacy brand assets: `assets/footer/logo-{corfo,corfo-valparaiso,rau}.png`, `assets/hero-rapanui.jpg`, `assets/logo.png` | Unreferenced (hero only inside unused helper `functions.php:469-485`) | Archive or delete (F12) |
 | GORE logo low-res; RAU logo missing | `assets/logos/README.md` ("Pendiente del cliente") | Request HD originals from client (F13) |

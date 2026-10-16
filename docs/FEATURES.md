@@ -3,7 +3,9 @@
 Inventory of functional modules as of commit `5f43933` (+ working-tree deltas), updated after
 the **read-only runtime pass of 2026-10-15** ([VERIFICATION.md](VERIFICATION.md)), the F19
 requirement registration and the **F1 navigation fix of 2026-10-16** (both documentation-only
-except F1). Status vocabulary:
+except F1), and the **user guide delivered that same day** (client-requested,
+[§8](#8-user-guide-help-centre--archive-guiaphp--guias-contenidophp) and
+[VERIFICATION.md](VERIFICATION.md) §V24). Status vocabulary:
 
 - **Implemented (static)** — code present and coherent on read; runtime unverified.
 - **Implemented, defective (F#)** — code present with a known static defect.
@@ -23,7 +25,7 @@ except F1). Status vocabulary:
 | 5 | Indicators + Excel drawer | `/indicadores/` | Implemented (static); Excel path unverified |
 | 6 | Good practices | `/buenas-practicas/` | Implemented, provisional copy (F7) |
 | 7 | Support material | `/material-de-apoyo/`, `/material/<term>/` | Implemented, provisional copy (F7) |
-| 8 | User guides | `/guias/` | Implemented, provisional copy (F7) |
+| 8 | User guide (help centre) | `/guias/` (private) | **Implemented 2026-10-16** as a session-gated guide: 10 topics + appendix, 12 real figures, no new route/CPT/DB row (§8). The old sample post is still the only `guia` item (F27); **pending the client's UX/UI review** |
 | 9 | Pladetur follow-up + statistics | `/seguimiento-pladetur/`, `/estadisticas/` | Implemented, provisional copy (F7); data unverified |
 | 10 | News | `/noticias/`, `single-post.php` | Implemented, provisional copy (F7) |
 | 11 | Geoportal | `/geoportal/` | Implemented; external target decision pending (F9) |
@@ -31,7 +33,7 @@ except F1). Status vocabulary:
 | 13 | Front-page data cards | `/` via `dato_portada` CPT | Implemented; data provisional |
 | 14 | Survey dashboard embed | none (orphan file) | Decision pending (F10) |
 | 15 | Admin capabilities seeding | wp-admin | Implemented; runtime roles = WP defaults only (no "Operador") |
-| 16 | Private-section gating | `template_redirect` | HTML gate PASS; **REST exposure confirmed (F11b)** |
+| 16 | Private-section gating | `template_redirect` + `rest_*` | HTML gate PASS; `evaluacion`/`criterio_autodiag` REST exposure confirmed (F11b); the guide uses the **same pattern** with its own session gate (§8, §V24) |
 
 ## 1. Immersive landing — `front-page.php`
 
@@ -57,9 +59,9 @@ except F1). Status vocabulary:
   the account control and the burger. Grouping (2026-10-16, pending UX/UI approval):
   `Inicio · Observatorio ▾ (Acerca de, Noticias) · Datos ▾ (Indicadores, Geoportal) · Buenas
   prácticas · Planificación ▾ (Iniciativas Pladetur, Estadísticas) · Material de apoyo ▾
-  (Guía de usuario, Documentación, Reportes) · Autoevaluación ▾ (Autoevaluaciones, Mapa,
-  Nueva autoevaluación — logged-in only)`. No destination or URL changed; the private gate is
-  untouched.
+  (Guía de usuario — hidden when anonymous, Documentación, Reportes) · Autoevaluación ▾
+  (Autoevaluaciones, Mapa, Nueva autoevaluación — logged-in only)`. No destination or URL
+  changed; the private gate is untouched.
 - Account control: a 21 px person icon (44×44 px hit area) replaces the `Iniciar sesión` /
   `Salir` button; logged out it links to the existing login, logged in it opens a small panel
   with «Cerrar sesión». Inline SVG with the site's icon language — Material Icons is not
@@ -116,13 +118,39 @@ except F1). Status vocabulary:
   `fuente_datos = Excel`, in-browser rendering of the sheet via vendored SheetJS.
 - Public. Table/detail content comes from the DB (unverified).
 
-## 6–8. Good practices, support material, guides
+## 6–7. Good practices, support material
 
 - Standard archive/single pairs on the `otrn-*` mu-plugin CPTs; material has two taxonomies
   and a `taxonomy-tipo_material.php` listing; the header nav builds one entry per material
   section via `otrn_material_secciones()` (`functions.php:579`).
-- All three still carry Rapa Nui intro copy on their archives (F7; see
+- Both still carry Rapa Nui intro copy on their archives (F7; see
   [ARAUCO_MIGRATION.md](ARAUCO_MIGRATION.md) for the exact lines).
+
+## 8. User guide (help centre) — `archive-guia.php` + `guias-contenido.php`
+
+Delivered 2026-10-16 at the client's request (code + assets in `d706872`); full runtime evidence
+in [VERIFICATION.md](VERIFICATION.md) §V24. **Pending the client's UX/UI review.**
+
+- **Route unchanged**: `/guias/` (the `guia` archive). No new route, post type, database row,
+  option or dependency; no other page, URL or account is touched.
+- **Copy lives in code, not in the database**: `guias-contenido.php` holds the 10 topics
+  (getting started; navigation & account; indicators; charts, filters & views; geoportal; good
+  practices; PlAdetur planning & monitoring; sustainability self-assessments; reports & material;
+  FAQ) as plain PHP arrays, rendered by `otrn_guia_bloques()` (paragraphs, subheadings, lists,
+  numbered steps, key lists, FAQ, notes, tables, figures), so editing a topic is editing one
+  array. `otrn_guia_anexos()` lists any published `guia` posts — today only the sample of F27.
+- **Session-gated, server-side**: `otrn_guia_usuario_privada()` (`functions.php`, priority 1 on
+  `template_redirect`) redirects anonymous visitors to the login with the destination preserved,
+  and `wp-content/mu-plugins/otrn-privacidad-guias.php` closes the non-HTML surfaces (REST 401,
+  search exclusion, oEmbed off, sitemap entry removed). The gate requires a **session**, not the
+  `read_private_guias` capability, so logged-in non-admins can read the guide while the existing
+  private-section rules stay exactly as they are.
+- **Layout**: a sticky left index (search + numbered topics) beside the article on desktop; a
+  single column with a native `<details>` index at ≤979 px; 12 real screenshots
+  (`assets/guias/`) with lazy loading, intrinsic size and alt text; guide-only stylesheet and
+  script enqueued on that archive only.
+- **Degrades without JavaScript**: every topic, anchor, figure and prev/next link is
+  server-rendered; JS only adds the text filter and the current-topic highlight.
 
 ## 9. Pladetur follow-up + statistics
 

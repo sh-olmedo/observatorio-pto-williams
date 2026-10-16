@@ -123,10 +123,28 @@ behavior; OSM attribution + provider policy respected.
 with F8 in Phase 4 — decide together whether the curated Arauco sector list survives as a
 quick-pick/fallback or is retired in favor of search-only.
 
+## Phase 7 — User guide (client-requested; delivered 2026-10-16)
+
+**Not part of the audit's plan**: the client asked for a user guide of the site itself, and it
+was implemented ahead of the phases above (`d706872`). It adds no route, post type, database
+row, option or dependency, and it changes nothing else on the site. Verification:
+[VERIFICATION.md](VERIFICATION.md) §V24 (anonymous closure, authenticated rendering,
+375→1920 px, keyboard, search, no-JS).
+
+| Item | Related | Status |
+| --- | --- | --- |
+| `/guias/` help centre: 10 topics + appendix, 12 real figures, session-gated server-side, updatable from one PHP data file | client request | **Implemented**; **pending the client's UX/UI review** |
+| Findings the round surfaced rather than fixed | F25 (no `<title>` on any route), F26 (`it_IT` locale on WordPress screens), F27 (sample `guia` post visible in the appendix) | **Open** — F25/F26 need a decision tied to the rebrand and the locale; F27 is a client content call |
+
+**Open for the client**: the visual review of the guide, the fate of the sample `guia` post
+(F27), and whether the guide should ever carry a figure of the private listing/map — it
+deliberately does not, because a theme image is a public file (§S-guia-1).
+
 ## Explicitly not proposed here
 
 - No redesign beyond the approved identity decision, and no new features beyond the ones
-  explicitly registered as Arauco requirements (currently F19, Phase 6 — documentation only).
+  explicitly registered as Arauco requirements (currently F19, Phase 6 — documentation only)
+  and the client-requested user guide delivered in Phase 7.
 - No deployment, no touching the original Rapa Nui project, no database edits without a
   backup/export decision.
 

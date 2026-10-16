@@ -1,4 +1,4 @@
-# Issue Register (F1–F24)
+# Issue Register (F1–F27)
 
 Persistent register of every finding from the static audit (commit `5f43933` + working
 tree), **preserving the original finding IDs** (including the F11b sub-finding). Keep these
@@ -7,7 +7,10 @@ as a new Arauco functional requirement — documentation only, not implemented. 
 registered on 2026-10-16 too, while verifying the mobile glass pass: pre-existing, not requested,
 not introduced by that commit. **F23** was registered later the same day, on the client's fourth
 round: a regression that round introduced deliberately (see F21). **F24** was registered later
-the same day from a direct client request (sticky footer) and fixed in `90bf739`. Severities:
+the same day from a direct client request (sticky footer) and fixed in `90bf739`. **F25**,
+**F26** and **F27** were registered at the end of that day, while building and verifying the
+**user guide** at `/guias/` (§V24): F25 and F26 are pre-existing, site-wide defects the guide
+had to describe instead of fix; F27 is a content decision the guide surfaced. Severities:
 **P0** critical, **P1** high, **P2** medium, **P3** low. No P0 was found statically.
 
 Status values: *Open* (needs work), *Open — verify at runtime* (needs a runtime/browser/DB
@@ -686,3 +689,60 @@ explicit UX/UI approval of the visuals**. Files: `header.php`, `functions.php`,
   toolbars cannot be exercised in the harness). `/evaluar/` — the only template with the sticky
   `.otrn-formbar`, and a private route — was not measured (not logged in); its bar is contained by
   the `<form>` inside `main`, so the shell does not move it.
+
+### F25 — No page emits a `<title>` (the theme never declares `title-tag`)
+
+- **Severity**: P2 · **Status**: **Open** (pre-existing, site-wide) · **Category**: Metadata/accessibility.
+- **How it was raised**: while building the user guide (§V24): the browser tab of `/guias/` showed
+  the URL instead of a page name, so the title tag was checked across routes.
+- **Evidence**: `studio wp eval` → `current_theme_supports( 'title-tag' )` = **`false`**; a `<title>`
+  count by `curl` returns **0** on `/`, `/indicadores/`, `/guias/` and `/evaluar/`. The child theme
+  ships its own `header.php`/`footer.php` and never declares the support, and the parent block
+  theme's templates are not used for these routes (F16); WordPress therefore never renders a title.
+- **Impact**: tabs, history entries, bookmarks and the accessible name of the document fall back to
+  the URL; there is no page-level metadata for shares either. It affects **every** route, not only
+  the guide.
+- **Fix path (proposed, not approved)**: one line — `add_theme_support( 'title-tag' )` in
+  `otrn_setup_theme()` — but it changes every route at once and the site name in the database is
+  still *"Observatorio Turístico Rapa Nui"* (F7), so titles would resurface the old brand. Decide
+  it together with the site-name/rebrand item, not as a drive-by fix.
+- **Verification**: `curl -s <route> | grep -o '<title>[^<]*'` on the main routes (public and
+  private) in both locales.
+
+### F26 — Site locale is `it_IT`: WordPress-generated screens are Italian
+
+- **Severity**: P2 · **Status**: **Open — decision pending** (pre-existing) · **Category**: Localization/UX.
+- **How it was raised**: while capturing the login screen for the guide's topic 2 and FAQ (§V24.5):
+  the labels read *"Nome utente o indirizzo email"*, *"Ricordami"*, *"Accedi"*,
+  *"Password dimenticata?"* and the submit button *"Cambia"*.
+- **Evidence**: the login screen renders WordPress core strings in Italian; core's own language
+  switcher on that screen offers only **English (US)** and **Italiano** — Spanish is not installed
+  (`get_available_languages()`), and `users_can_register` is 0. The locale also reaches the theme's
+  pages through core strings: the skip link read *"Vai alla barra degli strumenti"* in the §V24.4
+  keyboard log.
+- **Impact**: all site copy is Spanish, so the only screens WordPress generates itself (login,
+  password reset, admin) appear in a third language. A reader following the guide sees that same
+  mismatch, which is why the guide quotes the Italian labels verbatim instead of pretending they
+  are Spanish.
+- **Fix path (proposed, not approved)**: install `es_ES` and set `WPLANG` (or at minimum offer
+  Spanish in the login switcher), then re-check the guide's quoted labels — the guide quotes what
+  the screen shows, so its copy has to follow the locale.
+- **Verification**: after the locale change, repeat the login capture and the keyboard skip-link
+  check; grep the guide's topics 2 and 10 for the now-stale Italian labels.
+
+### F27 — The only published `guia` item is a WordPress sample placeholder
+
+- **Severity**: P3 · **Status**: **Open — decision pending (content, client)** · **Category**: Content.
+- **How it was raised**: while rendering the guide's appendix *"Guías publicadas por el equipo"*
+  (§V24.2): the appendix lists the real published `guia` posts, and the database holds exactly one.
+- **Evidence**: post ID 409 — title *"Nueva giua de usuario"*, slug `nueva-giua-de-usuario`,
+  status `publish`, `post_content` *"Esta es una nueva giua de usuario"* (85 chars), no excerpt and
+  no meta other than `_edit_lock`. The typo is in the stored content, not in code; the guide shows
+  the entry and links to its detail page (which answers 200 to a session).
+- **Impact**: a reader of the guide sees an unfinished sample presented as team documentation. The
+  database **must not be edited from this repository** (F18), so the call belongs to the client:
+  delete it, rewrite it, or unpublish it.
+- **Fix path**: none needed in code — the guide's appendix renders only when the type has published
+  posts, so it disappears by itself once the placeholder is gone or unpublished.
+- **Verification**: `studio wp post list --post_type=guia --post_status=publish` after the client
+  decides, plus a reload of `/guias/#guias-publicadas`.

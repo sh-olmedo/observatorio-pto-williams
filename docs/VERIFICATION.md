@@ -1148,3 +1148,138 @@ hero act 100 %, then territorio, then costa, matching the pre-change sequence.
   shell does not move it; unverified in the browser.
 - **`@media print`** (F22) and `prefers-reduced-motion`: unchanged, not re-tested.
 - **The client's confirmation** that this is the behaviour asked for.
+
+## V24 — "Guía de usuario": a session-gated help centre for the real site (new, client request) — 2026-10-16
+
+A client-requested deliverable, implemented ahead of any roadmap phase and committed as
+**`d706872`** (code + assets; this documentation commit follows it): a help centre at the
+existing route `/guias/` that explains the site as it actually behaves (content model, private
+gating, filters, charts, geoportal, PlAdetur, self-assessment, reports) to non-technical staff.
+It **adds no route, no post type, no database row, no option and no dependency**, and it
+changes no other page: the guide's copy lives in one PHP data file. It is **pending the
+client's UX/UI review**; nothing here is a design sign-off.
+
+| Area | File |
+| --- | --- |
+| Topic copy + block renderer + appendix helper | `wp-content/themes/otrn/guias-contenido.php` (**new**) |
+| Template (route `/guias/` unchanged) | `wp-content/themes/otrn/archive-guia.php` (rewritten) |
+| Guide-only styles / behaviour | `assets/css/otrn-guias.css`, `assets/otrn-guias.js` (**new**, enqueued only on the guide) |
+| Session gate (HTML routes) | `functions.php` — `otrn_guia_usuario_privada()` on `template_redirect`, priority 1 |
+| Anonymous surfaces (REST/search/oEmbed/sitemap) | `wp-content/mu-plugins/otrn-privacidad-guias.php` (**new**) |
+| Figures | `assets/guias/*.webp` (12, **new**) |
+
+### V24.1 The anonymous surface, measured (no session, `curl`)
+
+| Probe | Result |
+| --- | --- |
+| `/guias/` | **302** → `/wp-login.php?redirect_to=…%2Fguias%2F` |
+| `/guias/nueva-giua-de-usuario/` | **302** → login, own destination preserved |
+| `/guias/feed/` | **302** → login |
+| `/?post_type=guia`, `/?guia=nueva-giua-de-usuario` | **302** → login (query rebuilt verbatim in `redirect_to`) |
+| `/wp-json/wp/v2/guia`, `/wp-json/wp/v2/guia/409` | **401** |
+| `/wp-json/wp/v2/search?search=guia` | **200**, body `[]` (2 bytes) |
+| `/?s=guia` | **200**, 0 matches for the guide's title or copy |
+| `/wp-sitemap.xml` | **200**, no `guia` entry; `wp-sitemap-posts-guia-1.xml` → **404** |
+| `/wp-json/oembed/1.0/embed?url=…/guias/nueva-giua-de-usuario/` | **404** |
+| Home page `/` | 0 occurrences of `otrn-guia`, `Guía de usuario` or the guide's copy |
+
+- **Only a session is required**, not a capability: adding `guia` to `otrn_privado_tipos()`
+  would have demanded `read_private_guias` (held by administrators only) and 403'd every
+  logged-in non-admin, so the type gets its own gate with "logged-in" semantics while the
+  **existing** private-section rules are untouched.
+- **Residual surface, same as the private section**: `/wp-json/wp/v2/types` still advertises
+  the `guia` type (it advertises `evaluacion` too — the F11b shape). The item route itself
+  answers 401, and no content was observed in any payload.
+- **No caching add-on needed**: the guide answers with WordPress's own logged-in headers,
+  `cache-control: no-cache, must-revalidate, max-age=0, no-store, private` (identical to
+  `/evaluar/`), so a shared cache cannot hand the HTML to an anonymous visitor.
+
+### V24.2 Authenticated rendering (temporary session shim, deleted afterwards)
+
+The harness has no credentials (only account `admin` exists), so the private views were
+rendered with a temporary `determine_current_user` mu-plugin — the same method as §V16 — which
+was **deleted before committing** (`wp-content/mu-plugins/` lists no `zz-` file, and the
+anonymous probes in §V24.1 were re-run after deleting it).
+
+- `/guias/` → **200**, **88 887 B**, 11 `.otrn-guia-tema` sections (10 topics + the appendix),
+  **12 figures**, **0 "Captura pendiente"**, no `Fatal error`/`Warning`/`Notice`/`Deprecated`.
+- Block census (same renderer call): 22 paragraphs, 17 subheadings, 7 bullet lists, 10 step
+  lists, 3 definition lists, 1 FAQ list, 18 notes, 2 tables, 1 appendix entry
+  (the pre-existing post 409, "Nueva giua de usuario" — §F27).
+- The template renders one index twice (desktop `<nav>`, mobile `<details>`) and swaps them by
+  CSS; the count of 45 index links (2 × 22 + headings) confirms both copies carry the same
+  destinations.
+
+### V24.3 Responsive behaviour (real rendering, same-origin iframes)
+
+Ten widths, one already-loaded guide document resized in place, measuring the document itself:
+
+| Widths | Layout | Article width | Horizontal overflow |
+| --- | --- | --- | --- |
+| 375, 414, 679, 768, 979 px | single column; sticky index hidden, `<details>` index visible | 311-767 px (fluid) | **0 px** |
+| 980, 1024, 1280, 1440, 1920 px | two columns (index + article) | 640-820 px, **capped at 820** | **0 px** |
+
+- `scrollWidth == clientWidth` at every width: the **page** never scrolls sideways.
+- The only element wider than a 375 px viewport is the guide's own 2-column table (553 px),
+  which lives inside `.otrn-guia-tablawrap{overflow-x:auto}` — the same convention as the
+  application's `.otrn-tablewrap`, so it scrolls inside its container, not the page.
+- The sticky index measured `top: 56 px` with the admin-bar variable defined (24 px + 32 px),
+  i.e. it parks below the bar as intended; with no bar the `0px` fallback applies.
+
+### V24.4 Keyboard, focus, search and current-topic (real key events, 809×804)
+
+Real `Tab` presses in a real tab (not synthetic events), logging every `focusin`:
+
+- Order: WordPress's own skip link → brand → nav (`Inicio`, `Datos`, `Buenas prácticas`,
+  `Más`) → account control → **`input#otrn-guia-q` (guide search)** → **`<summary>` "Temas de la
+  guía"** → the article's prev/next and "Volver arriba" → next topic → … No trap, no skipped
+  control, and every stop matched `:focus-visible` with `outline: 2px solid rgb(0, 80, 184)`
+  (`--primary-dark`) — the theme's own ring, not the browser default.
+- **Search** (no results are requested from the server; it filters the rendered copy): "glosario"
+  → 0 topics, counter "Sin resultados.", empty state shown, 22 of 45 index entries hidden;
+  "pladetur" → 4 topics ("4 temas coinciden.": primeros-pasos, buenas-practicas, pladetur,
+  autoevaluacion); clearing → all 11 sections back. Accent- and case-insensitive.
+- **Current topic**: after scrolling, `aria-current="true"` sits on the index entry of the
+  section in view (both index copies), driven by an IntersectionObserver.
+- **Mobile index**: choosing a topic closes the `<details>` and applies the anchor (checked:
+  `open` true → false, hash `#pladetur`).
+- **No broken links**: the 51 in-page anchors all resolve to existing ids.
+
+### V24.5 Images, no-JS and the figures
+
+- Every figure carries `loading="lazy"`, `width`/`height` from `wp_getimagesize()` (no layout
+  shift) and a descriptive `alt`; a figure scrolled into view loads (`naturalWidth` 1618).
+- **No JavaScript** (`sandbox="allow-same-origin"` iframe, no `allow-scripts`): the 10 topics,
+  the appendix, the 22 index links, the 38 steps, the 9 FAQ questions and the 12 figures are
+  all server-rendered; the `<noscript>` line is visible ("La búsqueda necesita JavaScript…");
+  the search input is inert (all 11 sections stay visible, no counter, no empty state) — the
+  documented baseline.
+- **Captured from the real interface only** (12 webp, 1618 px wide = 809 CSS px at DPR 2, one
+  element-referenced screenshot per figure). Method: a scaled same-origin `<iframe>` at a real
+  layout width (1360 px desktop, 390 px phone) inside a temporary overlay, the rest of the body
+  hidden and the admin-bar offset neutralised, then the overlay captured by element reference.
+  No figure is drawn or retouched; the geoportal figure needed a **9 s wait** for the external
+  ArcGIS viewer to paint, and it shows the **current** story (a Rapa Nui/Valparaíso asset) —
+  i.e. it also documents the open F9 decision.
+- **Two views deliberately have no figure**: the self-assessment **listing and map**. They show
+  territorial results, and a theme image is a static file that any anonymous request can fetch
+  once its URL is known, so the guide states the limitation in its own text ("Por privacidad,
+  esta guía no incluye capturas del listado ni del mapa…") instead of shipping the exposure.
+  The form figure shows an **empty** form (0/74 answered, no sector chosen).
+- The account-panel figure shows only «Cerrar sesión» — the panel has no name or address
+  (verified against `header.php`), so no account data is reproduced.
+
+### V24.6 NOT VERIFIED
+
+- **A real login**: no credentials in the harness; the private views were rendered through the
+  temporary shim (§V24.2). The gate is exercised anonymously (§V24.1) and as user 1
+  (administrator) only — a **non-admin logged-in account was not available**, so the
+  "session is enough" claim rests on the code path, not on a second account.
+- **No account menu → login → return trip** in a browser: the 302 carries the exact
+  `redirect_to`, but the round trip after authenticating was not performed.
+- Real devices: touch targets, iOS dynamic viewport (`dvh`), `prefers-reduced-motion` and real
+  screen readers (the harness cannot resize its window or deliver touch).
+- The guide's content as **UX copy for non-technical users** — that is exactly what the client
+  review has to judge; no usability test was run.
+- Whether a non-admin account should see the guide's appendix entry, and whether the appendix
+  should ship at all (F27 — client content decision).

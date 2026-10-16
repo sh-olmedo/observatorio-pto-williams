@@ -29,15 +29,18 @@ wp-content/
 │  ├─ front-page.php             # immersive landing (scrollytelling)
 │  ├─ page-*.php                 # one template per key slug (see §4)
 │  ├─ archive-*.php, single-*.php, taxonomy-*.php
+│  ├─ guias-contenido.php        # user-guide copy + block renderer (new 2026-10-16)
 │  ├─ template-parts/            # shared partials (map, cards, chart)
 │  ├─ embeds/encuesta-percepcion-rapanui.html   # static dashboard (unreferenced)
-│  └─ assets/                    # css/ js fonts/ logos/ img/ vendor/ (see §7)
+│  └─ assets/                    # css/ js fonts/ logos/ img/ vendor/ guias/ (see §7)
 └─ mu-plugins/
    ├─ 99-studio-loader.php       # Studio-managed (machine-specific, see HANDOFF)
    ├─ otrn-contenido.php         # CPTs: indicador, buena_practica, dato_portada, material_apoyo
    ├─ otrn-autodiagnostico.php   # CPTs: criterio_autodiag, evaluacion, sector + handler
    ├─ otrn-guias.php             # CPT: guia
    ├─ otrn-iniciativa-pladetur.php  # CPT: iniciativa_pladetur + taxonomía lineamiento
+   ├─ otrn-privacidad-seccion.php   # anonymous REST/search/oEmbed/sitemap closure (private section)
+   ├─ otrn-privacidad-guias.php  # same closure for the guia surfaces (new 2026-10-16)
    └─ sqlite-database-integration/  # SQLite implementation (loaded by db.php)
 ```
 
@@ -75,7 +78,7 @@ Tracked files at audit: **792**.
 | `archive-indicador.php`, `single-indicador.php` | `/indicadores/` | Indicator listing and detail (Excel drawer) | Public |
 | `archive-buena_practica.php`, `single-buena_practica.php` | `/buenas-practicas/` | Good practices | Public |
 | `archive-material_apoyo.php`, `single-material_apoyo.php`, `taxonomy-tipo_material.php` | `/material-de-apoyo/`, `/material/<term>/` | Support material by type | Public |
-| `archive-guia.php`, `single-guia.php` | `/guias/` | User guides | Public |
+| `archive-guia.php`, `single-guia.php` | `/guias/` | User guide (help centre; 10 topics from `guias-contenido.php` + appendix) | **Private (session)** |
 | `archive-iniciativa_pladetur.php`, `single-iniciativa_pladetur.php` | `/seguimiento-pladetur/` | Pladetur initiatives | Public |
 | `single-post.php` | news detail | News article | Public |
 | `template-parts/mapa-evaluaciones.php`, `material-lista.php`, `noticia-card.php`, `pladetur/chart-anual.php` | — | Shared partials | — |
@@ -91,7 +94,11 @@ Tracked files at audit: **792**.
 - Private gating: `otrn_seccion_autoevaluacion_privada()` (`functions.php:250-265`)
   redirects anonymous users to login for the evaluation archive/single, criterion single
   and `/evaluar/`, `/mapa/`. Draft evaluations redirect to their continuation URL
-  (`functions.php:277`).
+  (`functions.php:277`). The user guide has its own gate with the same shape but
+  **session-only** semantics: `otrn_guia_usuario_privada()` (priority 1 on
+  `template_redirect`) covers the `guia` archive, its singles and its feed, and
+  `mu-plugins/otrn-privacidad-guias.php` covers REST, search, oEmbed and the sitemap (§5,
+  [VERIFICATION.md](VERIFICATION.md) §V24).
 
 ### Enqueues (`otrn_enqueue_assets()`, `functions.php:345-458`)
 
@@ -103,6 +110,8 @@ Tracked files at audit: **792**.
 | `otrn-xlsx` | `assets/vendor/xlsx.full.min.js` | Single indicator, only when meta `fuente_datos = Excel` | Vendored SheetJS |
 | `otrn-indicador` | `assets/indicador.js` | Single indicator | Drawer + Excel rendering |
 | `otrn-menu` | `assets/otrn-menu.js` | All pages | Focus-trap for the burger menu |
+| `otrn-guias` | `assets/css/otrn-guias.css` | `is_post_type_archive('guia')` | Session-gated help centre; existing tokens only |
+| `otrn-guias` (script) | `assets/otrn-guias.js` | `is_post_type_archive('guia')` | Text filter + current-topic highlight; the page is complete without it |
 | `otrn-arauco` | `assets/css/otrn-arauco.css` | **Front page only** | `--aru-*` tokens scoped to `.otrn.home` |
 | `otrn-landing` | `assets/css/otrn-landing.css` | **Front page only** | Landing layout + burger/panel CSS (F1) |
 | `gsap`, `otrn-scrolltrigger`, `otrn-landing` | `assets/vendor/*`, `assets/otrn-landing.js` | **Front page only** | Version fallbacks "3.12.5" |
@@ -122,8 +131,12 @@ any template), `otrn_mision_portada()` (:492), `otrn_datos_portada()` (:508),
 | `otrn-autodiagnostico.php` | CPTs `criterio_autodiag`, `evaluacion`, `sector`; shared taxonomy `ambito`; seeds; performance calculation; evaluation submit/archive handlers; draft-token validation | :25-135, :138-166, :213-250, :381-521 |
 | `otrn-guias.php` | CPT `guia` + admin caps | :16-27, :28, :49 |
 | `otrn-iniciativa-pladetur.php` | CPT `iniciativa_pladetur` + taxonomy `lineamiento` + seeds + caps | :57-64, :91-100, :119, :169 |
+| `otrn-privacidad-seccion.php` | Closes the private section's non-HTML surfaces for anonymous visitors (REST 401, search exclusion, oEmbed off, sitemap entry removed) | file head; F11b |
+| `otrn-privacidad-guias.php` | The same closure for the `guia` type, whose HTML gate is session-only | file head; [VERIFICATION.md](VERIFICATION.md) §V24 |
 
-All CPTs and taxonomies register `show_in_rest => true` (potential REST surface — F11/F11b).
+All CPTs and taxonomies register `show_in_rest => true` (potential REST surface — F11/F11b);
+the two `otrn-privacidad-*` plugins filter those surfaces for the gated types, and no custom
+REST routes are registered.
 
 ## 6. Content model
 
@@ -152,6 +165,7 @@ when the CPT is empty (`otrn-autodiagnostico.php:239-250`).
 | Fonts | `assets/fonts/*.woff2` | Montserrat (400–800) + IBM Plex Mono (400–700), subset latin, `font-display:swap` |
 | Landing images | `assets/img/arauco/` | WebP/JPG derived from `references/web/` (EXIF stripped) |
 | Institutional logos | `assets/logos/` | Arauco footer/header logos (sourcing gaps — F13) |
+| Guide figures | `assets/guias/` | 12 real screenshots of the guide's own views (1618 px wide, DPR 2). They are theme assets, so any anonymous request that knows the URL gets the bytes — which is why the guide deliberately ships **no** figure of the private listing/map ([VERIFICATION.md](VERIFICATION.md) §V24.5) |
 | Vendor JS | `assets/vendor/` | GSAP + ScrollTrigger + SheetJS (`xlsx.full.min.js`), self-hosted |
 | Leaflet | unpkg CDN | Loaded only for the evaluations archive; no SRI (see SECURITY_AUDIT) |
 | StoryMaps | external iframe | Hardcoded URL in `page-geoportal.php:15` (F9) |
