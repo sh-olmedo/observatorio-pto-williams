@@ -9,17 +9,47 @@
  * no existía porque `style.css` oculta `.otrn-nav` a ≤600 px sin reemplazo.
  *
  * Esta hoja se encola en todas las vistas, al final, y sus selectores incluyen
- * `.otrn-header` para ganar por especificidad a `style.css` y a
- * `otrn-landing.css` sin depender del orden de carga.
+ * `.otrn-header` para ganar por especificidad a `style.css`, `otrn-arauco.css`
+ * y `otrn-landing.css` sin depender del orden de carga.
  *
- * Punto de corte único: ≤1280 px. Medición real en navegador: el nav en línea
- * necesita ≥1233 px para no desbordar (10 enlaces; a 1440 px entra en una sola
- * línea). Por debajo de 1280 px se usa el panel en vez de comprimir enlaces.
+ * Puntos de corte (medidos en navegador con el texto a 13,5 px). El contenedor
+ * de la cabecera (`.otrn .wrap`) nunca pasa de 1440 px, así que el ancho útil
+ * real para la fila son 1376 px (1440 menos los 32 px de padding de cada lado):
+ *
+ *   - Escritorio: hueco de 18 px, enlaces que no se encogen (`flex:0 0 auto`) ni
+ *     se parten en dos líneas (`white-space:nowrap`).
+ *       · Sin sesión: la fila ocupa 1274 px —logo de la portada de 56 px, 10
+ *         enlaces (957 px) y botón de 133 px—, así que cabe desde 1338 px de
+ *         viewport. El panel entra a ≤1360 px (23 px de margen de seguridad).
+ *       · Con sesión: el 11.º enlace («Evaluación de sostenibilidad», 195 px)
+ *         sube la fila a 1424 px, más de los 1376 px útiles, y el contenedor ya
+ *         está al máximo a partir de 1504 px de viewport. Por eso con sesión
+ *         iniciada el nav es *siempre* el panel lateral.
+ *   - Antes el hueco era de 26 px y el nav se partía en dos líneas desde 1382 px
+ *     de viewport (tres etiquetas rotas a 1366 px sin sesión). Con sesión la fila
+ *     necesitaba 1568 px y en la portada el botón «Salir» acababa fuera de
+ *     pantalla: la cabecera es `fixed` y el desborde no genera barra de scroll.
+ *   - Panel lateral: `position:fixed` a altura completa, anclado con `top:0` y
+ *     `height:100vh` porque en la portada el `backdrop-filter` de la cabecera la
+ *     convierte en su bloque contenedor (por eso no se usa `inset`/`bottom:0`).
+ *   - Barra de administración de WordPress: ocupa los 32 px superiores (46 px a
+ *     ≤782 px) con `z-index:99999`. El `html{margin-top}` de core solo desplaza
+ *     el flujo estático, así que la cabecera `fixed` de la portada quedaba
+ *     debajo de la barra (enlaces y botón tapados) y hay que desplazarla a mano.
  *
  * Tokens: solo los globales de `style.css` (`--paper`, `--grey`, `--blue-dark`,
- * `--primary`, `--primary-soft`, `--dark`). No se usan `--aru-*` (existen solo
- * en la portada; F6 sigue pendiente) ni se definen tokens nuevos.
+ * `--primary`, `--primary-soft`). No se usan `--aru-*` (existen solo en la
+ * portada; F6 sigue pendiente) ni se definen tokens nuevos.
  */
+
+/* ---- Escritorio: fila compacta, siempre en una sola línea ------------- */
+.otrn-header .otrn-nav{
+  gap:18px;
+  justify-content:flex-start;
+}
+/* Sin encogerse ni partir etiquetas: si algún día no cupieran, el desborde se
+   vería en vez de disfrazarse con un salto de línea. */
+.otrn-header .otrn-nav a{ flex:0 0 auto; white-space:nowrap; }
 
 /* ---- Botón de menú (hamburguesa) ------------------------------------- */
 .otrn-header .otrn-burger{
@@ -33,16 +63,36 @@
 .otrn-header .otrn-burger.is-active .otrn-burger__line:nth-child(3){transform:translateY(-8px) rotate(-45deg);}
 .otrn-header .otrn-burger:focus-visible{outline:2px solid var(--primary); outline-offset:3px;}
 
-/* ---- Móvil: panel lateral -------------------------------------------- */
-@media (max-width:1280px){
-  .otrn-header .otrn-burger{display:flex;}
+/* ---- Barra de administración de WordPress ---------------------------- */
+/* La cabecera de la portada es `fixed` (`.otrn.home .otrn-header{top:0}`, en
+   otrn-arauco.css): hay que bajarla por debajo de la barra. Se añade `.home`
+   para ganar en especificidad —y porque esa regla es justo la que fija el
+   `top:0`—. En las páginas internas la cabecera es `static` y la desplaza el
+   margen de core, así que ahí `top` no tiene efecto. */
+body.admin-bar.home .otrn-header{ top:32px; }
+/* El panel se ancla al contenedor (la cabecera en la portada, el viewport en
+   las internas), así que el desplazamiento se declara para cada caso. Se usan
+   `top` y `max-height` (no `height`) porque ninguna de las dos propiedades
+   afecta a la fila estática de escritorio: así estas reglas no dependen del
+   punto de corte del panel y se declaran una sola vez. */
+body.admin-bar.home .otrn-header .otrn-nav{ max-height:calc(100vh - 32px); }
+body.admin-bar:not(.home) .otrn-header .otrn-nav{ top:32px; max-height:calc(100vh - 32px); }
+@media screen and (max-width:782px){
+  body.admin-bar.home .otrn-header{ top:46px; }
+  body.admin-bar.home .otrn-header .otrn-nav{ max-height:calc(100vh - 46px); }
+  body.admin-bar:not(.home) .otrn-header .otrn-nav{ top:46px; max-height:calc(100vh - 46px); }
+}
 
-  /* El acceso queda junto al botón (no centrado): a 390 px entran logo
-     (38 px de alto), «Iniciar sesión» y la hamburguesa en una sola fila. */
+/* ---- Panel lateral --------------------------------------------------- */
+/* El mismo panel se declara en dos sitios: (1) a ≤1360 px para cualquier
+   visitante —ahí la fila sin sesión ya no cabe— y (2) con sesión iniciada a
+   cualquier ancho, porque el 11.º enlace hace que la fila no quepa nunca dentro
+   de los 1376 px útiles. Si se edita un bloque, editar el otro. */
+
+/* (1) Sin sesión: la fila necesita 1338 px de viewport. */
+@media (max-width:1360px){
   .otrn-header .otrn-login{margin-left:auto;}
-
-  /* `display:flex` es necesario aquí: anula el `display:none` que `style.css`
-     aplica a `.otrn-nav` a ≤600 px (causa del fallo de F1 en la portada). */
+  .otrn-header .otrn-burger{display:flex;}
   .otrn-header .otrn-nav{
     display:flex;
     position:fixed; top:0; right:0;
@@ -59,7 +109,6 @@
     transition:transform .34s ease, visibility 0s linear .34s;
     z-index:60;
   }
-  /* Abierto: el panel entra y pasa a ser enfocable. */
   body.otrn-menu-abierto .otrn-header .otrn-nav{
     transform:translateX(0);
     visibility:visible;
@@ -71,6 +120,36 @@
   }
   .otrn-header .otrn-nav a:focus-visible{outline:2px solid var(--primary); outline-offset:2px;}
 }
+
+/* (2) Con sesión: la fila necesita 1424 px y nunca caben más de 1376 px. */
+body.logged-in .otrn-header .otrn-login{margin-left:auto;}
+body.logged-in .otrn-header .otrn-burger{display:flex;}
+body.logged-in .otrn-header .otrn-nav{
+  display:flex;
+  position:fixed; top:0; right:0;
+  height:100vh; max-height:100vh;
+  width:min(84vw,360px);
+  flex-direction:column; gap:4px; margin:0;
+  background:var(--paper);
+  border-left:1px solid var(--grey);
+  padding:96px 28px 32px;
+  box-shadow:-20px 0 60px rgba(16,28,40,.18);
+  overflow-y:auto;
+  transform:translateX(100%);
+  visibility:hidden;
+  transition:transform .34s ease, visibility 0s linear .34s;
+  z-index:60;
+}
+body.logged-in.otrn-menu-abierto .otrn-header .otrn-nav{
+  transform:translateX(0);
+  visibility:visible;
+  transition:transform .34s ease, visibility 0s linear 0s;
+}
+body.logged-in .otrn-header .otrn-nav a{
+  font-size:16px; font-weight:600; padding:12px 0;
+  border-bottom:1px solid var(--primary-soft);
+}
+body.logged-in .otrn-header .otrn-nav a:focus-visible{outline:2px solid var(--primary); outline-offset:2px;}
 
 /* ---- Accesibilidad: movimiento reducido ------------------------------ */
 @media (prefers-reduced-motion:reduce){
