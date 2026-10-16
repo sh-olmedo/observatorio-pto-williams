@@ -44,7 +44,8 @@ Runtime status (first pass, **2026-10-15**): measured results are in
 
 ### F1 — Mobile navigation unusable on internal pages
 
-- **Severity**: P1 · **Status**: Open — **runtime confirmed (FAIL)** · **Evidence**:
+- **Severity**: P1 · **Status**: **Fixed in code (2026-10-16), browser-verified — see the
+  limitation under *Verification* below** · **Evidence**:
   - `style.css:508-509` hides `.otrn-nav` under 600 px with no replacement rule elsewhere.
   - Burger and mobile-panel CSS exist only in `assets/css/otrn-landing.css:194, 213-224`,
     enqueued only on the front page (`functions.php:409-457`).
@@ -62,6 +63,37 @@ Runtime status (first pass, **2026-10-15**): measured results are in
   stylesheet or globally enqueued menu stylesheet) so the existing JS works site-wide.
 - **Verification**: browser at ≤600 px on `/`, `/indicadores/`, `/geoportal/`; open/close,
   Escape, focus trap, keyboard-only pass.
+- **Fix (2026-10-16)** — `0dd2de4` (first pass: global menu stylesheet + JS) and `e727756`
+  (responsive fix of the regression reported in an authenticated session); both local, not
+  pushed:
+  - `assets/css/otrn-menu.css` is enqueued on every view (after `style.css` /
+    `otrn-landing.css`) and scopes its selectors with `.otrn-header` so it wins by
+    specificity. The duplicated landing copies stay until F5/F14 cleanup.
+  - Desktop row: `gap:18px`, non-shrinking links (`flex:0 0 auto`) and `white-space:nowrap`,
+    so it is always single-line. The header container (`.otrn .wrap`, ≤1440 px) leaves
+    1376 px of usable width: without a session the row needs 1274 px (fits from 1338 px
+    viewport, panel at ≤1360 px); **with a session the 11th link (195 px) makes the row
+    1424 px, so it never fits and the panel is used at every width**.
+  - Admin bar: the front-page header is `position:fixed`, so core's
+    `html{margin-top:32px !important}` did not move it and `#wpadminbar` covered its first
+    32 px (logo, links, button). The header now shifts 32 px (46 px at ≤782 px) and the panel
+    is anchored below the bar. Internal pages (static header) were already pushed down —
+    hence the homepage-only symptom.
+  - Regression also fixed here: with the old `gap:26px`, the anonymous row broke 3 labels at
+    1366 px, the authenticated row needed 1568 px, and on the front page the overflowing
+    «Salir» button was clipped off-screen (a `fixed` element creates no scrollbar).
+- **Runtime (2026-10-16)**: `/` and `/noticias/` at 1920/1600/1440/1366/1361/1360/1280/1024/
+  768/390 px — 0 broken labels, 0 px header overflow, 0 horizontal page overflow, header and
+  burger below the admin bar, panel from the bar to the viewport bottom; real top-level page
+  (1038 px): Enter opens + focus to the first link, Tab/Shift+Tab wrap inside the panel,
+  Escape and real outside/link clicks close and return focus, `aria-*` and label correct,
+  resize resyncs. Public 200; private gates unchanged (302/302/302, `/criterio/` 301)
+  ([VERIFICATION.md](VERIFICATION.md) §V15).
+- **Limitation (not verified)**: the authenticated header could not be produced with a real
+  login (no second account exists and signing in writes session tokens to the DB, which the
+  task forbids), so its 11th link and the admin bar were reproduced in the DOM with the real
+  markup/CSS. A real authenticated session, real touch devices, the iOS dynamic viewport and
+  `prefers-reduced-motion` emulation remain pending.
 
 ### F2 — Proposed Arauco palette not implemented
 

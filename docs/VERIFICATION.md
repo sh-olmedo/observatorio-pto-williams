@@ -123,6 +123,8 @@ Measured inside 390 px / 700 px iframes on `/` and `/noticias/` (menu JS execute
   row; the front-page panel works there.
 - **Caveat**: iframe-based viewport, not a device; touch, real media-query resize events and
   virtual keyboards are out of scope. Keyboard/Escape/focus-trap behavior NOT VERIFIED.
+- **Superseded (2026-10-16)**: the F1 fix, its authenticated regression and the re-measured
+  breakpoints are recorded in §V15.
 
 ## V7 — Landing without JavaScript (F5) — **FAIL — confirmed**
 
@@ -238,7 +240,7 @@ f.setAttribute('sandbox', 'allow-same-origin'); // then scroll inside and read .
 
 | Finding | Before | After this pass |
 | --- | --- | --- |
-| F1 mobile nav | Open (static) | **FAIL confirmed** — ≤600 px both page types; 601–768 px internal visible but cramped; front panel works only 601–768 px |
+| F1 mobile nav | Open (static) | **FAIL confirmed** — ≤600 px both page types; 601–768 px internal visible but cramped; front panel works only 601–768 px — *fixed 2026-10-16, see §V15* |
 | F5 no-JS reveals | Open (static) | **FAIL confirmed** — 9/9 hidden without JS; 3/9 appear with JS in the control |
 | F6 token conflict | Open (static) | runtime-confirmed divergence (`#C0392B` vs `#DF8056`) |
 | F11b REST exposure | verify at runtime | **CONFIRMED** — anonymous read of evaluations (titles/slugs), criteria, sectors; drafts safe |
@@ -253,3 +255,54 @@ f.setAttribute('sandbox', 'allow-same-origin'); // then scroll inside and read .
 should be fixed together with F3 as the Phase 1 security scope; F1 and F5 are confirmed UX
 defects for Phase 2; nothing gained P0 status; Phase 0's remaining decisions (F14 commit
 strategy, F4 workflow) and all client decisions are unchanged.
+
+## V15 — F1 navigation: fix, authenticated regression and measured breakpoints (2026-10-16)
+
+Fix commits (local, not pushed): `0dd2de4` (global menu stylesheet + JS) and `e727756`
+(regression fix). Method: same-origin iframes at each width on `/` and `/noticias/` (media
+queries active) plus the real top-level page; the authenticated header (11th link +
+`#wpadminbar` + `html{margin-top}`) was reproduced in the DOM because signing in would write
+session tokens to the DB.
+
+**Root causes of the regression reported in an authenticated session**
+
+1. Front page: `.otrn.home .otrn-header{position:fixed;top:0}` (`otrn-arauco.css`) ignored
+   core's `html{margin-top:32px !important}` (that only shifts static flow), so `#wpadminbar`
+   (`position:fixed;z-index:99999;height:32px`) painted over the header's first 32 px
+   (logo, links and button). Internal pages use a `static` header and were pushed down — the
+   homepage-only symptom.
+2. `.otrn-nav{gap:26px}` with shrinking links: the row wrapped into 2–3 lines instead of
+   staying single-line, and on the front page the overflowing «Salir» button was clipped
+   off-screen (a `fixed` element creates no scrollbar).
+
+**Measured row widths** (13.5 px text; `.otrn .wrap` caps at 1440 px, i.e. 1376 px usable)
+
+| Case | Before (`gap:26px`) | After (`gap:18px`) | Verdict |
+| --- | --- | --- | --- |
+| 10 links, anonymous | 1029 px → needs 1382 px viewport | 957 px → needs 1274 px | fits from 1338 px (front page, widest 158 px brand) |
+| 11 links, authenticated | 1250 px → needs 1568 px | 1170 px → needs 1424 px | **never fits** (usable max 1376 px) |
+
+**Before → after (selected)**
+
+| Page | Width | State | Before | After |
+| --- | --- | --- | --- | --- |
+| `/noticias/` | 1366 | anonymous | 3 wrapped labels (nav 41 px tall) | single line, 0 wrapped |
+| `/noticias/` | 1440 | authenticated | 4 wrapped labels | panel (360 px), 0 wrapped |
+| `/` | 1366 | authenticated | 4 wrapped labels + «Salir» clipped (right edge 1438 px on a 1366 px viewport) | panel; header and burger below the bar |
+| `/` | 1440 | authenticated | header top 0 px → top 32 px hidden under the bar | header top 32 px, panel 32→viewport bottom, first link at 128 px |
+
+Across 1920/1600/1440/1366/1361/1360/1280/1024/768/390 px on both page types: 0 broken
+labels, 0 px header overflow, 0 horizontal page overflow, header/burger below the bar, and
+the bar height (32 px, 46 px at ≤782 px) reflected in the header and panel offsets.
+
+**Keyboard and clicks (real top-level page, 1038 px, panel mode)**: Enter opens and moves
+focus to the first link; Tab cycles the 10 links and wraps last→first; Shift+Tab wraps
+first→last; Escape closes, restores the label to «Abrir menú de navegación», sets
+`aria-hidden=true` and returns focus to the button; real clicks on the burger, on a panel
+link and outside the panel all close and return focus. Closed panel = nav links absent from
+the accessibility snapshot; open = `aria-expanded=true` and links exposed. No console errors.
+Resize 1361→1360→open→1361→1440 resyncs (`aria-hidden` in panel mode, removed in row mode).
+
+**Still NOT VERIFIED**: a real authenticated session (login), real touch devices, the iOS
+dynamic viewport, and `prefers-reduced-motion: reduce` emulation (the rule exists in CSS
+only).

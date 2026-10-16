@@ -1,8 +1,9 @@
 # Features
 
 Inventory of functional modules as of commit `5f43933` (+ working-tree deltas), updated after
-the **read-only runtime pass of 2026-10-15** ([VERIFICATION.md](VERIFICATION.md)) and after
-the F19 requirement registration (2026-10-16; documentation only). Status vocabulary:
+the **read-only runtime pass of 2026-10-15** ([VERIFICATION.md](VERIFICATION.md)), the F19
+requirement registration and the **F1 navigation fix of 2026-10-16** (both documentation-only
+except F1). Status vocabulary:
 
 - **Implemented (static)** — code present and coherent on read; runtime unverified.
 - **Implemented, defective (F#)** — code present with a known static defect.
@@ -16,7 +17,7 @@ the F19 requirement registration (2026-10-16; documentation only). Status vocabu
 | # | Module | Entry points | Status |
 | --- | --- | --- | --- |
 | 1 | Immersive landing (scrollytelling) | `/` (`front-page.php`) | Implemented; data provisional; **F5 confirmed at runtime**; pin/scrub + CLS unverified |
-| 2 | Site chrome (header/footer/nav/login/burger) | all classic templates | Implemented, **defective — F1 confirmed at runtime (≤600 px, internal *and* front page)** |
+| 2 | Site chrome (header/footer/nav/login/burger) | all classic templates | Implemented; **F1 fixed 2026-10-16** (`0dd2de4` + `e727756`) — responsive row/panel on every page type, admin-bar offset |
 | 3 | Autodiagnóstico: form + drafts | `/evaluar/` (private) | Implemented, defective (F3: no capability check) — 1 account today; sectors: CPT seeded with Rapa Nui data (F8); location search **not implemented (F19)** |
 | 4 | Autodiagnóstico: archive/map + results | `/autoevaluacion/`, single (private) | Implemented; **HTML gate PASS at runtime**; 6 evaluations (3 published) |
 | 5 | Indicators + Excel drawer | `/indicadores/` | Implemented (static); Excel path unverified |
@@ -55,11 +56,18 @@ the F19 requirement registration (2026-10-16; documentation only). Status vocabu
   [Evaluación de sostenibilidad — logged-in only], Planificación, Geoportal, Noticias,
   Guía de usuario, dynamic Material links), login/logout button, burger button.
 - Menu JS: aria state, Escape/click-outside close, focus trap (`assets/otrn-menu.js:1-28`).
-- Defect (F1, **runtime-confirmed 2026-10-15**): at ≤600 px the nav stays `display:none` on
-  internal pages **and** on the front page; burger clicks toggle state (`aria-expanded`,
-  `otrn-menu-abierto`) but the nav is 0×0. At 601–768 px the internal nav stays visible
-  (cramped) and the front-page panel works. Static cause: burger/panel CSS exists only in
-  the front-page-only landing stylesheet.
+- Menu behaviour is now defined once for every page type in `assets/css/otrn-menu.css`
+  (enqueued site-wide) and `assets/otrn-menu.js`: a compact single-line desktop row
+  (`gap:18px`, `nowrap`) and a full-height side panel. The panel engages at ≤1360 px without
+  a session; **with a session it is always the panel**, because the 11th link
+  («Evaluación de sostenibilidad») makes the row 1424 px while the header container leaves
+  1376 px usable. The front-page `fixed` header is offset below the WordPress admin bar
+  (32 px, 46 px at ≤782 px) like the panel.
+- Fixed 2026-10-16 (F1, commits `0dd2de4` + `e727756`, local): before, ≤600 px lost all
+  navigation on internal pages and the front page; at ≥1366 px the authenticated row wrapped
+  and, on the front page, the «Salir» button was clipped off-screen under the admin bar.
+  Evidence: [VERIFICATION.md](VERIFICATION.md) §V15. Landing copies in `otrn-landing.css`
+  remain duplicated (F5/F14 cleanup).
 
 ## 3. Autodiagnóstico form — `page-evaluar.php` + `otrn-autodiagnostico.php`
 

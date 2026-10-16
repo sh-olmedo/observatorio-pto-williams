@@ -6,17 +6,21 @@ project baseline`, not pushed). Neither the audit nor the runtime pass modified 
 code, configuration or database. Runtime results: [VERIFICATION.md](VERIFICATION.md).
 
 **Update 2026-10-16:** the Arauco requirement *self-assessment location search (OSM
-geocoding)* is registered as **F19** — documentation only; this change set is uncommitted
-for review. Local commit `8d3d40b` (F11b protections) is now the branch tip (see Git
-baseline); its documentation update is still pending.
+geocoding)* is registered as **F19** (local commit `d4fa738`, documentation only). **F1
+(responsive navigation)** is fixed in application code by `0dd2de4` (first pass) and
+`e727756` (authenticated regression: admin bar over the fixed front-page header + wrapping);
+both are browser-verified with the limitations recorded in
+[VERIFICATION.md](VERIFICATION.md) §V15. The three pre-existing working-tree files were
+**not** touched by any of these commits (the fix lives in the new globally enqueued
+`assets/css/otrn-menu.css` plus `assets/otrn-menu.js`).
 
 ## Git baseline
 
 | Item | Value |
 | --- | --- |
 | Branch | `main` (remote `origin` configured; no remote refs fetched locally) |
-| HEAD | `8d3d40b` — `fix(otrn): gate de la sección privada en REST, búsqueda, oEmbed y sitemap (F11b)` (local, not pushed) |
-| History | `99092d1` repo init → `70b22a7` "portada scrollytelling inmersiva + branding Arauco (ETAPA A+B+C)" → `5f43933` "modo dual estatico/inmersivo" → `f506104` docs baseline → `bb38d8b` runtime record → `8d3d40b` F11b protections (last three local, not pushed) |
+| HEAD | `e727756` — `fix(otrn): fila de navegación compacta y cabecera bajo la barra de admin (F1)` (local, not pushed) |
+| History | `99092d1` repo init → `70b22a7` "portada scrollytelling inmersiva + branding Arauco (ETAPA A+B+C)" → `5f43933` "modo dual estatico/inmersivo" → `f506104` docs baseline → `bb38d8b` runtime record → `8d3d40b` F11b protections → `d4fa738` F19 docs → `0dd2de4` F1 nav → `e727756` F1 regression fix (last five local, not pushed) |
 | Remote | `https://github.com/sh-olmedo/observatorio-arauco.git` |
 | Tracked files | 803 (`bb38d8b` added `docs/VERIFICATION.md`; `8d3d40b` added `wp-content/mu-plugins/otrn-privacidad-seccion.php`) |
 
@@ -32,9 +36,10 @@ baseline); its documentation update is still pending.
 
 These changes are part of the current documentation baseline (the audit read them as-is).
 Decide their commit strategy in Phase 0 ([ROADMAP.md](ROADMAP.md), F14) — either way, they
-must be reviewed, not reverted. After the later commits (`bb38d8b` runtime record,
-`8d3d40b` F11b protections), `git status` again shows exactly these 3 files; the F19
-documentation change set (2026-10-16) is a new intentionally-uncommitted set.
+must be reviewed, not reverted. The F1 fix (`0dd2de4` + `e727756`) intentionally does not
+touch them: it adds the globally enqueued `assets/css/otrn-menu.css` (which wins by
+specificity) instead of editing `style.css` or `otrn-landing.css`. `git status` therefore
+still shows exactly these 3 files.
 
 ## What exists today (static view)
 
@@ -62,6 +67,8 @@ documentation change set (2026-10-16) is a new intentionally-uncommitted set.
 | DB content inventoried at count level (2026-10-15): pages, 74 criteria, 10 sectors, 6 evaluations, 3 data cards; copy migration still pending | F18 | Team (Phase 4) |
 | Geocoding provider + usage policy for the location search (rate limits, attribution, caching; browser-direct vs server proxy) | F19 | Client/team (before Phase 6) |
 | Fate of the curated sector list and of the location metas under the new search picker | F8 ↔ F19 | Client/team (Phase 4/6) |
+| Push/deploy decision for the local commits (`8d3d40b`, `d4fa738`, `0dd2de4`, `e727756`) | F14 | User |
+| Real authenticated-session pass for the F1 nav (login writes session tokens to the DB) | F1, F17 | Team (needs a disposable environment) |
 
 ## Recommended next task (proposed, not approved)
 
@@ -70,8 +77,9 @@ Phase 0 progress: the runtime checklist was executed on 2026-10-15
 remaining Phase 0 items are decisions: (1) the working-tree strategy (F14) and (2) the ACF
 workflow (F4). The recommended first implementation scope (proposed, not approved) is the
 security pair **F3 + F11b** (Phase 1 — F11b is now a confirmed anonymous-read exposure),
-followed by **F1 + F5** (Phase 2). Do not start palette/token work (F2/F6) or content
-migration (F7–F10) before the client decisions above.
+followed by **F5** (Phase 2; F1 is implemented and browser-verified — `0dd2de4` + `e727756`).
+Do not start palette/token work (F2/F6) or content migration (F7–F10) before the client
+decisions above.
 
 **2026-10-16 addition:** F19 (self-assessment location search — OSM geocoding) is registered
 as a new Arauco requirement: documentation only, not approved; proposed as Phase 6 and
@@ -96,9 +104,11 @@ recommended order above.
   versionable — nothing else (verify with `git show --stat f506104`).
 - The 2026-10-15 runtime pass changed only documentation (the new
   [VERIFICATION.md](VERIFICATION.md) and status updates in the existing documents); those
-  edits were committed locally as `bb38d8b` (not pushed). The only application-code change
-  since is `8d3d40b` (F11b protections: one new mu-plugin, local). The 2026-10-16 F19 change
-  set touches only documentation and is intentionally left uncommitted for review.
+  edits were committed locally as `bb38d8b` (not pushed). Application-code changes since:
+  `8d3d40b` (F11b protections: one new mu-plugin) and the F1 navigation pair `0dd2de4` +
+  `e727756` (new `assets/css/otrn-menu.css`, `assets/otrn-menu.js`, `functions.php` enqueue).
+  The F19 change set is committed as `d4fa738` (documentation only). All of them are local
+  and unpushed.
 
 ## Documentation maintenance
 
