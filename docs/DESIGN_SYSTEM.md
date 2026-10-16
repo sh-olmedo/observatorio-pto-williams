@@ -90,9 +90,10 @@ map, its legend and the CSS cannot drift apart.
   ≥24 px / weight 800 (4.41:1 clears the 3:1 large-text threshold).
 - Solid fills that carry small white text use `--primary-dark` (7.40:1), never `--primary`.
 - White on `--secondary` (4.79:1) and on `--blue-dark` (8.63:1) are both safe.
-- **Known gap:** non-text contrast (WCAG 1.4.11) of form-control borders. The system has a single
-  light `--grey` (#E0E0E0, 1.3:1 on white), below the 3:1 needed to identify an input boundary.
-  Held for a UX decision instead of inventing a second border token.
+- **Known gap, decided (2026-10-16):** non-text contrast (WCAG 1.4.11) of form-control borders.
+  The system has a single light `--grey` (#E0E0E0, 1.3:1 on white), below the 3:1 needed to
+  identify an input boundary. The client decided to **leave it as it is** rather than add a
+  second border token: keep it documented, do not "fix" it silently in a later pass.
 
 ### 2.4 Geometry
 
@@ -150,9 +151,10 @@ These must not be adopted as brand tokens without explicit approval. The brief's
 - `--font-title` is Montserrat and `--font-mono` is IBM Plex Mono; every font declaration goes
   through them. The historical defect (the committed CSS asked for `'Manrope'`, which is **not
   shipped** — text fell back to `system-ui`) is fixed: no `Manrope` reference remains (grep).
-- **Poppins** (the municipal *secondary* family) is **not** declared as a token: the theme does
-  not ship it, so a `--font-secondary` would be a broken fallback. Add it only with the font
-  files.
+- **Poppins** (the municipal *secondary* family) is **not** declared as a token and, by client
+  decision (2026-10-16), **will not be shipped**: the theme only carries Montserrat + IBM Plex
+  Mono, and a `--font-secondary` without the font files would be a broken fallback. The two
+  self-hosted families are the system.
 - IBM Plex Mono for numeric content is a **temporary** decision inherited from the baseline.
 
 ## 4. Components & conventions
@@ -269,7 +271,10 @@ remapping of tiers/scales, the literal replacements and the deleted dead CSS is 
 1. **Visual sign-off** of the token pass (and of the F1 navigation) — nothing here is approved.
    Two review rounds have landed: the drawer contrast (`9142179`) and the home page
    (**F20/F21**, `e2c3a9f`).
-2. **Non-text contrast** of form-control borders (§2.3) — needs a UX decision.
-3. **Poppins**: ship it or drop it from the municipal parity list (§3).
-4. **How much photograph to keep under the mobile scene text (§6)** — the veil is now measured
-   and passes AA; lightening it trades the worst-case ratio for photograph. Client decision.
+2. ~~**Non-text contrast** of form-control borders~~: **decided 2026-10-16 — left as is**, kept
+   as a documented gap (§2.3).
+3. ~~**Poppins**~~: **decided 2026-10-16 — not shipped** (Montserrat + IBM Plex Mono only, §3);
+   the municipal site's secondary family is dropped from the parity list.
+4. ~~**How much photograph to keep under the mobile scene text (§6)**~~: **decided 2026-10-16 —
+   keep 0.88-0.92** (AA guaranteed against the brightest pixel; the photograph stays as a
+   blue-tinted backdrop with detail in the top strip).

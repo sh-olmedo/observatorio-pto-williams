@@ -479,15 +479,17 @@ authorised for removal) is kept.
   `--lgrey` and the descriptions at 4.95:1 on white — AA by the minimum, but out of step with
   the indicator definition, which is black. Fixed in `9142179`
   ([VERIFICATION.md](VERIFICATION.md) §V18.2).
-- **No Poppins token.** The theme ships only Montserrat + IBM Plex Mono (`assets/fonts`), so a
-  `--font-secondary` would be a broken fallback; it is documented instead.
+- **No Poppins token — decided.** The theme ships only Montserrat + IBM Plex Mono
+  (`assets/fonts`), so a `--font-secondary` would be a broken fallback; the client decided
+  (2026-10-16) **not to ship Poppins**, so it stays documented instead.
 - **`--accent` is decorative.** #41BCFF is 2.13:1 on white, so it is used for icon/spots only
   (`.otrn-dato-lite__ico`), never for text.
 - **Retained legacy token names** (`--cream`, `--lgrey`, `--paper`, `--dark`, `--text2`) to keep
   the diff reviewable; their values are municipal/neutral, and the names are documented here.
-- **Remaining gap:** non-text contrast (WCAG 1.4.11) for form-control borders — the system has a
-  single light `--grey` (#E0E0E0, 1.3:1 on white), which is below the 3:1 needed to identify an
-  input boundary. Held for a UX decision rather than inventing a second border token.
+- **Remaining gap, decided:** non-text contrast (WCAG 1.4.11) for form-control borders — the
+  system has a single light `--grey` (#E0E0E0, 1.3:1 on white), below the 3:1 needed to identify
+  an input boundary. The client decided (2026-10-16) to **leave it as it is** instead of inventing
+  a second border token; it stays documented as a known gap.
 
 ### 13.7 Files changed by the implementation
 

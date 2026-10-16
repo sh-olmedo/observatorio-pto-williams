@@ -220,7 +220,8 @@ explicit UX/UI approval of the visuals**. Files: `header.php`, `functions.php`,
   descriptions were reported as too faint: they are the content the evaluator must read, but
   they carried `--text2` (4.58:1 on `--lgrey`, 4.95:1 on white — AA by the minimum, and out of
   step with the indicator definition, which is black). Fixed in **`9142179`**: both now use
-  `--dark`; the `.et` labels keep `--text2` for hierarchy. Measured: 19.43:1 and 21:1
+  `--dark`; the `.et` labels keep `--text2` for hierarchy — confirmed by the client on
+  2026-10-16, they stay secondary. Measured: 19.43:1 and 21:1
   ([VERIFICATION.md](VERIFICATION.md) §V18.2). No other page was reported.
 - **Client review, second round (2026-10-16)**: two home-page notes — informative KPIs that look
   clickable (**F20**) and poorly legible slides (**F21**) — fixed in **`e2c3a9f`**; no token
@@ -547,7 +548,8 @@ explicit UX/UI approval of the visuals**. Files: `header.php`, `functions.php`,
   809/1024/1440/1920 px ≥ 5,06:1; immersive scene 3 (darkest photo) ≥ 4,88:1; rail 6,62:1
   minimum after the fix. Detail and the NOT VERIFIED list:
   [VERIFICATION.md](VERIFICATION.md) §V19.2.
-- **Open (client decision, not a code task)**: the veil's visual weight. Guaranteeing AA against
-  the **brightest** pixel of each photograph needs ≈0.87–0.88 opacity, which leaves the mobile
-  scenes reading as a blue-tinted backdrop whose detail survives mainly in the top ~20 %; a
-  lighter veil shows more photograph and gives up that worst case.
+- **Decided 2026-10-16 (client, not a code task)**: **keep the veil at 0.88–0.92**. Guaranteeing
+  AA against the **brightest** pixel of each photograph is the governing requirement; the mobile
+  scenes stay a blue-tinted backdrop whose detail survives mainly in the top ~20 %. A lighter
+  veil would show more photograph and give up that worst case — deliberately rejected.
+  [HANDOFF.md](HANDOFF.md) eighth round.

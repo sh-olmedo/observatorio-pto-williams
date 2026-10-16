@@ -489,8 +489,9 @@ window is not visible, so every statement here is a computed style); the private
 rendered (their components were exercised synthetically, and their gate was confirmed, but the
 pages themselves were not opened); text over photographs on the landing (excluded above);
 non-text contrast of form-control borders against white (WCAG 1.4.11 — the single light
-`--grey` border is a documented gap pending a UX decision); the rendered focus ring, real
-keyboard modality, real touch devices, the iOS dynamic viewport and `prefers-reduced-motion`.
+`--grey` border is a documented gap that the client **decided to leave as is**, 2026-10-16); the
+rendered focus ring, real keyboard modality, real touch devices, the iOS dynamic viewport and
+`prefers-reduced-motion`.
 
 ## V18 — Client review of the token pass: two defects fixed (2026-10-16)
 

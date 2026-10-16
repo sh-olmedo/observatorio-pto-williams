@@ -81,8 +81,7 @@ rendered result (logged in) and reported **two defects, both now fixed**:
   the labels keep `--text2` for hierarchy — §V18.2.
 
 No other page was reported. The client's **final visual sign-off is still pending** (the review
-found these two things, it did not approve the pass); the non-text contrast of form borders and
-the Poppins decision remain open.
+found these two things, it did not approve the pass).
 
 **Update 2026-10-16 (seventh round — client review of the home page):** the client reviewed the
 **home page** and reported **two defects, both now fixed** in `e2c3a9f` (only
@@ -165,7 +164,6 @@ loader remains.
 | **Visual confirmation of the dropdown spacing (`510e981`)** — 12 px rows / 2 px gap / inset highlight, and the account-menu row. **The client's review found that the 12 px gap made the panel unreachable with the mouse; the mouse bridge in `3dbfbc6` fixes it and the confirmation is pending again** (screenshots are possible again, so it can now be captured) | F1 | Client/team |
 | Real authenticated-session pass for the F1 nav (login writes session tokens to the DB; the 2026-10-16 pass used a temporary `wp_set_current_user()` mu-plugin, since deleted) | F1, F17 | Team (needs a disposable environment) |
 | Real-device pass: touch, iOS dynamic viewport, `prefers-reduced-motion` and the rendered focus ring (the harness could not deliver real key events while its window was hidden) | F1, F17 | Team |
-| **How much photograph to keep under the mobile scene text (F21)** — AA over the brightest pixel of each photo needs ≈0.87–0.88 veil opacity; a lighter veil wins back photograph and gives up that worst case | F21 | Client |
 
 ## Recommended next task (proposed, not approved)
 
@@ -239,6 +237,23 @@ raised the home page only, and produced **F20** (informative KPIs read as clicka
    was visible), and a **pixel-sampling method** for text-over-photograph contrast was added to
    §V19. Re-run the contrast/overflow sweeps with them rather than trusting computed styles alone.
    The proposed code order is otherwise unchanged: **F3 + F11b**, then **F5**.
+
+**Update 2026-10-16 (eighth round — four decisions closed, no code change):** the client answered
+the open design questions raised after the seventh round. **No file changed**, so this is
+documentation only:
+
+1. **Scene veil weight (F21)**: **keep 0.88–0.92**. AA against the brightest pixel of each
+   photograph is the governing requirement; the mobile scenes stay a blue-tinted backdrop with
+   detail mainly in the top strip.
+2. **Drawer `.et` labels**: **keep `--text2`** (4.58:1 / 4.95:1, AA) for hierarchy against the
+   `--dark` content.
+3. **Form-control borders (WCAG 1.4.11)**: **leave as is**. The single `--grey` stays below 3:1;
+   it is a documented gap, not a silent one, and no second border token is added.
+4. **Poppins**: **not shipped**. Montserrat + IBM Plex Mono are the system; the municipal
+   secondary family is dropped from the parity list.
+
+With these four closed, the only thing outstanding on the identity work is the **client's visual
+sign-off** of `52a7d4d` + `3dbfbc6` + `9142179` + `e2c3a9f` (and of the F1 navigation).
 
 ## How to run the site (reference only — not executed in this task)
 
