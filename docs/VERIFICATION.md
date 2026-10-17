@@ -1417,6 +1417,30 @@ longer emits `Disallow: /` for a non-public site — verified by reading
   sign-off**. Every pending visual decision from V16–V24 applies to this deployment unchanged.
 - The installer leftovers the client chose to leave: a published *Sample Page* (`/sample-page/`)
   and two draft copies of *Privacy Policy*.
-- LiteSpeed serves HTML with `cache-control: public, max-age=604800` (7 days) — recorded, not
-  changed.
+- The HTML cache TTL: **changed during this round** — see §V25.8.
 - Anything outside this site on the same account: untouched.
+
+### V25.8 HTML browser cache lowered to one hour (`max-age=604800` → `3600`)
+
+A reviewer's browser kept showing the pre-fix page after the F25 deploy and a normal reload did
+not help: the response carried `cache-control: public, max-age=604800`. The header does **not**
+come from the LiteSpeed plugin — lowering `cache-ttl_pub` to 3600 changed nothing, the plugin's
+browser cache is off and its `cache-ttl_browser` was not touched — but from the host's default
+expiry block in the site's own `.htaccess`:
+
+```
+ExpiresDefault "access plus 1 weeks"
+```
+
+Fix applied inside the same `<IfModule mod_expires.c>` block, with a copy of the file first
+(`.htaccess.bak-ttl-202610170845`):
+
+```
+ExpiresByType text/html "access plus 1 hour"
+```
+
+Measured after a purge: HTML `max-age=3600` on `/`, `/indicadores/`, `/acerca/` and `/noticias/`,
+while CSS keeps `max-age=2592000` (1 month) and images keep 1 year — nothing that matters for
+performance changed. `cache-ttl_pub` and `cache-ttl_frontpage` were also lowered from 604800 to
+3600 while diagnosing; they govern the **server-side** page cache, not the browser copy, and both
+are one-line reversions.

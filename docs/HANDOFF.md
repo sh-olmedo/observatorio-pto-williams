@@ -446,6 +446,10 @@ machine; full evidence in [VERIFICATION.md](VERIFICATION.md) §V25.
   concern that made the old fix path "not a drive-by fix" is gone — production's `blogname` is
   already Arauco. Locally the title still shows the old brand because the **local** `blogname`
   was not touched (F7).
+- **Browser cache lowered to one hour** after a reviewer's browser kept serving the pre-fix page:
+  the `max-age=604800` came from the host's `ExpiresDefault` in the site's `.htaccess`, not from
+  LiteSpeed, so one line — `ExpiresByType text/html "access plus 1 hour"` — was added to that
+  block (copy kept as `.htaccess.bak-ttl-202610170845`). Assets keep 1 month / 1 year (§V25.8).
 - **Open**: no authenticated view on production (only the administrator account exists and no
   credentials were used); the installer leftovers the client chose to leave (*Sample Page* and two
   *Privacy Policy* drafts); and every pending visual decision from §V16–§V24, which a deployment
@@ -510,8 +514,10 @@ machine; full evidence in [VERIFICATION.md](VERIFICATION.md) §V25.
 - The **first production deployment** (fourteenth round, §V25) wrote **outside this repository**,
   on the client's Hostinger account, and only inside the site `observatorioarauco.cl`: the files
   under `public_html/wp-content/themes/otrn/` and six `mu-plugins/otrn-*.php`, that site's own
-  MySQL database (the content import, 8 URL replacements and seven options), and two plugins
-  installed (one deactivated after use). No core file, no `wp-config.php`, no other site on the
+  MySQL database (the content import, 8 URL replacements and seven options), two plugins
+  installed (one deactivated after use), and one line appended to that site's own `.htaccess`
+  expiry block — with the previous file kept beside it as `.htaccess.bak-ttl-202610170845`. No
+  core file, no `wp-config.php`, no other site on the
   account, no DNS record and no panel setting outside that site was touched; its whole docroot and
   its database were backed up **before** the first write. The repository changed only in
   `functions.php` (`1b19d5c`, the F25 fix — one line — plus the comment that records the finding)
