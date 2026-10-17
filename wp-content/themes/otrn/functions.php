@@ -313,6 +313,11 @@ add_action( 'template_redirect', 'otrn_redirigir_borrador_evaluacion' );
  */
 function otrn_setup_theme() {
 	add_theme_support( 'post-thumbnails' );
+	// F25: el tema trae su propio header.php/footer.php y las plantillas del tema
+	// padre no se usan en estas rutas, así que sin esta declaración WordPress no
+	// renderiza nunca `<title>` y la pestaña cae a la URL. El nombre del sitio sale
+	// de `blogname` (en producción ya es «Observatorio Turístico de Arauco»).
+	add_theme_support( 'title-tag' );
 	add_image_size( 'otrn-noticia', 1120, 560, true );      // Cabecera del detalle.
 	add_image_size( 'otrn-noticia-card', 640, 400, true );  // Tarjeta del listado.
 }
