@@ -1444,3 +1444,59 @@ while CSS keeps `max-age=2592000` (1 month) and images keep 1 year — nothing t
 performance changed. `cache-ttl_pub` and `cache-ttl_frontpage` were also lowered from 604800 to
 3600 while diagnosing; they govern the **server-side** page cache, not the browser copy, and both
 are one-line reversions.
+
+### V25.9 Hostinger's assistant switched the active theme (incident and defence)
+
+**Reported by the client**, from their own logged-in session: the public site showed the admin bar
+followed by one centred paragraph, with no header, navigation or footer.
+
+**Diagnosis.** The earlier anonymous checks had looked fine because they hit a **cached** copy; the
+theme was correct when that copy was generated. A cache-busting request to `/` told another story:
+
+| Check (cache-busting request to `/`) | Result |
+| --- | --- |
+| `<body class>` | `home blog … wp-theme-hostinger-ai-theme hostinger-ai-builder-gutenberg` |
+| `<header>` / `<footer>` / `.otrn-act` | 0 / 0 / 0 |
+| `wp-block-post-content` | 1 — a single paragraph |
+| `wp option get template` / `stylesheet` | `hostinger-ai-theme` / `hostinger-ai-theme` |
+| `wp theme list` | `hostinger-ai-theme` **active**, `otrn` inactive |
+
+The AI theme declares `Requires PHP: 8.1` and the host runs PHP 8.0.30, so WordPress refuses that
+switch on its own (`validate_theme_requirements()`, `wp-includes/theme.php:962`, called at the top of
+`switch_theme()`): the options were written **from outside WordPress**. The only `switch_theme()`
+calls in the Hostinger plugins live in `hostinger-easy-onboarding`
+(`includes/Rest/StepRoutes.php:248`, fallback at `:301`), and `hostinger_ai_version` was stamped
+`1792228950` (2026-10-17 ≈ 08:42 UTC).
+
+**Recovery.** `wp theme activate otrn` plus `wp litespeed-purge all`, re-measured per route with a
+cache-busting query: `/`, `/indicadores/`, `/noticias/`, `/acerca/`, `/buenas-practicas/` and
+`/geoportal/` all come back as `wp-child-theme-otrn`; `/evaluar/`, `/mapa/`, `/autoevaluacion/` and
+`/guias/` still answer **302**; `<title>` and `noindex, nofollow` intact. Nothing else moved —
+`blogname`, `blogdescription`, `WPLANG`, `timezone_string`, `permalink_structure`, `blog_public` and
+the item counts are exactly as deployed, and no post was created during the incident.
+
+**Defence (two layers).**
+
+1. `hostinger-easy-onboarding` **deactivated** — it is the plugin exposing that REST route, and the
+   site is already set up. Reversible with `wp plugin activate hostinger-easy-onboarding`.
+2. New mu-plugin `otrn-vigilante-tema.php`, deployed: it checks the active theme at `setup_theme`
+   — before the intruding theme includes its `functions.php` — and at `switch_theme`, restores the
+   project theme and logs the attempt and the acting user to the site's PHP error log
+   (`~/.logs/error_log_observatorioarauco_cl`). It stands down in recovery mode and when the project
+   theme is paused, and is disabled by deleting the file or defining `OTRN_VIGILANTE_TEMA_OFF`.
+
+**Both paths tested on the host (2026-10-17).**
+
+| Test | Action | Result |
+| --- | --- | --- |
+| A · WordPress path | `wp theme activate twentytwentyfour` | `Error: Could not switch to 'Twenty Twenty-Four' theme.`; `stylesheet` stays `otrn`; log: *"…detectado en switch_theme; se restaura otrn"* |
+| B · external write (the real path) | options set to `hostinger-ai-theme` with `mysqli` from outside WordPress | next request: `stylesheet=otrn`, `template=twentytwentyfive`, page rendered `wp-child-theme-otrn`; log: *"Tema \"hostinger-ai-theme\" activo (detectado en setup_theme); se restaura \"otrn\". Usuario: 0."* |
+
+Test B's line is `[17-Oct-2026 09:48:40 UTC]` in `~/.logs/error_log_observatorioarauco_cl`.
+
+**NOT VERIFIED / open**: **who** called the switch. The host exposes no activity log for that option
+write, the panel session was not recorded and the client's own steps through the panel were not
+captured either, so the caller is inferred from the plugin code and the version timestamp, not
+proven. Whether the panel can bring the theme back by another path is unproven as well — which is
+exactly why the watchdog is in place, and why **the AI assistant/builder should not be used on this
+site**.

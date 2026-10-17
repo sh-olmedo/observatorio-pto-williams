@@ -107,15 +107,29 @@ database change):
   look, not the client's sign-off**, and the F1 navigation, F2/F6 identity and this round all
   remain **pending the client's visual review**.
 
+**Update 2026-10-17 (fifteenth round — the active theme was switched back):** hours after the site
+went live the client reported that *"once authenticated, WordPress does not show the site"*: the
+front page was the admin bar plus one stray paragraph. The theme had not broken — Hostinger's
+onboarding/AI assistant had written `template`/`stylesheet` back to `hostinger-ai-theme`, so the
+page was rendering with that theme's block templates. WordPress rejects such a switch by itself (the
+AI theme declares `Requires PHP: 8.1` and the host runs PHP 8.0), so the options were written from
+**outside** WordPress. Registered as **F28** and mitigated the same day: `otrn` reactivated and the
+caches purged, `hostinger-easy-onboarding` **deactivated** (it is the plugin exposing that REST
+route), and a new mu-plugin `otrn-vigilante-tema.php` deployed that restores the project theme at
+`setup_theme`/`switch_theme` and logs each attempt. Both paths were tested on the host — including
+forcing the options by hand, outside WordPress, where the **next request** put them back —
+[VERIFICATION.md](VERIFICATION.md) §V25.9. Nothing else moved: options, content and plugins are as
+deployed. The client's visual sign-off is of course still pending.
+
 ## Git baseline
 
 | Item | Value |
 | --- | --- |
-| Branch | `main` (remote `origin` configured; no remote refs fetched locally) |
-| HEAD | `1b19d5c` — `fix(otrn): el <title> vuelve a emitirse en todas las rutas (F25)` (local, not pushed; this documentation commit follows it) |
-| History | `99092d1` repo init → `70b22a7` "portada scrollytelling inmersiva + branding Arauco (ETAPA A+B+C)" → `5f43933` "modo dual estatico/inmersivo" → `f506104` docs baseline → `bb38d8b` runtime record → `8d3d40b` F11b protections → `d4fa738` F19 docs → `0dd2de4` F1 nav → `e727756` F1 regression fix → `932986b` F1 docs → `5f17b38` F1 grouped navigation → `57e09a8` F1 redesign docs → `510e981` F1 dropdown spacing fix → `cd9fd09` F1 spacing docs → `9aeaa82` design-token audit docs → `52a7d4d` municipal token consolidation → `d691f03` token docs → `3dbfbc6` dropdown hover fix (F1) → `9142179` drawer contrast fix (F2) → `0d35f84` client-review docs → `e2c3a9f` home legibility + KPI affordance fix (F20, F21) → `f40cb52` home-review docs → `ce9a093` four decisions closed (docs) → `649b01f` mobile glass pass (F21) → `94714ff` mobile glass docs → `05d2ecb` glass on the lead only (F21) → `7f93114` fourth-round docs → `bef8332` plate values set by the client (F21) → `90bf739` sticky footer (F24) → `a360fcc` sticky-footer docs → `d706872` user guide (F25-F27) → `c0fc3ce` user-guide docs → `1b19d5c` F25 title fix → this documentation commit (last local, not pushed) |
+| Branch | `main` — now tracking `origin/main`; the first push (2026-10-17) sent the full history |
+| HEAD | `c5fba94` — `docs(arauco): registrar el TTL de caché de navegador del HTML (§V25.8)` (pushed; this documentation commit follows it) |
+| History | `99092d1` repo init → `70b22a7` "portada scrollytelling inmersiva + branding Arauco (ETAPA A+B+C)" → `5f43933` "modo dual estatico/inmersivo" → `f506104` docs baseline → `bb38d8b` runtime record → `8d3d40b` F11b protections → `d4fa738` F19 docs → `0dd2de4` F1 nav → `e727756` F1 regression fix → `932986b` F1 docs → `5f17b38` F1 grouped navigation → `57e09a8` F1 redesign docs → `510e981` F1 dropdown spacing fix → `cd9fd09` F1 spacing docs → `9aeaa82` design-token audit docs → `52a7d4d` municipal token consolidation → `d691f03` token docs → `3dbfbc6` dropdown hover fix (F1) → `9142179` drawer contrast fix (F2) → `0d35f84` client-review docs → `e2c3a9f` home legibility + KPI affordance fix (F20, F21) → `f40cb52` home-review docs → `ce9a093` four decisions closed (docs) → `649b01f` mobile glass pass (F21) → `94714ff` mobile glass docs → `05d2ecb` glass on the lead only (F21) → `7f93114` fourth-round docs → `bef8332` plate values set by the client (F21) → `90bf739` sticky footer (F24) → `a360fcc` sticky-footer docs → `d706872` user guide (F25-F27) → `c0fc3ce` user-guide docs → `1b19d5c` F25 title fix → `b51a521` first-deployment docs → `c5fba94` cache-TTL docs → this documentation commit (all pushed to `origin/main`) |
 | Remote | `https://github.com/sh-olmedo/observatorio-arauco.git` |
-| Tracked files | 821 at `d706872` (805 at `a360fcc`; `d706872` added 16 — `guias-contenido.php`, `assets/css/otrn-guias.css`, `assets/otrn-guias.js`, the 12 screenshots under `assets/guias/` and `mu-plugins/otrn-privacidad-guias.php`). Unchanged by `1b19d5c` and this commit: no file added or removed |
+| Tracked files | 822 at this commit (`otrn-vigilante-tema.php`, the F28 watchdog, is the only addition since `d706872`: 821 there, 805 at `a360fcc` — `d706872` added 16, `guias-contenido.php`, `assets/css/otrn-guias.css`, `assets/otrn-guias.js`, the 12 screenshots under `assets/guias/` and `mu-plugins/otrn-privacidad-guias.php`) |
 
 ## Working tree — 1 remaining file (do not commit)
 
@@ -166,7 +180,8 @@ loader remains.
 | Git push of the local commits (`8d3d40b` … `1b19d5c` plus the two documentation commits): **decided in the fourteenth round** — the client asked for the push, together with the deployment | F14 | User (done) |
 | **Production `observatorioarauco.cl` is live** (fourteenth round) with the public content set, and search engines are discouraged (`blog_public = 0`) until the client approves. Going public means flipping that option back — and the visual sign-off above still stands | §V25, F7–F13 | Client |
 | Installer leftovers on production, **left in place at the client's request**: a published *Sample Page* (`/sample-page/`) and two draft copies of *Privacy Policy* | §V25.7 | Client (content) |
-| No **authenticated** view has ever been verified on production (only the administrator account exists and no credentials were used), so the private sections are proven closed — not proven to render | §V25.7, §V24.6 | Team |
+| **F28 — Hostinger's onboarding/AI assistant switched the active theme back** on production (`template`/`stylesheet` → `hostinger-ai-theme`), leaving the live front page as a single paragraph until it was caught. Mitigated the same day: `hostinger-easy-onboarding` **deactivated** and `otrn-vigilante-tema.php` deployed (restores the project theme at `setup_theme`/`switch_theme` and logs the attempt). **Do not run the AI assistant/builder for this site** | F28, §V25.9 | Client/team |
+| No **authenticated** view has been verified **by the team** on production (only the administrator account exists and no credentials were used), so the private sections are proven closed — not proven to render. The **client** reviews them with their own account instead (their choice); their first authenticated visit is what surfaced **F28**, and no private-view finding has been reported yet | §V25.7, §V24.6 | Client (review) |
 | Sticky footer (`90bf739`, **F24**): the footer now sits on the bottom edge of short pages and is pushed by the content otherwise. Pending **the client's visual confirmation**, ideally on a real phone (`dvh` + dynamic toolbars are not verifiable in the harness) | F24 | Client/team |
 | **UX/UI review of the user guide** (`d706872`): its look (index, article, figures) and its Spanish copy for non-technical readers. The guide is a deliverable, **not a signed-off design** | §V24 | Client/team |
 | Fate of the sample `guia` post that the guide's appendix surfaces (*"Nueva giua de usuario"*, ID 409): delete it, rewrite it or unpublish it. **The database is not editable from this repository**; the production import deliberately left the `guia` type out, so the sample post is local-only today | F27 | Client (content) |
@@ -261,6 +276,13 @@ public content set, and F25 was fixed on the way in (`1b19d5c`); search engines 
 until the client approves (§V25). The proposed code order is unchanged — **F3 + F11b**, then
 **F5** — but two housekeeping items now sit alongside it: deciding when to lift the
 search-engine discouragement, and the installer leftovers on production.
+
+**2026-10-17 addition (F28 incident):** a few hours after going live, the front page was taken over
+by Hostinger's AI theme (F28). The mitigation is in place and tested — the onboarding plugin
+deactivated plus the `otrn-vigilante-tema.php` watchdog (§V25.9) — and it does not change the
+proposed order (**F3 + F11b**, then **F5**). One operational rule comes out of it: **do not run
+Hostinger's AI assistant/builder on this site**, and re-check the active theme after any panel-side
+action on it.
 
 **Update 2026-10-16 (eighth round — four decisions closed, no code change):** the client answered
 the open design questions raised after the seventh round. **No file changed**, so this is

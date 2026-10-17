@@ -41,6 +41,7 @@ wp-content/
    ├─ otrn-iniciativa-pladetur.php  # CPT: iniciativa_pladetur + taxonomía lineamiento
    ├─ otrn-privacidad-seccion.php   # anonymous REST/search/oEmbed/sitemap closure (private section)
    ├─ otrn-privacidad-guias.php  # same closure for the guia surfaces (new 2026-10-16)
+   ├─ otrn-vigilante-tema.php    # restores the project theme if the Hostinger assistant replaces it (new 2026-10-17)
    └─ sqlite-database-integration/  # SQLite implementation (loaded by db.php)
 ```
 
@@ -133,6 +134,7 @@ any template), `otrn_mision_portada()` (:492), `otrn_datos_portada()` (:508),
 | `otrn-iniciativa-pladetur.php` | CPT `iniciativa_pladetur` + taxonomy `lineamiento` + seeds + caps | :57-64, :91-100, :119, :169 |
 | `otrn-privacidad-seccion.php` | Closes the private section's non-HTML surfaces for anonymous visitors (REST 401, search exclusion, oEmbed off, sitemap entry removed) | file head; F11b |
 | `otrn-privacidad-guias.php` | The same closure for the `guia` type, whose HTML gate is session-only | file head; [VERIFICATION.md](VERIFICATION.md) §V24 |
+| `otrn-vigilante-tema.php` | Keeps the project theme active: checks it on `setup_theme` — before the intruding theme loads — and on `switch_theme`, restores it and logs the attempt. Covers the Hostinger onboarding/AI assistant, which writes `template`/`stylesheet` directly | file head; [VERIFICATION.md](VERIFICATION.md) §V25.9 |
 
 All CPTs and taxonomies register `show_in_rest => true` (potential REST surface — F11/F11b);
 the two `otrn-privacidad-*` plugins filter those surfaces for the gated types, and no custom

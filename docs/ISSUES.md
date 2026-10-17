@@ -1,4 +1,4 @@
-# Issue Register (F1–F27)
+# Issue Register (F1–F28)
 
 Persistent register of every finding from the static audit (commit `5f43933` + working
 tree), **preserving the original finding IDs** (including the F11b sub-finding). Keep these
@@ -14,6 +14,14 @@ had to describe instead of fix — **F25 was fixed on 2026-10-17** while prepari
 production deployment (`1b19d5c`) and F26 is still open; F27 is a content decision the guide
 surfaced. Severities:
 **P0** critical, **P1** high, **P2** medium, **P3** low. No P0 was found statically.
+
+**Update 2026-10-17 (production incident — F28):** hours after the first deployment, the live front
+page started rendering a **single paragraph** with no header or footer — the client reported it
+with a screenshot from their logged-in session. The cause was not the theme: Hostinger's
+onboarding/AI assistant had written `template`/`stylesheet` back to `hostinger-ai-theme`, so the
+site rendered with the AI theme's block templates. Registered as **F28** (hosting/process, not a
+theme defect) and mitigated the same day; see the F28 entry and
+[VERIFICATION.md](VERIFICATION.md) §V25.9.
 
 Status values: *Open* (needs work), *Open — verify at runtime* (needs a runtime/browser/DB
 check first), *Open — decision pending* (blocked on a client/team decision).
@@ -83,6 +91,10 @@ login anonymously. Measurements on the host: [VERIFICATION.md](VERIFICATION.md) 
 | F22 | Home page has no print styles (scene copy lost on paper) | P3 | Resilience/A11y | 3 |
 | F23 | Ghost CTA boundary over photography (&lt;3:1, WCAG 1.4.11) | P2 | Accessibility | 4 |
 | F24 | Footer left mid-screen on pages shorter than the viewport | P2 | Layout/UX | 3 |
+| F25 | No page emits a `<title>` (theme never declares `title-tag`) | P2 | Metadata/A11y | — |
+| F26 | Site locale is `it_IT`: WordPress-generated screens are Italian | P2 | Localization/UX | — |
+| F27 | The only published `guia` item is a WordPress sample placeholder | P3 | Content | — |
+| F28 | Hostinger's assistant can switch the active theme back on production | P1 | Hosting/Process | — |
 
 ---
 
@@ -762,3 +774,45 @@ explicit UX/UI approval of the visuals**. Files: `header.php`, `functions.php`,
   posts, so it disappears by itself once the placeholder is gone or unpublished.
 - **Verification**: `studio wp post list --post_type=guia --post_status=publish` after the client
   decides, plus a reload of `/guias/#guias-publicadas`.
+
+### F28 — Hostinger's assistant can switch the active theme back on production
+
+- **Severity**: P1 · **Status**: **Mitigated on production 2026-10-17** (theme restored, onboarding
+  plugin deactivated, `otrn-vigilante-tema.php` deployed — [VERIFICATION.md](VERIFICATION.md)
+  §V25.9) · **Category**: Hosting/Process. **Not a defect of the project theme.**
+- **How it was raised**: the client reported that "once authenticated, WordPress does not show the
+  site": the screenshot showed the admin bar followed by one centred paragraph
+  (*"Operadores y gestores turísticos participaron en la primera jornada…"*) and nothing else.
+- **Evidence**: a **fresh** (cache-miss) request to `/` returned
+  `<body class="home blog … wp-theme-hostinger-ai-theme hostinger-ai-builder-gutenberg">` with a
+  single `wp-block-post-content` paragraph and no `<header>`, `<footer>` or `.otrn-act` marks;
+  `wp option get template` / `stylesheet` both read `hostinger-ai-theme`, while `otrn` was
+  `inactive`. The AI theme's `style.css` declares **`Requires PHP: 8.1`** and the host runs
+  **PHP 8.0.30**, so WordPress's own guard rejects the switch
+  (`validate_theme_requirements()`, `wp-includes/theme.php:962`; the guard runs at the top of
+  `switch_theme()`): **the change cannot have come through `switch_theme()`** — it was written
+  straight into the options from outside WordPress. The only `switch_theme()` calls in the
+  Hostinger plugins are `hostinger-easy-onboarding/includes/Rest/StepRoutes.php:248` and its
+  fallback at `:301`; the option `hostinger_ai_version` was stamped `1792228950`
+  (2026-10-17 ≈ 08:42 UTC), i.e. during that morning's session.
+- **Impact**: the public front page (and any route the AI theme's block templates covered) lost the
+  whole project layout and showed a single stray post paragraph to every visitor, logged in or not.
+  The URL, the database and the content were untouched.
+- **Mitigation applied (2026-10-17)**: `wp theme activate otrn` plus a full LiteSpeed purge;
+  `hostinger-easy-onboarding` deactivated (it is the plugin exposing that REST route; the site is
+  already set up and reactivating it is one command); and the new mu-plugin
+  **`otrn-vigilante-tema.php`**, which restores the project theme at `setup_theme` — *before* the
+  intruding theme loads its `functions.php` — and at `switch_theme`, logging each attempt to the
+  site's PHP error log (`~/.logs/error_log_observatorioarauco_cl`). It steps aside in recovery mode
+  or when the project theme is paused, and is disabled by deleting the file or defining
+  `OTRN_VIGILANTE_TEMA_OFF`.
+- **Verification** (§V25.9): with the options forced to `hostinger-ai-theme` **by hand, outside
+  WordPress**, the very next request restored `template`/`stylesheet` to
+  `twentytwentyfive`/`otrn` and rendered the project theme; the log recorded
+  *"Tema \"hostinger-ai-theme\" activo (detectado en setup_theme); se restaura \"otrn\""*. A normal
+  `switch_theme()` attempt (`wp theme activate twentytwentyfour`) was likewise reverted. Fresh
+  renders of `/`, `/indicadores/`, `/noticias/`, `/acerca/`, `/buenas-practicas/` and `/geoportal/`
+  all carry `wp-child-theme-otrn`, and the private routes still answer 302.
+- **Still open**: the exact caller was not identified — the host exposes no per-site activity log for
+  the change — so if the panel re-runs that step by another route, the watchdog is what keeps the
+  site standing. Treat "the AI assistant/builder" as off-limits for this site.
