@@ -9,8 +9,10 @@ not introduced by that commit. **F23** was registered later the same day, on the
 round: a regression that round introduced deliberately (see F21). **F24** was registered later
 the same day from a direct client request (sticky footer) and fixed in `90bf739`. **F25**,
 **F26** and **F27** were registered at the end of that day, while building and verifying the
-**user guide** at `/guias/` (§V24): F25 and F26 are pre-existing, site-wide defects the guide
-had to describe instead of fix; F27 is a content decision the guide surfaced. Severities:
+**user guide** at `/guias/` (§V24): F25 and F26 were pre-existing, site-wide defects the guide
+had to describe instead of fix — **F25 was fixed on 2026-10-17** while preparing the first
+production deployment (`1b19d5c`) and F26 is still open; F27 is a content decision the guide
+surfaced. Severities:
 **P0** critical, **P1** high, **P2** medium, **P3** low. No P0 was found statically.
 
 Status values: *Open* (needs work), *Open — verify at runtime* (needs a runtime/browser/DB
@@ -44,6 +46,15 @@ pushed by the content when it grows. Registered as **F24** and fixed the same da
 (one file, `style.css`: the page shell becomes a column flex box with a viewport-based
 `min-height`): [VERIFICATION.md](VERIFICATION.md) §V23. **Pending the client's visual
 confirmation**; like every other round in this phase, not a sign-off.
+
+**Update 2026-10-17 (first production deployment):** the client asked to prepare and publish the
+site and approved **direct-to-production** (Hostinger's *Staging* needs a plan upgrade).
+`observatorioarauco.cl` now runs the project theme on the client's own host with the **public**
+content set — 216 items; the criteria, evaluations and sectors were purposely left out, as was the
+sample `guia` post of F27 — and with **search engines discouraged** (`blog_public = 0`) until the
+client approves the content. **F25 was fixed** on the way in (`1b19d5c`), and no private-section
+gate was weakened: `/evaluar/`, `/mapa/`, `/autoevaluacion/` and `/guias/` still answer 302 to the
+login anonymously. Measurements on the host: [VERIFICATION.md](VERIFICATION.md) §V25.
 
 | ID | Title | Sev | Category | Phase |
 | --- | --- | --- | --- | --- |
@@ -692,7 +703,8 @@ explicit UX/UI approval of the visuals**. Files: `header.php`, `functions.php`,
 
 ### F25 — No page emits a `<title>` (the theme never declares `title-tag`)
 
-- **Severity**: P2 · **Status**: **Open** (pre-existing, site-wide) · **Category**: Metadata/accessibility.
+- **Severity**: P2 · **Status**: **Fixed 2026-10-17** (`1b19d5c`, one line; verified locally and on
+  the production host — [VERIFICATION.md](VERIFICATION.md) §V25.6) · **Category**: Metadata/accessibility.
 - **How it was raised**: while building the user guide (§V24): the browser tab of `/guias/` showed
   the URL instead of a page name, so the title tag was checked across routes.
 - **Evidence**: `studio wp eval` → `current_theme_supports( 'title-tag' )` = **`false`**; a `<title>`
@@ -702,12 +714,16 @@ explicit UX/UI approval of the visuals**. Files: `header.php`, `functions.php`,
 - **Impact**: tabs, history entries, bookmarks and the accessible name of the document fall back to
   the URL; there is no page-level metadata for shares either. It affects **every** route, not only
   the guide.
-- **Fix path (proposed, not approved)**: one line — `add_theme_support( 'title-tag' )` in
-  `otrn_setup_theme()` — but it changes every route at once and the site name in the database is
-  still *"Observatorio Turístico Rapa Nui"* (F7), so titles would resurface the old brand. Decide
-  it together with the site-name/rebrand item, not as a drive-by fix.
+- **Fix applied (2026-10-17)**: one line — `add_theme_support( 'title-tag' )` in
+  `otrn_setup_theme()`, with the finding reference in the code. It changes every route at once, and
+  the reason it was parked — the database site name still reading *"Observatorio Turístico Rapa
+  Nui"* (F7) — was resolved first **on production**, whose `blogname` is now
+  *"Observatorio Turístico de Arauco"*. The **local** database was deliberately not touched, so
+  local titles still carry the old brand until F7/F26 are decided.
 - **Verification**: `curl -s <route> | grep -o '<title>[^<]*'` on the main routes (public and
-  private) in both locales.
+  private) in both locales. **Done 2026-10-17**: exactly one `<title>` per route, hierarchical
+  (*"Indicadores – Observatorio Turístico de Arauco"* on production, the old brand locally), with
+  the private routes still answering 302 to the login (§V25.6).
 
 ### F26 — Site locale is `it_IT`: WordPress-generated screens are Italian
 

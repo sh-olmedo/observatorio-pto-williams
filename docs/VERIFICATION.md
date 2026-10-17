@@ -1283,3 +1283,140 @@ Real `Tab` presses in a real tab (not synthetic events), logging every `focusin`
   review has to judge; no usability test was run.
 - Whether a non-admin account should see the guide's appendix entry, and whether the appendix
   should ship at all (F27 — client content decision).
+
+## V25 — First production deployment: `observatorioarauco.cl` (Hostinger) — 2026-10-17
+
+The client asked to prepare and publish the site. This is the **first round of the project that
+writes outside this machine**, so the method differs from V1–V24: the evidence is the live host,
+not localhost. The client chose **direct-to-production** after the panel showed that Hostinger's
+*Staging* feature requires a plan upgrade (Premium Web Hosting) and the free alternative
+(subdomain + second install) was declined.
+
+### V25.1 Safety net taken first
+
+| Item | Result |
+| --- | --- |
+| Files | `~/backups-arauco-20261016-2141/files-antes.tar.gz` (62 MB, whole docroot) |
+| Database | `~/backups-arauco-20261016-2141/db-antes.sql` (117 KB) |
+| Host's own backups | untouched (panel *Backups*) |
+
+`wp db export` **fails on this host** (exit 255, no output, no file; `mysqldump` is present at
+`/usr/bin/mysqldump`). The dump was taken with `mysqldump` directly, reading `DB_PASSWORD` from
+`wp-config.php` inside the remote shell — the password was never printed, echoed or stored here.
+
+### V25.2 Host facts (read-only, before writing)
+
+| Check | Result |
+| --- | --- |
+| Docroot | `/home/u997291669/domains/observatorioarauco.cl/public_html` |
+| WordPress / PHP (CLI) | 7.1.3 / **8.0.30** (local is 8.3) |
+| DB | MySQL `u997291669_eVCNN` (production) vs SQLite (local) |
+| Server | LiteSpeed + `hcdn`; SSH `u997291669@46.202.199.89:65002`; `rsync`, `git`, `unzip`, `tar` present |
+| Disk | 2.0 T free |
+| Existing content | **0** published posts/pages (only the installer's draft Privacy Policy) |
+| Existing theme/plugins | `hostinger-ai-theme`; Hostinger mu-plugins + `litespeed-cache` |
+
+PHP 8.0 was **not** changed: the theme and mu-plugins use no PHP 8.1+ syntax (checked by grep for
+`readonly`/`enum`/`never`/first-class callable syntax — the only `readonly` hit is an HTML
+attribute), and every route rendered without errors afterwards (§V25.5).
+
+### V25.3 What was deployed (file scope)
+
+`rsync` over SSH, no `--delete`; the Studio-only paths were **excluded on purpose**:
+`mu-plugins/99-studio-loader.php`, the SQLite integration and `wp-content/database/`.
+
+| Payload | Files | Bytes |
+| --- | --- | --- |
+| `themes/otrn/` | 95 (82 transferred) | 4,255,533 |
+| `mu-plugins/otrn-*.php` | 6 | 50,892 |
+| `uploads/` | 41 (36 transferred) | 4,995,915 |
+
+Local migrations did **not** apply (production is MySQL, so no `db.php` drop-in was shipped), and
+no `wp-config.php`, core file or other site on the account was touched.
+
+### V25.4 Content selection — 216 items
+
+Exported with `studio wp export --post_type=...` and imported with `wp import
+--authors=create`:
+
+| Included | Count | | Excluded | Count |
+| --- | --- | --- | --- | --- |
+| Buena práctica | 79 | | Criterio de autodiagnóstico | 74 |
+| Iniciativa Pladetur | 64 | | Evaluación | 6 |
+| Indicador | 44 | | Sector (`public => false`) | 10 |
+| Página | 9 | | `guia` sample post (F27) | 1 |
+| Material de apoyo | 6 | | | |
+| Noticia (`post`) | 4 | | | |
+| Dato de portada | 3 | | | |
+| Adjunto | 7 | | | |
+
+The private geography (`criterio`, `evaluacion`, `sector`) and the WordPress sample post the guide
+appendix surfaced (*"Nueva giua de usuario"*) were left out by client decision. The 7 attachments
+report *"Failed to import Media"* (the importer tries to download the file from
+`localhost:8895`); the files themselves were copied by `rsync` and the URLs rewritten afterwards,
+so the images resolve.
+
+URL rewrite: `wp search-replace` made **8 replacements** (6 in `wp_postmeta`, 2 in `wp_posts`).
+
+### V25.5 Configuration applied and the anonymous surface, measured
+
+| Setting | Value |
+| --- | --- |
+| `blogname` | Observatorio Turístico de Arauco |
+| `blogdescription` | Observatorio Turístico de la comuna de Arauco |
+| `WPLANG` | `es_CL` (language pack installed) |
+| `timezone_string` | `America/Santiago` |
+| `permalink_structure` | `/%postname%/` (the host's default; local uses date-based — CPT slugs are unaffected) |
+| `blog_public` | **0** — *discourage search engines* until the content is approved |
+| Plugins | `advanced-custom-fields` **6.8.10** active (6.8.0 does not exist in wp.org); `wordpress-importer` 0.9.6 installed and **deactivated** after the import |
+
+| Route (anonymous `curl`) | Result |
+| --- | --- |
+| `/`, `/indicadores/`, `/buenas-practicas/`, `/material-de-apoyo/`, `/noticias/`, `/acerca/`, `/geoportal/`, `/mision/`, `/estadisticas/` | **200**, no PHP error string, no broken `<img>` |
+| `/evaluar/`, `/mapa/`, `/autoevaluacion/`, `/guias/` | **302** to `wp-login.php` with `redirect_to` intact |
+| `/criterio/` | **301** to a good-practice post — the CPT has `has_archive => false`, so the bare path 404s and WordPress guesses. **Identical locally** (checked): not a deployment defect |
+| Fiches: indicador, buena práctica, iniciativa, material, noticia | **200**, 0 error strings |
+| Theme assets (`fonts.css`, `otrn-arauco.css`, `otrn-landing.css`, `otrn-menu.css`) | **200** |
+| `robots.txt`, `/wp-sitemap.xml`, `/feed/`, `/wp-json/wp/v2/pages` | **200** |
+
+The home page renders 49,373 bytes with the Arauco header/logo, the hero *"Arauco, territorio que
+inspira"* and 5 mentions of "Rapa Nui" (the provisional copy the client accepted).
+
+### V25.6 F25 fixed during this round — every route now emits one `<title>`
+
+`add_theme_support( 'title-tag' )` in `otrn_setup_theme()` (`functions.php`), with the finding
+reference in the code. Local: `current_theme_supports( 'title-tag' )` = `true`, and
+`/`, `/indicadores/`, `/noticias/`, `/acerca/`, `/wp-login.php` each return **exactly one**
+`<title>`; locally the brand still reads *"Observatorio Turístico de Rapa Nui"* because the
+**local** `blogname` was not touched (F7).
+
+Production, after the change:
+
+| Route | `<title>` |
+| --- | --- |
+| `/` | Observatorio Turístico de Arauco – Observatorio Turístico de la comuna de Arauco |
+| `/indicadores/` | Indicadores – Observatorio Turístico de Arauco |
+| `/noticias/` | Noticias – Observatorio Turístico de Arauco |
+| `/acerca/` | Acerca de – Observatorio Turístico de Arauco |
+| `/buenas-practicas/` | Buenas prácticas – Observatorio Turístico de Arauco |
+
+`noindex, nofollow` is present on every HTML route checked (`/`, `/indicadores/`, `/noticias/`,
+`/buenas-practicas/`, `/acerca/`, `/wp-login.php` → `noindex, nofollow, noarchive`). **Feeds carry
+no robots meta** (recorded, not fixed). Note for the next pass: `do_robots()` in WP 7.1.3 no
+longer emits `Disallow: /` for a non-public site — verified by reading
+`wp-includes/functions.php:1713` on the host — so `robots.txt` stays permissive and the
+"discourage search engines" signal is the **meta tag** only.
+
+### V25.7 NOT VERIFIED / open
+
+- **Any authenticated view on production**: only the administrator account exists and no
+  credentials were used, so the private sections are proven closed to anonymous visitors and
+  *not* proven to render once logged in.
+- Real devices, iOS dynamic toolbars, and the visual result: the live home page was looked at
+  once by the team (see the deployment summary), which is **a developer look, not a client
+  sign-off**. Every pending visual decision from V16–V24 applies to this deployment unchanged.
+- The installer leftovers the client chose to leave: a published *Sample Page* (`/sample-page/`)
+  and two draft copies of *Privacy Policy*.
+- LiteSpeed serves HTML with `cache-control: public, max-age=604800` (7 days) — recorded, not
+  changed.
+- Anything outside this site on the same account: untouched.

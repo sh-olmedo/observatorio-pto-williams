@@ -112,10 +112,10 @@ database change):
 | Item | Value |
 | --- | --- |
 | Branch | `main` (remote `origin` configured; no remote refs fetched locally) |
-| HEAD | `d706872` — `feat(otrn): guía de usuario en /guias/ restringida a la sesión (F25-F27)` (local, not pushed; this documentation commit follows it) |
-| History | `99092d1` repo init → `70b22a7` "portada scrollytelling inmersiva + branding Arauco (ETAPA A+B+C)" → `5f43933` "modo dual estatico/inmersivo" → `f506104` docs baseline → `bb38d8b` runtime record → `8d3d40b` F11b protections → `d4fa738` F19 docs → `0dd2de4` F1 nav → `e727756` F1 regression fix → `932986b` F1 docs → `5f17b38` F1 grouped navigation → `57e09a8` F1 redesign docs → `510e981` F1 dropdown spacing fix → `cd9fd09` F1 spacing docs → `9aeaa82` design-token audit docs → `52a7d4d` municipal token consolidation → `d691f03` token docs → `3dbfbc6` dropdown hover fix (F1) → `9142179` drawer contrast fix (F2) → `0d35f84` client-review docs → `e2c3a9f` home legibility + KPI affordance fix (F20, F21) → `f40cb52` home-review docs → `ce9a093` four decisions closed (docs) → `649b01f` mobile glass pass (F21) → `94714ff` mobile glass docs → `05d2ecb` glass on the lead only (F21) → `7f93114` fourth-round docs → `bef8332` plate values set by the client (F21) → `90bf739` sticky footer (F24) → `a360fcc` sticky-footer docs → `d706872` user guide (F25-F27) → this documentation commit (last local, not pushed) |
+| HEAD | `1b19d5c` — `fix(otrn): el <title> vuelve a emitirse en todas las rutas (F25)` (local, not pushed; this documentation commit follows it) |
+| History | `99092d1` repo init → `70b22a7` "portada scrollytelling inmersiva + branding Arauco (ETAPA A+B+C)" → `5f43933` "modo dual estatico/inmersivo" → `f506104` docs baseline → `bb38d8b` runtime record → `8d3d40b` F11b protections → `d4fa738` F19 docs → `0dd2de4` F1 nav → `e727756` F1 regression fix → `932986b` F1 docs → `5f17b38` F1 grouped navigation → `57e09a8` F1 redesign docs → `510e981` F1 dropdown spacing fix → `cd9fd09` F1 spacing docs → `9aeaa82` design-token audit docs → `52a7d4d` municipal token consolidation → `d691f03` token docs → `3dbfbc6` dropdown hover fix (F1) → `9142179` drawer contrast fix (F2) → `0d35f84` client-review docs → `e2c3a9f` home legibility + KPI affordance fix (F20, F21) → `f40cb52` home-review docs → `ce9a093` four decisions closed (docs) → `649b01f` mobile glass pass (F21) → `94714ff` mobile glass docs → `05d2ecb` glass on the lead only (F21) → `7f93114` fourth-round docs → `bef8332` plate values set by the client (F21) → `90bf739` sticky footer (F24) → `a360fcc` sticky-footer docs → `d706872` user guide (F25-F27) → `c0fc3ce` user-guide docs → `1b19d5c` F25 title fix → this documentation commit (last local, not pushed) |
 | Remote | `https://github.com/sh-olmedo/observatorio-arauco.git` |
-| Tracked files | 821 at `d706872` (805 at `a360fcc`; `d706872` added 16 — `guias-contenido.php`, `assets/css/otrn-guias.css`, `assets/otrn-guias.js`, the 12 screenshots under `assets/guias/` and `mu-plugins/otrn-privacidad-guias.php`) |
+| Tracked files | 821 at `d706872` (805 at `a360fcc`; `d706872` added 16 — `guias-contenido.php`, `assets/css/otrn-guias.css`, `assets/otrn-guias.js`, the 12 screenshots under `assets/guias/` and `mu-plugins/otrn-privacidad-guias.php`). Unchanged by `1b19d5c` and this commit: no file added or removed |
 
 ## Working tree — 1 remaining file (do not commit)
 
@@ -163,11 +163,14 @@ loader remains.
 | DB content inventoried at count level (2026-10-15): pages, 74 criteria, 10 sectors, 6 evaluations, 3 data cards; copy migration still pending | F18 | Team (Phase 4) |
 | Geocoding provider + usage policy for the location search (rate limits, attribution, caching; browser-direct vs server proxy) | F19 | Client/team (before Phase 6) |
 | Fate of the curated sector list and of the location metas under the new search picker | F8 ↔ F19 | Client/team (Phase 4/6) |
-| Push/deploy decision for the local commits (from `8d3d40b` to `90bf739` and the docs commit of this round) | F14 | User |
+| Git push of the local commits (`8d3d40b` … `1b19d5c` plus the two documentation commits): **decided in the fourteenth round** — the client asked for the push, together with the deployment | F14 | User (done) |
+| **Production `observatorioarauco.cl` is live** (fourteenth round) with the public content set, and search engines are discouraged (`blog_public = 0`) until the client approves. Going public means flipping that option back — and the visual sign-off above still stands | §V25, F7–F13 | Client |
+| Installer leftovers on production, **left in place at the client's request**: a published *Sample Page* (`/sample-page/`) and two draft copies of *Privacy Policy* | §V25.7 | Client (content) |
+| No **authenticated** view has ever been verified on production (only the administrator account exists and no credentials were used), so the private sections are proven closed — not proven to render | §V25.7, §V24.6 | Team |
 | Sticky footer (`90bf739`, **F24**): the footer now sits on the bottom edge of short pages and is pushed by the content otherwise. Pending **the client's visual confirmation**, ideally on a real phone (`dvh` + dynamic toolbars are not verifiable in the harness) | F24 | Client/team |
 | **UX/UI review of the user guide** (`d706872`): its look (index, article, figures) and its Spanish copy for non-technical readers. The guide is a deliverable, **not a signed-off design** | §V24 | Client/team |
-| Fate of the sample `guia` post that the guide's appendix now surfaces (*"Nueva giua de usuario"*, ID 409): delete it, rewrite it or unpublish it. **The database is not editable from this repository** | F27 | Client (content) |
-| `<title>` on every route (the theme never declares `title-tag`) and the language of WordPress's own screens (the site locale is `it_IT`): both wait on the site name and the locale being decided — the DB still says *"Observatorio Turístico Rapa Nui"* | F25, F26 | Client/team |
+| Fate of the sample `guia` post that the guide's appendix surfaces (*"Nueva giua de usuario"*, ID 409): delete it, rewrite it or unpublish it. **The database is not editable from this repository**; the production import deliberately left the `guia` type out, so the sample post is local-only today | F27 | Client (content) |
+| WordPress's own screens and the title's brand: the **local** locale is still `it_IT` and the **local** `blogname` still says *"Observatorio Turístico Rapa Nui"* (F7). Production already runs `es_CL` with the Arauco name | F26, F7 | Client/team |
 | Real authenticated pass for the guide: the login → return trip and a **non-admin** logged-in account (only the administrator account exists), neither available in the harness | §V24.6 | Team (needs a disposable environment) |
 | **Explicit UX/UI sign-off of the grouped navigation (F1 redesign, `5f17b38`)** — colours, wording, chevrons, «Más» behaviour; nothing else should change until it is reviewed | F1 | Client/team |
 | **Visual confirmation of the dropdown spacing (`510e981`)** — 12 px rows / 2 px gap / inset highlight, and the account-menu row. **The client's review found that the 12 px gap made the panel unreachable with the mouse; the mouse bridge in `3dbfbc6` fixes it and the confirmation is pending again** (screenshots are possible again, so it can now be captured) | F1 | Client/team |
@@ -252,6 +255,12 @@ of the site itself, and it landed ahead of the plan — `/guias/`, `d706872`, ev
 **delivered and awaiting the client's UX/UI review**, and it leaves three small decisions behind it
 (F27 the sample post, F25 the missing `<title>`, F26 the Italian locale). None of them displaces the
 proposed code order above: **F3 + F11b**, then **F5**.
+
+**2026-10-17 addition (deployment):** the site is now **live on `observatorioarauco.cl`** with the
+public content set, and F25 was fixed on the way in (`1b19d5c`); search engines are discouraged
+until the client approves (§V25). The proposed code order is unchanged — **F3 + F11b**, then
+**F5** — but two housekeeping items now sit alongside it: deciding when to lift the
+search-engine discouragement, and the installer leftovers on production.
 
 **Update 2026-10-16 (eighth round — four decisions closed, no code change):** the client answered
 the open design questions raised after the seventh round. **No file changed**, so this is
@@ -409,6 +418,39 @@ data file, and no other page, URL, user or content is touched.
   not a signed-off design), the fate of the sample post (F27), and whether a non-admin account
   should reach the guide at all (§V24.6: only the administrator account exists today).
 
+**Update 2026-10-17 (fourteenth round — first production deployment):** the client asked to
+prepare and publish the site and approved **direct-to-production** after the panel showed that
+Hostinger's *Staging* requires a plan upgrade (Premium Web Hosting) and the free alternative
+(subdomain + second install) was declined. Everything below happened **on the host**, not on this
+machine; full evidence in [VERIFICATION.md](VERIFICATION.md) §V25.
+
+- **Safety net first**: whole docroot (`files-antes.tar.gz`, 62 MB) and database
+  (`db-antes.sql`, 117 KB) under `~/backups-arauco-20261016-2141/`. `wp db export` **fails on this
+  host** (exit 255, no output); the dump was taken with `mysqldump` reading the password inside
+  the remote shell — never printed, never stored here.
+- **Code**: `rsync` of `themes/otrn/` (95 files) and the 6 `mu-plugins/otrn-*.php`. The Studio-only
+  paths were deliberately **not** shipped: `99-studio-loader.php`, the SQLite integration and
+  `wp-content/database/` (the host is MySQL).
+- **Content**: 216 items of the **public** set — 79 buenas prácticas, 64 iniciativas PlAdetur,
+  44 indicadores, 9 páginas, 6 material, 4 noticias, 3 datos de portada, 7 adjuntos. Left out by
+  client decision: the 74 criteria, 6 evaluations and 10 sectors (the private geography) and the
+  `guia` sample post (F27). 8 URL replacements (`localhost:8895` → the domain).
+- **Configuration**: site name and description moved to Arauco, `es_CL`, `America/Santiago`,
+  `/%postname%/`, and **`blog_public = 0`** (discourage search engines) until the content is
+  approved. ACF 6.8.10 active (6.8.0 does not exist in wp.org); the importer was deactivated
+  after use. The host's PHP 8.0 was **not** changed: the theme uses no PHP 8.1+ syntax.
+- **Measured anonymously**: public routes and fiches 200 with no PHP error string and no broken
+  image; `/evaluar/`, `/mapa/`, `/autoevaluacion/` and `/guias/` 302 to the login; `/criterio/`
+  301 exactly as it does locally (the CPT has `has_archive => false`).
+- **F25 fixed in this round** (`1b19d5c`): one line, `add_theme_support( 'title-tag' )`. The
+  concern that made the old fix path "not a drive-by fix" is gone — production's `blogname` is
+  already Arauco. Locally the title still shows the old brand because the **local** `blogname`
+  was not touched (F7).
+- **Open**: no authenticated view on production (only the administrator account exists and no
+  credentials were used); the installer leftovers the client chose to leave (*Sample Page* and two
+  *Privacy Policy* drafts); and every pending visual decision from §V16–§V24, which a deployment
+  does not resolve.
+
 ## How to run the site (reference only — not executed in this task)
 
 - Current local site (2026-10-15): `http://localhost:8895/`, WordPress 7.1.3, PHP 8.3 —
@@ -465,6 +507,17 @@ data file, and no other page, URL, user or content is touched.
   route, post type, database row, option or dependency added and no other page, URL, user or
   content touched. It is local and unpushed too, and its rendered result is **not** claimed as
   approved either.
+- The **first production deployment** (fourteenth round, §V25) wrote **outside this repository**,
+  on the client's Hostinger account, and only inside the site `observatorioarauco.cl`: the files
+  under `public_html/wp-content/themes/otrn/` and six `mu-plugins/otrn-*.php`, that site's own
+  MySQL database (the content import, 8 URL replacements and seven options), and two plugins
+  installed (one deactivated after use). No core file, no `wp-config.php`, no other site on the
+  account, no DNS record and no panel setting outside that site was touched; its whole docroot and
+  its database were backed up **before** the first write. The repository changed only in
+  `functions.php` (`1b19d5c`, the F25 fix — one line — plus the comment that records the finding)
+  and in this documentation, and the Studio-only paths (`99-studio-loader.php`, the SQLite
+  integration and `wp-content/database/`) were never shipped. The local database was not written
+  to, and the local site's name and locale are left as they were (F7/F26).
 - Temporary files used to verify F1 (§V16) were deleted before committing: the simulation
   mu-plugin (`wp_set_current_user()`, re-created and deleted again for the `510e981` re-check)
   and the local evidence pages. The guide's pass (§V24) used the same device — a temporary

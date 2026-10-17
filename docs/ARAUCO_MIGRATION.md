@@ -109,6 +109,20 @@ titles; indicator/Pladetur data quality.
    export/seed procedure documented so environments are reproducible.
 5. **Verify** every change in a browser (F17 checklist in [ROADMAP.md](ROADMAP.md)).
 
+### 7.1 First deployment — executed 2026-10-17 (out of the order above)
+
+The client asked to publish the site, so a **direct-to-production** deployment happened before
+step 1 was closed, on the client's own Hostinger account (`observatorioarauco.cl`):
+
+- **Shipped**: the theme `otrn` and the six project mu-plugins, plus the **public** content set
+  (216 items). The seeded criteria, evaluations and sectors (F8/F18) were **left out**, and so was
+  the sample `guia` post (F27) — so the deployment does not publish the pending geography.
+- **Not published yet**: search engines are discouraged (`blog_public = 0`) until the client
+  approves the content, which includes the Rapa Nui copy of §3 and the §5 decisions.
+- **Still open for production**: the Rapa Nui copy (F7), the geography (F8/F18), the geoportal URL
+  (F9), the survey embed (F10) and the logo originals (F13) — the site carries its provisional
+  notices in the meantime. Evidence: [VERIFICATION.md](VERIFICATION.md) §V25.
+
 ## 8. New Arauco requirement — self-assessment location search (F19)
 
 Registered **2026-10-16** — **documentation only: not implemented, not approved**. It must
