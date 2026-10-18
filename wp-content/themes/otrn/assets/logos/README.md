@@ -33,6 +33,9 @@ Logotipos extraídos de las fotografías de `references/` y normalizados a WebP 
 ## Pendiente del cliente (no se descarga sin autorización)
 
 - [ ] **GORE Región del Bío-Bío** en alta resolución (PNG/SVG transparente).
-- [ ] **RAU · Consultores en Turismo** en alta resolución (PNG/SVG transparente).
+- [x] **RAU · Consultores en Turismo** — resuelto el 2026-10-18: el cliente señaló el archivo que ya
+      estaba en el repositorio, `assets/footer/logo-rau.png` (193×120, PNG con alfa), y el pie lo usa
+      como cuarto logo institucional. Sigue pendiente una versión en alta resolución si se quiere
+      ampliar.
 - [ ] Confirmar si **Municipalidad** y **Oficina de Turismo** se usan con fondo gris,
       se pasan a transparente, o se usa franja gris en el footer.

@@ -444,13 +444,21 @@ explicit UX/UI approval of the visuals**. Files: `header.php`, `functions.php`,
 
 ### F13 — Logo sourcing gaps
 
-- **Severity**: P2 · **Status**: Open — decision pending · **Evidence**:
+- **Severity**: P2 · **Status**: **Partially resolved 2026-10-18** (RAU added to the footer; GORE
+  still low-res) · **Evidence**:
   `assets/logos/README.md` ("Pendiente del cliente"): GORE logo only 160×283 (needs HD),
   RAU logo exists only inside a low-res strip, municipal/oficina logos carry an opaque
-  `#ECECEC` interior handled by the "chapa" treatment (`otrn-arauco.css:66-75`).
+  `#ECECEC` interior handled by the "chapa" treatment (`style.css:88-92`).
 - **Impact**: footer/branding quality; missing institution (RAU) in the Arauco footer.
 - **Proposed fix (not approved)**: request original assets; confirm chapa vs transparent PNGs.
 - **Verification**: asset swap + visual comparison.
+- **Update 2026-10-18**: the client pointed at the RAU logo and sent the reference strip with the
+  **four** institutions in order (GORE, Municipalidad, Oficina de Turismo, RAU). The logo was already
+  in the repository — `assets/footer/logo-rau.png` (193×120, RGBA with alpha), a leftover of the
+  original project that no template referenced (F12) — so the footer now carries four plates in that
+  order instead of three ([VERIFICATION.md](VERIFICATION.md) §V27). What remains open is the **GORE
+  original** (160×283 is too small to enlarge: at the row's common height the logo is the narrowest of
+  the four), and the confirmation of the "chapa" treatment against transparent PNGs.
 
 ### F14 — Three uncommitted files at risk
 

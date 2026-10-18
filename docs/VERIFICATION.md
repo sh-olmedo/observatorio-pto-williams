@@ -1647,3 +1647,60 @@ Deployed to production and LiteSpeed purged; the site's PHP error log gained no 
 - Keyboard, device (real phone) and CLS behaviour remain unverified, as in earlier rounds — and the
   whole visual layer is still pending the client's sign-off.
 
+## V27 — The footer's fourth logo: RAU (client request) — 2026-10-18
+
+**Reported by the client**, with the reference strip they want the row to follow: four institutions in
+that order — **GORE · Municipalidad de Arauco · Oficina de Turismo · RAU**— with RAU at the right end.
+
+**Diagnosis.** The footer carried **three** plates (`footer.php`), and the RAU logo was not used by any
+template: the file had been sitting in the repository since the original project —
+`assets/footer/logo-rau.png`, 193×120, RGBA with a real alpha channel — as an unreferenced leftover
+(F12/F13). The **original** footer of the project (commit `99092d1`) did use four logos, with a
+per-child height each (`.otrn-footer-logos img:nth-child(1..4){64/50/52/56px}`; mobile 48/38/40/42),
+and that rule set was dropped in `52a7d4d` when the Arauco logos went onto white "chapas" with a single
+height. So the reference strip is the project's own footer, not a new design.
+
+**Change.** One `<span class="otrn-footer-logo">` added to `footer.php`, in fourth place, with the
+logo's real dimensions (`width="193" height="120"`) and the alt text *"RAU · Consultores en Turismo"*.
+No CSS was touched: the existing plate (`background: var(--paper)`, one border, `border-radius`,
+`padding:14px 20px`) and the row's `space-between` already produce the four-in-a-row layout, and the
+mobile rule (`justify-content: center`, 40 px images) already wraps and centres.
+
+**Measured in a real browser** (local, same-origin iframes for narrow widths; all four images load):
+
+| Viewport | Row | Plates (width × height, in document order) |
+| --- | --- | --- |
+| 1280 px | 1 row, `space-between` | 69×78 · 166×78 · 178×78 · 119×78 |
+| 1024 px | 1 row | 69×78 · 166×78 · 178×78 · 119×78 |
+| 768 px | 1 row | 69×78 · 166×78 · 178×78 · 119×78 |
+| 600 px | 2 rows, centred | 65×70 · 145×70 / 155×70 · 106×70 |
+| 390 px | 2 rows, centred | 65×70 · 145×70 / 155×70 · 106×70 |
+
+The RAU logo renders at 77×48 px inside its 119 px plate (its 193×120 original at the row's common
+height). The footer's **height does not change on desktop** (177 px, before and after: the row is one
+plate tall), and it does not change at 390 px either (280 px, where three plates already wrapped into
+two rows); at 600 px the fourth plate makes the row wrap that one step earlier — 169 → 261 px — because
+the row needs 521 px with three plates and 660 px with four, against 536 px of content width. The
+copyright line is unchanged.
+
+**On production**, after deploying `footer.php` (the logo file was already there) and purging LiteSpeed:
+
+| Check | Result |
+| --- | --- |
+| `/`, `/indicadores/`, `/buenas-practicas/`, `/noticias/`, `/acerca/` | **4** `otrn-footer-logo` plates each, in order, with `alt="RAU · Consultores en Turismo"` |
+| `…/assets/footer/logo-rau.png` | `200`, `image/png`, 14 242 bytes |
+
+**NOT VERIFIED / open.**
+
+- **No screenshot was taken this round**: the harness desktop window was not visible, so the pictures
+  could not be captured. The geometry, the images' load state and the production HTML were measured,
+  but the *look* has not been looked at — the client's own view is the verification.
+- **The GORE logo is the narrowest of the four** (27 px wide at the row's common height) because the
+  source is a 160×283 portrait strip and the row equalises **height**, not width; the reference strip
+  appears to show it larger. Enlarging it would magnify a 160 px original (F13 asks for the HD file),
+  so the height was left alone rather than guessing.
+- The client's reference strip carries no white plates: the row keeps the "chapa" treatment that is
+  deployed today (the municipal and oficina logos have an opaque `#ECECEC` interior, so a bare row
+  would show grey rectangles). Confirm if the plates are to go.
+
+

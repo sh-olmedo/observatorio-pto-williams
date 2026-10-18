@@ -131,6 +131,11 @@ keeps `?ambito=` a listing filter instead of a taxonomy archive (F30), and the s
 registered **in code** by the new mu-plugin `otrn-campos.php` (F31) so the content is editable again.
 Evidence: §V26.
 
+**Client requests on the live site, same day (2026-10-18):** the footer was corrected to carry the
+**four** institutional logos of the reference strip — GORE, Municipalidad de Arauco, Oficina de Turismo
+and RAU — by adding the RAU logo that already existed in the repository and no template used (F13;
+§V27).
+
 ## 8. New Arauco requirement — self-assessment location search (F19)
 
 Registered **2026-10-16** — **documentation only: not implemented, not approved**. It must

@@ -174,7 +174,7 @@ when the CPT is empty (`otrn-autodiagnostico.php:239-250`).
 | Leaflet | unpkg CDN | Loaded only for the evaluations archive; no SRI (see SECURITY_AUDIT) |
 | StoryMaps | external iframe | Hardcoded URL in `page-geoportal.php:15` (F9) |
 | Survey embed | `embeds/encuesta-percepcion-rapanui.html` | Static HTML/SVG dashboard, **not referenced** by any template (F10) |
-| Legacy assets | `assets/footer/*`, `assets/hero-rapanui.jpg`, `assets/logo.png` | Not referenced by code (hero image only inside an unused helper) — F12 |
+| Legacy assets | `assets/footer/*`, `assets/hero-rapanui.jpg`, `assets/logo.png` | Not referenced by code (hero image only inside an unused helper) — F12. `assets/footer/logo-rau.png` is the exception since 2026-10-18: the footer uses it as the fourth institutional logo (F13) |
 
 ## 8. Data flows
 

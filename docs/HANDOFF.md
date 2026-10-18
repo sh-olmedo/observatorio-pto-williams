@@ -107,6 +107,22 @@ database change):
   look, not the client's sign-off**, and the F1 navigation, F2/F6 identity and this round all
   remain **pending the client's visual review**.
 
+**Update 2026-10-18 (segunda parte — el cuarto logo del pie):** el cliente señaló que faltaba corregir
+el pie y envió la referencia con los **cuatro** logos institucionales en orden: GORE · Municipalidad de
+Arauco · Oficina de Turismo · **RAU**. El logo de RAU ya estaba en el repositorio desde el proyecto
+original (`assets/footer/logo-rau.png`, 193×120, PNG con alfa) y **ninguna plantilla lo usaba**; el pie
+llevaba tres chapas. Se añadió el cuarto (`footer.php`, sin tocar CSS: la chapa y el `space-between` ya
+daban el diseño) y se desplegó. Medido en navegador real a 1280/1024/768 px (una fila) y 600/390 px
+(dos filas centradas); en producción las cinco rutas públicas sirven las cuatro chapas en orden y el
+archivo responde `200 image/png` ([VERIFICATION.md](VERIFICATION.md) §V27).
+
+**Open after this round:** no **screenshot** was possible (the harness desktop window was not visible),
+so the look of the row is unverified by us — the client's view is the check. The **GORE** logo stays the
+narrowest of the four (27 px at the row's common height) because its source is a 160×283 portrait and
+enlarging it would magnify a low-res file: the HD original is still pending (F13). And the reference
+strip carries no white plates, so if the "chapa" treatment is to go, that is a design decision for the
+client.
+
 **Update 2026-10-18 (sixteenth round — the client reported that administrators "cannot edit"):** the
 report came with two screenshots from the published site — a `buena_practica` edit screen with an
 **empty main column**, and `edit.php?ambito=economico&post_type=indicador` answering *"You need a
@@ -215,7 +231,7 @@ loader remains.
 | Arauco geography: sector list + coordinates | F8 | Client (Phase 4) |
 | Geoportal StoryMap URL (scope unknown) | F9 | Client (Phase 4) |
 | Survey embed fate | F10 | Client (Phase 4) |
-| HD/transparent logos (GORE, RAU) | F13 | Client (Phase 4) |
+| HD/transparent logos: **GORE** (the RAU one was resolved 2026-10-18 — the repository already had it and the footer now uses it) | F13 | Client (Phase 4) |
 | DB content inventoried at count level (2026-10-15): pages, 74 criteria, 10 sectors, 6 evaluations, 3 data cards; copy migration still pending | F18 | Team (Phase 4) |
 | Geocoding provider + usage policy for the location search (rate limits, attribution, caching; browser-direct vs server proxy) | F19 | Client/team (before Phase 6) |
 | Fate of the curated sector list and of the location metas under the new search picker | F8 ↔ F19 | Client/team (Phase 4/6) |

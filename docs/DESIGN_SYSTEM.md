@@ -301,7 +301,7 @@ These must not be adopted as brand tokens without explicit approval. The brief's
 | Token layering | Three overlapping systems | One (`style.css :root`) | **Resolved** (F6) |
 | Suite of colours | 14 tokens, 3 semantic pairs | 26 tokens incl. 4 status pairs + rhythm + pill radius | Applied |
 | Typography | Montserrat + IBM Plex Mono, but Manrope requested | Montserrat + IBM Plex Mono via `--font-title`/`--font-mono` | Resolved (Manrope) |
-| Institutional logos | 3 Arauco logos, GORE low-res, RAU absent | Same 3 logos, now on white plates with one height | Source material still pending (F13) |
+| Institutional logos | 3 Arauco logos, GORE low-res, RAU absent | **4** logos (GORE · Municipalidad · Oficina de Turismo · RAU) on white plates with one height | RAU added 2026-10-18 from `assets/footer/logo-rau.png`; the GORE original is still pending (F13) |
 | Rapa Nui leftovers | Present in copy/tokens/theme name | Tokens cleaned; **copy/theme name untouched** | Migration pending (F7–F10) |
 | Scene text over photographs | Veils that missed the text (F21) | Vertical static veil above 768 px + pixel-stop immersive veil; at ≤768 px a gauze with a **glass plate on the lead** (tint 0,35) and a text-shadow for the rest | Applied; the lead is 4,12-4,44:1 on its worst pixel, the copy off the plate is raw below AA — client decision open (F21, F23) |
 
