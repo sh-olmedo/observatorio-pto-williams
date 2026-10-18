@@ -554,6 +554,25 @@ function otrn_enqueue_assets() {
 add_action( 'wp_enqueue_scripts', 'otrn_enqueue_assets' );
 
 /**
+ * URL de un asset fijo del tema, con marca de versión.
+ *
+ * Los archivos estáticos se sirven con caché larga (7 días), así que al
+ * reemplazar un archivo por otro del mismo nombre —logos del pie, por
+ * ejemplo— el navegador seguiría mostrando el anterior. La marca es la fecha
+ * del archivo, igual que en los assets encolados (`otrn_enqueue_assets`), y
+ * cambia sola cuando el archivo cambia.
+ *
+ * @param string $ruta Ruta relativa al tema hijo, p. ej. `assets/favicon.png`.
+ * @return string URL con `?v=<fecha>`.
+ */
+function otrn_asset( $ruta ) {
+	$archivo = get_theme_file_path( $ruta );
+	$version = file_exists( $archivo ) ? (string) filemtime( $archivo ) : '0';
+
+	return add_query_arg( 'v', $version, get_theme_file_uri( $ruta ) );
+}
+
+/**
  * Imagen del hero de la portada.
  *
  * Prioriza lo que el editor cargue desde wp-admin (imagen destacada de la

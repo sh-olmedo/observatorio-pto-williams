@@ -18,9 +18,9 @@
 		<a class="otrn-brand" href="<?php echo esc_url( home_url( '/' ) ); ?>">
 			<img
 				class="otrn-brand-logo"
-				src="<?php echo esc_url( get_theme_file_uri( 'assets/logos/oficina-turismo-arauco.webp' ) ); ?>"
-				width="1289"
-				height="456"
+				src="<?php echo esc_url( otrn_asset( 'assets/logos/oficina-turismo-arauco.webp' ) ); ?>"
+				width="800"
+				height="284"
 				alt="Observatorio Turístico de Arauco — Oficina de Turismo, Municipalidad de Arauco"
 			>
 		</a>

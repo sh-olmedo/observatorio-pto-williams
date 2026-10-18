@@ -79,15 +79,16 @@ body.otrn > .otrn-footer{flex:0 0 auto;}
 .otrn-nav a.active{color:var(--primary-dark);font-weight:800;}
 
 /* ---- Footer ------------------------------------------------------------
-   Franja con los tres logos institucionales de Arauco (GORE del Bío-Bío,
-   Municipalidad y Oficina de Turismo). Una sola pieza para la portada y las
-   páginas internas. Los logos de Municipalidad y Oficina traen un fondo gris
-   interior opaco (assets/logos/README.md), así que cada uno va sobre una
-   «chapa» blanca clara: el recorte se lee como sello institucional. Sin
-   sombras, para mantener el lenguaje plano municipal. */
+   Franja con los cuatro logos institucionales de Arauco: GORE del Bío-Bío,
+   Municipalidad, Oficina de Turismo y RAU Consultores en Turismo, en ese
+   orden. Una sola pieza para la portada y las páginas internas. Los cuatro
+   son PNG/WebP con transparencia real (los originales del cliente se
+   recortaron en `assets/logos/README.md`), así que van sueltos sobre el
+   fondo: sin «chapa», sin borde y sin sombras, como en la referencia del
+   cliente. La fila iguala la altura, no el ancho. */
 .otrn-footer{margin-top:60px;background:var(--cream);padding:40px 0;}
 .otrn-footer-logos{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:24px;}
-.otrn-footer-logo{display:flex;align-items:center;justify-content:center;background:var(--paper);border:1px solid var(--grey);border-radius:var(--radius);padding:14px 20px;}
+.otrn-footer-logo{display:flex;align-items:center;justify-content:center;}
 .otrn-footer-logo img{display:block;width:auto;height:48px;object-fit:contain;}
 .otrn-footer-copy{text-align:center;color:var(--text2);font-size:12.5px;margin-top:28px;}
 
