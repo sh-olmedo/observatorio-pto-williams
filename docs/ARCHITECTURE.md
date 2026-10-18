@@ -89,7 +89,9 @@ Tracked files at audit: **792**.
   a **hardcoded nav list** (not a WP menu), a login/logout button and the mobile burger
   button. The private "Evaluación de sostenibilidad" link only shows to logged-in users
   (`header.php:36-38`).
-- `footer.php` renders three institutional logos and the copyright line (`footer.php:10-27`).
+- `footer.php` renders four institutional logos (GORE, Municipalidad, Oficina de Turismo, RAU) and the
+  copyright line (`footer.php:10-33`). The four files carry real transparency, so there is no plate
+  behind them; each URL goes through `otrn_asset()` ([VERIFICATION.md](VERIFICATION.md) §V28).
 - Templates must exist as **pages with the slugs above** in the database; the templates
   are matched by the `page-<slug>.php` convention, not by a `Template Name` header
   (no template headers exist). See F18.
@@ -118,10 +120,12 @@ Tracked files at audit: **792**.
 | `otrn-landing` | `assets/css/otrn-landing.css` | **Front page only** | Landing layout + burger/panel CSS (F1) |
 | `gsap`, `otrn-scrolltrigger`, `otrn-landing` | `assets/vendor/*`, `assets/otrn-landing.js` | **Front page only** | Version fallbacks "3.12.5" |
 
-Other helpers in `functions.php`: `otrn_cargar_criterios()` (:153), `otrn_noticias_url()` (:301),
-`otrn_hero_portada_url()` (:469 — last-resort fallback to the Rapa Nui hero image, unused by
-any template), `otrn_mision_portada()` (:492), `otrn_datos_portada()` (:508),
-`otrn_material_secciones()` (:579), `otrn_acerca_url()` (:868). Image sizes:
+Other helpers in `functions.php`: `otrn_cargar_criterios()` (:153), `otrn_noticias_url()` (:360),
+`otrn_asset()` (:568 — theme-asset URL carrying `?v=<filemtime>`, used by the header brand logo and
+the four footer logos so a replaced file of the same name is not served from a stale browser cache),
+`otrn_hero_portada_url()` (:584 — last-resort fallback to the Rapa Nui hero image, unused by any
+template), `otrn_mision_portada()` (:611), `otrn_datos_portada()` (:623),
+`otrn_material_secciones()` (:694), `otrn_acerca_url()` (:1164). Image sizes:
 `otrn-noticia` 1120×560, `otrn-noticia-card` 640×400 (`add_image_size` in `otrn_setup_theme()`).
 
 ## 5. mu-plugins
@@ -168,7 +172,7 @@ when the CPT is empty (`otrn-autodiagnostico.php:239-250`).
 | --- | --- | --- |
 | Fonts | `assets/fonts/*.woff2` | Montserrat (400–800) + IBM Plex Mono (400–700), subset latin, `font-display:swap` |
 | Landing images | `assets/img/arauco/` | WebP/JPG derived from `references/web/` (EXIF stripped) |
-| Institutional logos | `assets/logos/` | Arauco footer/header logos (sourcing gaps — F13) |
+| Institutional logos | `assets/logos/` | Arauco footer/header logos, **transparent WebP** derived from the client's originals in `references/logos/` (the GORE source is still low-res — F13). Emitted through `otrn_asset()` |
 | Guide figures | `assets/guias/` | 12 real screenshots of the guide's own views (1618 px wide, DPR 2). They are theme assets, so any anonymous request that knows the URL gets the bytes — which is why the guide deliberately ships **no** figure of the private listing/map ([VERIFICATION.md](VERIFICATION.md) §V24.5) |
 | Vendor JS | `assets/vendor/` | GSAP + ScrollTrigger + SheetJS (`xlsx.full.min.js`), self-hosted |
 | Leaflet | unpkg CDN | Loaded only for the evaluations archive; no SRI (see SECURITY_AUDIT) |

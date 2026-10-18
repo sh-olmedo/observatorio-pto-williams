@@ -1702,5 +1702,115 @@ copyright line is unchanged.
 - The client's reference strip carries no white plates: the row keeps the "chapa" treatment that is
   deployed today (the municipal and oficina logos have an opaque `#ECECEC` interior, so a bare row
   would show grey rectangles). Confirm if the plates are to go.
+  **Resolved 2026-10-18 — see §V28.**
+
+## V28 — Footer without plates: the client's originals, made transparent — 2026-10-18
+
+The client answered the two questions of §V27: **leave the GORE logo as it is** and **get transparent
+PNGs, then take the white "chapas" off the footer**. The same day they delivered four logo files
+(folder `LOGOS`), archived untouched in `references/logos/` (with their md5):
+
+| File | Institution | Size | Format | Alpha |
+| --- | --- | --- | --- | --- |
+| `gore-region-biobio.png` | GORE del Bío-Bío | 160×283 | PNG | ❌ |
+| `municipalidad-arauco.jpg` | Municipalidad de Arauco | 5333×3000 | JPEG | ❌ |
+| `oficina-turismo-arauco-color.png` | Oficina de Turismo (colour) | 2550×857 | PNG | ❌ |
+| `oficina-turismo-arauco-negro.png` | Oficina de Turismo (black) | 2550×857 | PNG | ✅ |
+
+Only the **black** Oficina variant carries real transparency, and the footer's reference strip uses the
+**colour** one, so the assets in use still had to be produced here. Two corrections to what §V27 and
+`assets/logos/README.md` assumed:
+
+- The municipal and oficina assets in the theme had a **pure white `#FFFFFF`** background (568 837 and
+  299 496 white pixels measured), **not** the `#ECECEC` an earlier reading attributed to them. The
+  plates are what hid that white box — and the same file is the header's brand logo, painted on
+  `--cream` since the beginning, so the header carried a faint white rectangle too.
+- The **GORE** arrived in the same 160×283 resolution as before (no HD file): F13 stays open by the
+  client's own decision.
+
+### V28.1 Assets generated (and how)
+
+Built with a one-off pure-Python script (this machine has no Pillow/ImageMagick; `sips` was used only to
+convert the JPEG to PNG and to read properties):
+
+1. **Flood fill from the border** (`min(R,G,B) >= 240`) for Municipalidad and the colour Oficina: only
+   the white *connected to the edge* disappears, so enclosed whites (the shield's white half, the
+   counters of the letters) stay opaque.
+2. **Soft matte** (ramp: `min(channel) <= 238` opaque → `>= 250` transparent) for the GORE, whose
+   artwork touches all four edges and blocks the fill: a border fill only reached 25–29 % of its
+   background.
+3. Trim to the opaque box **+ 24 px** of margin (the convention of the previous stage, so the apparent
+   size does not change) and downscale to 800 px wide (GORE stays at its original size).
+4. **WebP q92, lossless alpha** (`cwebp -alpha_q 100`).
+
+| Asset (theme) | Size | Weight | Transparent | Previous asset |
+| --- | --- | --- | --- | --- |
+| `assets/logos/municipalidad-arauco.webp` | 800×309 | 32 KB | 65,4 % | 1513×586, 59 KB, opaque white |
+| `assets/logos/oficina-turismo-arauco.webp` | 800×284 | 35 KB | 59,9 % | 1289×456, 52 KB, opaque white |
+| `assets/logos/gore-region-biobio.webp` | 160×283 | 16 KB | 33,9 % | 160×283, 14 KB, opaque near-white |
+| `assets/footer/logo-rau.png` | 193×120 | 14 KB | — | unchanged (already RGBA) |
+
+Checked per file: the four corners have alpha 0, and the three new files decode back from WebP with a
+real alpha channel (`dwebp` round trip). The client's originals were never modified.
+
+### V28.2 The plates are gone
+
+`style.css:88-92`: `.otrn-footer-logo` keeps only `display:flex;align-items:center;justify-content:center`
+— the `background`, the 1 px border, the radius and the `14px 20px` padding are gone — and the block
+comment above the footer was rewritten. The image rule (`height:48px`, `object-fit:contain`) and the
+mobile height (40 px) are unchanged, so the logos keep the size they had; what disappears is the box.
+
+### V28.3 Cache-busting (`otrn_asset()`)
+
+Theme assets are served with `cache-control: public, max-age=604800` (measured again this round), and the
+logo files **keep their names** while their content changed: a browser that had already loaded them
+would show the old opaque pictures against the plate-less CSS for up to a week. New helper
+`otrn_asset()` (`functions.php`, beside the enqueue block) appends `?v=<filemtime>` — the same convention
+the enqueued CSS/JS already use — and `footer.php` (four logos) plus `header.php` (brand logo) use it. The
+header image's `width`/`height` attributes went from 1289×456 to 800×284 (aspect 2,827 → 2,817, i.e. the
+painted box is unchanged).
+
+### V28.4 Measurements (local site, real browser)
+
+| Viewport | Logo row | Footer height | Painted logos |
+| --- | --- | --- | --- |
+| 1280 px | 1 row | 147 px (was 177) | 27×48 GORE · 124×48 Municipalidad · 135×48 Oficina · 77×48 RAU |
+| 390 px | 2 centred rows | 220 px (was 280) | same assets, 40 px high |
+
+- Computed style of every `.otrn-footer-logo`: `background-color: rgba(0, 0, 0, 0)`, `border: 0px none`,
+  `padding: 0px` — no plate left.
+- The four images load (`naturalWidth > 0`) at their real sizes 160×283 / 800×309 / 800×284 / 193×120, and
+  the five logo URLs carry `?v=` (theme files) as designed.
+
+### V28.5 Deployment and production checks
+
+`functions.php`, `header.php`, `footer.php`, `style.css` and the three WebP files were uploaded (one
+`rsync` per file, mtime preserved) after copying the previous versions to
+`~/backups-arauco-20261016-2141/pie-sin-chapa/`; all seven files **md5-match** the repository. LiteSpeed
+purged (`Success: Purged All!`), then:
+
+| Check | Result |
+| --- | --- |
+| `/`, `/indicadores/`, `/buenas-practicas/`, `/noticias/`, `/acerca/` | **4** `class="otrn-footer-logo"` each, in order |
+| `…/assets/logos/municipalidad-arauco.webp` | `200` `image/webp`, 32 874 bytes, `last-modified` 2026-10-18 |
+| `…/assets/logos/oficina-turismo-arauco.webp` | `200` `image/webp`, 36 030 bytes |
+| `…/assets/logos/gore-region-biobio.webp` | `200` `image/webp`, 16 234 bytes |
+| Header brand logo | `?v=`, `200` `image/webp`, 36 030 bytes |
+| `…/themes/otrn/style.css` | `4dc2c18378e659496621ae54f95190ad` = local; lines 90-92 carry no plate |
+
+### V28.6 NOT VERIFIED / open
+
+- **No screenshot again**: the harness desktop window was not visible, so no picture could be taken. As a
+  substitute, a composed preview — the four logos at 48 px and at 120 px on the real footer background
+  (`--cream`) plus the previous opaque assets at 48 px for comparison — was generated and shown to the
+  user. The client's own look remains the verification.
+- The GORE background removal is the least clean of the three (soft matte over a 160 px photo
+  extraction, F13). If the client ever provides an HD transparent GORE, only that file needs replacing.
+- The **black** Oficina de Turismo variant (the only delivered file with alpha) is archived in
+  `references/logos/` and unused: the strip's colour version is what is deployed. Confirm if it is wanted
+  anywhere.
+- The footer is now 30 px shorter on desktop (147 vs 177) because the plate padding is gone. The logo
+  height was deliberately left at 48 px (40 px on mobile) — enlarging it is a design decision for the
+  client.
 
 

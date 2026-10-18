@@ -24,7 +24,7 @@ Legend: ✅ Completed (static) · 🟡 Provisional · ⏳ Pending · ❓ Unverif
 | Element | Evidence |
 | --- | --- |
 | Header brand = Oficina de Turismo Arauco logo | `header.php:20-25` |
-| Footer = 3 Arauco institutional logos + Arauco copyright | `footer.php:10-27` |
+| Footer = 4 Arauco institutional logos (transparent files, no plates) + Arauco copyright | `footer.php:10-33` |
 | Landing photos sourced from approved Arauco references | `assets/img/arauco/`, `references/web/README.md` |
 | Landing narrative rebranded ("Narrativa territorial de Arauco", 5 scenes) | `front-page.php:1-25, 76` |
 | Arauco design layer for the front page | `assets/css/otrn-arauco.css` |
@@ -74,8 +74,8 @@ see §8.
 | Geoportal ArcGIS StoryMaps URL (scope unknown) | `page-geoportal.php:15` | Replace with Arauco story, keep, or remove (F9). **The guide's figure `assets/guias/geoportal.webp` captures the current story** (another region's viewer), so it has to be re-captured when the URL is decided ([VERIFICATION.md](VERIFICATION.md) §V24.5) |
 | Survey dashboard "Percepción de Rapa Nui" (unreferenced) | `embeds/encuesta-percepcion-rapanui.html:6,20` | Reuse/adapt, replace, or delete (F10) |
 | Legacy brand assets: `assets/footer/logo-{corfo,corfo-valparaiso,rau}.png`, `assets/hero-rapanui.jpg`, `assets/logo.png` | Unreferenced (hero only inside unused helper `functions.php:469-485`) | Archive or delete (F12) |
-| GORE logo low-res; RAU logo missing | `assets/logos/README.md` ("Pendiente del cliente") | Request HD originals from client (F13) |
-| Municipal/oficina logo opaque backgrounds | `assets/logos/README.md`; "chapa" treatment in `otrn-arauco.css:66-75` | Accept chapa, get transparent PNGs, or recolor footer |
+| GORE logo still low-res — client decided (2026-10-18) **not** to replace it for now; the other three logos are resolved | `references/logos/`, `assets/logos/README.md` | Request an HD GORE original whenever the client has it (F13) |
+| ~~Municipal/oficina logo opaque backgrounds~~ **Resolved 2026-10-18**: transparent assets derived from the client's originals and the white "chapas" removed | `references/logos/`, `assets/logos/`, `style.css:88-92` ([VERIFICATION.md](VERIFICATION.md) §V28) | — |
 | Municipal palette (`#0070FF`, `#41BCFF`, `#DE232B`, `#0C1434`, `#0C0D0E`, `#D6D5D5`) | **Implemented 2026-10-16** (`52a7d4d`); roles verified against `muniarauco.cl` (`primary #0070FF`, `secondary #DE232B`, `accent #41BCFF`, `text #000000`; `#0C1434` unverifiable, `#0C0D0E`/`#D6D5D5` are Elementor defaults and were **not** adopted) | **Applied**; pending the client's visual sign-off (F2, [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) §2, mapping §13 of the audit) |
 | `--aru-*` palette interpretation | Deleted in `52a7d4d` (`otrn-arauco.css` no longer defines tokens) | **Resolved** (F6): single source of truth in `style.css :root` |
 

@@ -93,7 +93,7 @@ login anonymously. Measurements on the host: [VERIFICATION.md](VERIFICATION.md) 
 | F11 | Private section enforced only at HTML render | P1 | Security | 1 |
 | F11b | REST exposure of private content (unverified) | P1 | Privacy | 1 |
 | F12 | Orphaned Rapa Nui brand assets | P3 | Cleanup decision | 4 |
-| F13 | Logo sourcing gaps (GORE low-res, RAU missing) | P2 | Branding decision | 4 |
+| F13 | Logo sourcing gaps (GORE still low-res) | P2 | Branding decision | 4 |
 | F14 | Three uncommitted files at risk | P1 | Process/Git | 0 |
 | F15 | Documentation artifacts referenced but absent | P2 | Documentation | 0/5 |
 | F16 | Hybrid theme architecture (fallback routes) | P3 | Architecture | 5 |
@@ -444,11 +444,13 @@ explicit UX/UI approval of the visuals**. Files: `header.php`, `functions.php`,
 
 ### F13 — Logo sourcing gaps
 
-- **Severity**: P2 · **Status**: **Partially resolved 2026-10-18** (RAU added to the footer; GORE
-  still low-res) · **Evidence**:
-  `assets/logos/README.md` ("Pendiente del cliente"): GORE logo only 160×283 (needs HD),
-  RAU logo exists only inside a low-res strip, municipal/oficina logos carry an opaque
-  `#ECECEC` interior handled by the "chapa" treatment (`style.css:88-92`).
+- **Severity**: P2 · **Status**: **Mostly resolved 2026-10-18** (RAU added to the footer; the four logos
+  now carry real transparency and the plates are gone; the GORE original is still 160×283 **by the
+  client's decision**) · **Evidence**:
+  `references/logos/README.md` (the client's untouched originals) and
+  `wp-content/themes/otrn/assets/logos/README.md`: GORE logo only 160×283 (needs HD); Municipalidad
+  (JPEG 5333×3000) and Oficina de Turismo (PNG 2550×857) delivered **without alpha**, so the theme's
+  transparent assets were derived here; the black Oficina variant is the only file with alpha.
 - **Impact**: footer/branding quality; missing institution (RAU) in the Arauco footer.
 - **Proposed fix (not approved)**: request original assets; confirm chapa vs transparent PNGs.
 - **Verification**: asset swap + visual comparison.
@@ -459,6 +461,14 @@ explicit UX/UI approval of the visuals**. Files: `header.php`, `functions.php`,
   order instead of three ([VERIFICATION.md](VERIFICATION.md) §V27). What remains open is the **GORE
   original** (160×283 is too small to enlarge: at the row's common height the logo is the narrowest of
   the four), and the confirmation of the "chapa" treatment against transparent PNGs.
+- **Update 2026-10-18 (second round)**: the client decided — GORE untouched, white "chapas" removed once
+  transparent PNGs were available — and delivered the four logo files. Only the black Oficina variant has
+  real alpha, so `municipalidad-arauco.webp`, `oficina-turismo-arauco.webp` and `gore-region-biobio.webp`
+  were regenerated from the client's originals (border flood fill for the first two, soft white matte for
+  the GORE, WebP q92 with lossless alpha), the plate styling was removed from `style.css:88-92` and a new
+  `otrn_asset()` helper appends `?v=<filemtime>` so browsers do not keep the old opaque files for a week
+  ([VERIFICATION.md](VERIFICATION.md) §V28). Still open: the **GORE HD original** and whether the black
+  Oficina variant is wanted anywhere.
 
 ### F14 — Three uncommitted files at risk
 

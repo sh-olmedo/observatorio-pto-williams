@@ -78,5 +78,6 @@ When you change the site, update the documents that are affected:
 - `README.md` (repo root) — repository scope table (what is and isn't versioned), Spanish.
 - `STUDIO.md` — WordPress Studio operations; always prefix WP-CLI with `studio wp`.
 - `references/web/README.md` — approved photo inventory (EXIF-free web copies).
-- `wp-content/themes/otrn/assets/logos/README.md` — logo sourcing status and client pendings.
+- `references/logos/README.md` — the client's original logo files (2026-10-18), untouched, with md5s.
+- `wp-content/themes/otrn/assets/logos/README.md` — the theme's transparent logo assets and their pendings.
 - `wp-content/themes/otrn/assets/fonts/README.md` — self-hosted font inventory.

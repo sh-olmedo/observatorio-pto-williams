@@ -484,6 +484,11 @@ authorised for removal) is kept.
   (2026-10-16) **not to ship Poppins**, so it stays documented instead.
 - **`--accent` is decorative.** #41BCFF is 2.13:1 on white, so it is used for icon/spots only
   (`.otrn-dato-lite__ico`), never for text.
+- **Footer plates removed (2026-10-18).** §9 measured the footer as "48 px logos in white 'chapas'"
+  and §10 recommended giving the plate a token. The client asked for the plates to go once transparent
+  logos existed, so the plate declaration was deleted from `.otrn-footer-logo` (`style.css:88-92`) and
+  the four logo files were regenerated with real alpha from the client's originals
+  ([VERIFICATION.md](VERIFICATION.md) §V28); there is no plate to tokenise.
 - **Retained legacy token names** (`--cream`, `--lgrey`, `--paper`, `--dark`, `--text2`) to keep
   the diff reviewable; their values are municipal/neutral, and the names are documented here.
 - **Remaining gap, decided:** non-text contrast (WCAG 1.4.11) for form-control borders — the

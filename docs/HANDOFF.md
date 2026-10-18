@@ -107,6 +107,29 @@ database change):
   look, not the client's sign-off**, and the F1 navigation, F2/F6 identity and this round all
   remain **pending the client's visual review**.
 
+**Update 2026-10-18 (tercera parte — el pie sin «chapas»):** el cliente respondió las dos preguntas del
+§V27: **dejar el GORE como está** y **quitar las chapas** una vez con PNG transparentes. Envió sus cuatro
+archivos (`~/Downloads/LOGOS/`, guardados intactos en `references/logos/`): la Municipalidad en JPEG
+5333×3000 **sin alfa**, la Oficina de Turismo en color 2550×857 **sin alfa**, el GORE en el mismo
+160×283 de siempre **sin alfa**, y la Oficina de Turismo **negra** (la única con alfa, y no es la que usa
+el pie). Como el pie usa la versión **color**, los assets se generaron aquí: relleno desde el borde para
+quitar el blanco de Municipalidad y Oficina (los blancos interiores del escudo y de las letras se
+conservan) y un recorte suave por umbral para el GORE, cuyo arte toca los cuatro bordes; margen de 24 px
+y salida WebP q92 con alfa sin pérdida. Se quitó la chapa de `style.css:88-92` (fondo, borde, radio y
+relleno) y se añadió `otrn_asset()`, que agrega `?v=<fecha del archivo>`: los assets se sirven con 7 días
+de caché y estos archivos **conservan el nombre**. Medido en navegador real: una fila a 1280 px
+(27 · 124 · 135 · 77 px de ancho, 48 px de alto) y el pie pasa de 177 a 147 px; a 390 px, dos filas
+(280 → 220 px). En producción las cinco rutas públicas sirven los cuatro logos sin chapa, los tres WebP
+responden `200 image/webp` con el tamaño nuevo y `style.css` coincide con el repositorio
+([VERIFICATION.md](VERIFICATION.md) §V28).
+
+**Open after this round:** sigue sin **captura de pantalla** (la ventana del harness no era visible):
+como sustituto se generó un montaje de comprobación —los cuatro logos a 48 y 120 px sobre el fondo real
+del pie, más los archivos anteriores para comparar— y se le mostró al usuario; la mirada del cliente
+sigue siendo la verificación. El **GORE** continúa siendo el original de 160×283 (decisión del cliente)
+y su recorte es el menos limpio de los tres (F13). Queda además por confirmar si la variante **negra** de
+la Oficina de Turismo se quiere en algún lugar del sitio.
+
 **Update 2026-10-18 (segunda parte — el cuarto logo del pie):** el cliente señaló que faltaba corregir
 el pie y envió la referencia con los **cuatro** logos institucionales en orden: GORE · Municipalidad de
 Arauco · Oficina de Turismo · **RAU**. El logo de RAU ya estaba en el repositorio desde el proyecto
@@ -121,7 +144,8 @@ so the look of the row is unverified by us — the client's view is the check. T
 narrowest of the four (27 px at the row's common height) because its source is a 160×283 portrait and
 enlarging it would magnify a low-res file: the HD original is still pending (F13). And the reference
 strip carries no white plates, so if the "chapa" treatment is to go, that is a design decision for the
-client.
+client. **Resolved**: the client asked for the plates to go and the logos are transparent as of the third
+part of this round ([VERIFICATION.md](VERIFICATION.md) §V28).
 
 **Update 2026-10-18 (sixteenth round — the client reported that administrators "cannot edit"):** the
 report came with two screenshots from the published site — a `buena_practica` edit screen with an
@@ -184,10 +208,10 @@ deployed. The client's visual sign-off is of course still pending.
 | Item | Value |
 | --- | --- |
 | Branch | `main` — now tracking `origin/main`; the first push (2026-10-17) sent the full history |
-| HEAD | `c5fba94` — `docs(arauco): registrar el TTL de caché de navegador del HTML (§V25.8)` (pushed; this documentation commit follows it) |
-| History | `99092d1` repo init → `70b22a7` "portada scrollytelling inmersiva + branding Arauco (ETAPA A+B+C)" → `5f43933` "modo dual estatico/inmersivo" → `f506104` docs baseline → `bb38d8b` runtime record → `8d3d40b` F11b protections → `d4fa738` F19 docs → `0dd2de4` F1 nav → `e727756` F1 regression fix → `932986b` F1 docs → `5f17b38` F1 grouped navigation → `57e09a8` F1 redesign docs → `510e981` F1 dropdown spacing fix → `cd9fd09` F1 spacing docs → `9aeaa82` design-token audit docs → `52a7d4d` municipal token consolidation → `d691f03` token docs → `3dbfbc6` dropdown hover fix (F1) → `9142179` drawer contrast fix (F2) → `0d35f84` client-review docs → `e2c3a9f` home legibility + KPI affordance fix (F20, F21) → `f40cb52` home-review docs → `ce9a093` four decisions closed (docs) → `649b01f` mobile glass pass (F21) → `94714ff` mobile glass docs → `05d2ecb` glass on the lead only (F21) → `7f93114` fourth-round docs → `bef8332` plate values set by the client (F21) → `90bf739` sticky footer (F24) → `a360fcc` sticky-footer docs → `d706872` user guide (F25-F27) → `c0fc3ce` user-guide docs → `1b19d5c` F25 title fix → `b51a521` first-deployment docs → `c5fba94` cache-TTL docs → this documentation commit (all pushed to `origin/main`) |
+| HEAD | `d332ac2` — `fix(arauco): pie sin «chapas» con los logos transparentes del cliente (F13)` (this documentation commit follows it) |
+| History | `99092d1` repo init → `70b22a7` "portada scrollytelling inmersiva + branding Arauco (ETAPA A+B+C)" → `5f43933` "modo dual estatico/inmersivo" → `f506104` docs baseline → `bb38d8b` runtime record → `8d3d40b` F11b protections → `d4fa738` F19 docs → `0dd2de4` F1 nav → `e727756` F1 regression fix → `932986b` F1 docs → `5f17b38` F1 grouped navigation → `57e09a8` F1 redesign docs → `510e981` F1 dropdown spacing fix → `cd9fd09` F1 spacing docs → `9aeaa82` design-token audit docs → `52a7d4d` municipal token consolidation → `d691f03` token docs → `3dbfbc6` dropdown hover fix (F1) → `9142179` drawer contrast fix (F2) → `0d35f84` client-review docs → `e2c3a9f` home legibility + KPI affordance fix (F20, F21) → `f40cb52` home-review docs → `ce9a093` four decisions closed (docs) → `649b01f` mobile glass pass (F21) → `94714ff` mobile glass docs → `05d2ecb` glass on the lead only (F21) → `7f93114` fourth-round docs → `bef8332` plate values set by the client (F21) → `90bf739` sticky footer (F24) → `a360fcc` sticky-footer docs → `d706872` user guide (F25-F27) → `c0fc3ce` user-guide docs → `1b19d5c` F25 title fix → `b51a521` first-deployment docs → `c5fba94` cache-TTL docs → `5f02910` F28 theme watchdog → `a7b33eb` F28 incident docs → `150067f` F29 permissions + F30 public ámbito filter + F31 editable fields → `fd08360` fourth footer logo, RAU (F13) → `d332ac2` footer without plates (F13) → this documentation commit |
 | Remote | `https://github.com/sh-olmedo/observatorio-arauco.git` |
-| Tracked files | 822 at this commit (`otrn-vigilante-tema.php`, the F28 watchdog, is the only addition since `d706872`: 821 there, 805 at `a360fcc` — `d706872` added 16, `guias-contenido.php`, `assets/css/otrn-guias.css`, `assets/otrn-guias.js`, the 12 screenshots under `assets/guias/` and `mu-plugins/otrn-privacidad-guias.php`) |
+| Tracked files | 828 at this commit (`d332ac2` added the five `references/logos/` files — the client's four originals plus their README — on top of the 823 left by `a7b33eb`/`150067f`; `d706872` had 821, `a360fcc` 805) |
 
 ## Working tree — 1 remaining file (do not commit)
 
