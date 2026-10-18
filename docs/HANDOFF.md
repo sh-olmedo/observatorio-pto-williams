@@ -107,6 +107,48 @@ database change):
   look, not the client's sign-off**, and the F1 navigation, F2/F6 identity and this round all
   remain **pending the client's visual review**.
 
+**Update 2026-10-18 (sixteenth round — the client reported that administrators "cannot edit"):** the
+report came with two screenshots from the published site — a `buena_practica` edit screen with an
+**empty main column**, and `edit.php?ambito=economico&post_type=indicador` answering *"You need a
+higher level of permission."*. Three separate, pre-existing defects were behind them, all reproduced
+on production and all fixed the same day:
+
+- **F29 — custom capabilities granted too late.** The four grants ran on `admin_init`, i.e. after
+  `wp-settings.php` had already built the current user (line 766) and taken the `allcaps` snapshot, so
+  `current_user_can()` could not see them in that request: the **first** admin request of every miss
+  was denied, the second worked. Reproduced by removing one capability from the role (request 1 →
+  **403** with the client's exact message, requests 2–3 → 200). Moved to `after_setup_theme` in
+  `otrn-contenido.php:204`, `otrn-guias.php:54`, `otrn-iniciativa-pladetur.php:174`,
+  `otrn-autodiagnostico.php:564`; deployed, and the same single request now answers **200**.
+- **F30 — the public ámbito filter never filtered.** `?ambito=<slug>` is the listings' own filter
+  *and* a public taxonomy query var, so the request resolved as a taxonomy archive and the parent
+  theme rendered `<h1>Archivos: </h1>` with **0** cards — while `?categoria=` worked. Fixed with a
+  front-end-only `request` filter (`functions.php:253-259`); `/indicadores/?ambito=economico` now
+  returns 10 cards (45 unfiltered) and `/buenas-practicas/?ambito=economico` 12 of 80. The first
+  attempt (`query_var => false`) was rejected because it broke the wp-admin list filter.
+- **F31 — nothing to edit.** No field definition existed anywhere for the content types: 0
+  `acf-field-group`/`acf-field` rows in both databases, no code registration, and the JSON load path
+  `docs/acf-json/` never existed — the visible consequence of **F4**. The data was there
+  (`descripcion`, `ubicacion`, … as post meta) but unreachable from the interface. New mu-plugin
+  **`otrn-campos.php`** registers six ACF groups on `acf/init`, with field names taken from the
+  existing meta keys and keys reproducing the stored `_<field>` references, so the saved values load.
+  Verified locally to the end of the save path (value written, reference kept, public page updated,
+  value restored) and on production at the render level (post 378 shows the six fields with
+  `value="Santiago"`; 411 shows 11 fields, 66 shows 20).
+
+Deployed and purged; front page, listings, detail pages, private routes (`302`) and the admin lists
+re-checked with no change and no new line in the PHP error log. Evidence: [VERIFICATION.md](VERIFICATION.md)
+§V26.
+
+**Open after this round:** the field definitions are a **reconstruction from the stored data** — the
+original labels/instructions/option lists and the deferred file repeater were not available anywhere,
+so the client must review them (and the `nivel_territorial`/`fuente_datos` option lists, which would
+drop a value outside them). No content was written on production (the save path was proven locally
+only), the client has not re-tested their accounts yet, and it is still unconfirmed whether their
+*"filtros"* complaint was the admin list (F29) or the public one (F30) — both are fixed. Still
+pending from earlier decisions: the `staging.observatorioarauco.cl` subdomain plus `staging` branch,
+and the mobile-home performance/accessibility round with Parcel.
+
 **Update 2026-10-17 (fifteenth round — the active theme was switched back):** hours after the site
 went live the client reported that *"once authenticated, WordPress does not show the site"*: the
 front page was the admin bar plus one stray paragraph. The theme had not broken — Hostinger's

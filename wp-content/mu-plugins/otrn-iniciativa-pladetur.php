@@ -166,4 +166,9 @@ function otrn_grant_admin_caps() {
 		}
 	}
 }
-add_action( 'admin_init', 'otrn_grant_admin_caps' );
+/*
+ * Se concede en `after_setup_theme` (antes de que el núcleo construya el usuario
+ * actual) para que las capacidades estén disponibles en la primera petición; en
+ * `admin_init` llegaban tarde (docs/ISSUES.md F29).
+ */
+add_action( 'after_setup_theme', 'otrn_grant_admin_caps' );

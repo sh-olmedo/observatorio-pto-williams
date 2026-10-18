@@ -42,6 +42,7 @@ wp-content/
    ├─ otrn-privacidad-seccion.php   # anonymous REST/search/oEmbed/sitemap closure (private section)
    ├─ otrn-privacidad-guias.php  # same closure for the guia surfaces (new 2026-10-16)
    ├─ otrn-vigilante-tema.php    # restores the project theme if the Hostinger assistant replaces it (new 2026-10-17)
+   ├─ otrn-campos.php            # ACF field groups for the content types, in code (new 2026-10-18, F31)
    └─ sqlite-database-integration/  # SQLite implementation (loaded by db.php)
 ```
 
@@ -135,6 +136,7 @@ any template), `otrn_mision_portada()` (:492), `otrn_datos_portada()` (:508),
 | `otrn-privacidad-seccion.php` | Closes the private section's non-HTML surfaces for anonymous visitors (REST 401, search exclusion, oEmbed off, sitemap entry removed) | file head; F11b |
 | `otrn-privacidad-guias.php` | The same closure for the `guia` type, whose HTML gate is session-only | file head; [VERIFICATION.md](VERIFICATION.md) §V24 |
 | `otrn-vigilante-tema.php` | Keeps the project theme active: checks it on `setup_theme` — before the intruding theme loads — and on `switch_theme`, restores it and logs the attempt. Covers the Hostinger onboarding/AI assistant, which writes `template`/`stylesheet` directly | file head; [VERIFICATION.md](VERIFICATION.md) §V25.9 |
+| `otrn-campos.php` | Registers the ACF field groups of the six editable content types on `acf/init`, in code. Names are the existing meta keys and keys reproduce the stored `_<field>` references, so ACF reads the saved values. Skips itself when ACF is not active | file head; [VERIFICATION.md](VERIFICATION.md) §V26.3 (F31) |
 
 All CPTs and taxonomies register `show_in_rest => true` (potential REST surface — F11/F11b);
 the two `otrn-privacidad-*` plugins filter those surfaces for the gated types, and no custom
@@ -197,7 +199,10 @@ when the CPT is empty (`otrn-autodiagnostico.php:239-250`).
 ## 9. Persistence, configuration & reproducibility
 
 - ACF field groups live **in the database**; the code only registers a JSON load path
-  `docs/acf-json/` that does not exist (`otrn-contenido.php:160-167`) — F4.
+  `docs/acf-json/` that does not exist (`otrn-contenido.php:160-167`) — F4. **F31 (2026-10-18)**: the
+  six content groups are now registered **in code** by `otrn-campos.php` (`acf/init`), so the schema
+  that makes the edit screens work is versioned with the site; the legacy JSON path remains declared
+  but unused.
 - Pages, menus, options (`page_on_front`, front-page sections, `mision` page) and all
   content live in the local SQLite database, which is gitignored (F18).
 - No custom REST routes are registered (grep), no custom WP-CLI commands, no build step.

@@ -1500,3 +1500,150 @@ captured either, so the caller is inferred from the plugin code and the version 
 proven. Whether the panel can bring the theme back by another path is unproven as well — which is
 exactly why the watchdog is in place, and why **the AI assistant/builder should not be used on this
 site**.
+
+## V26 — The client's editing report: permissions, filters and fields (F29/F30/F31) — 2026-10-18
+
+**Reported by the client**, with two screenshots from the published site: a `buena_practica` edit
+screen with an empty main column, and `/wp-admin/edit.php?ambito=economico&post_type=indicador`
+answering *"Necesitas un nivel de permisos superior."*. Both were reproduced on
+`observatorioarauco.cl`, and behind them stood **three** independent defects. All three are fixed and
+deployed; F29 and F30 were hotfixes on the live site, F31 adds one mu-plugin.
+
+**Method.** Authenticated production requests used a **session minted with WP-CLI**
+(`WP_Session_Tokens::create()` plus `wp_generate_auth_cookie()` for the `logged_in`, `auth` and
+`secure_auth` cookies) — no password was read, changed or recorded, and the shim file was removed
+afterwards. Admin HTML is never cached (`cache-control: no-cache, no-store, private`;
+`x-litespeed-cache-control: no-cache`), so what the checks read is what WordPress rendered. Where a
+write was needed to prove behaviour (capability removal, save round-trip) it was done on the **local**
+copy or reverted immediately, and production content was left as it was; LiteSpeed was purged after
+each deployment.
+
+### V26.1 F29 — the capability had been granted too late (fixed)
+
+Reproduced on production by taking `edit_indicadores` off the `administrator` role with WP-CLI and
+then making **one** request to the filtered list:
+
+| Request to `/wp-admin/edit.php?ambito=economico&post_type=indicador` | Before the fix | After the fix |
+| --- | --- | --- |
+| 1st (capability missing at user-build time) | **403**, `<h1>Necesitas un nivel de permisos superior.</h1>`, “no tienes permisos para editar este tipo de entradas” | **200** |
+| 2nd | 200 | 200 |
+| 3rd | 200 | 200 |
+
+Blueprint: `WP_User::allcaps` is a snapshot taken when WordPress builds the current user in
+`wp-settings.php` (`after_setup_theme` at line **757** → `$GLOBALS['wp']->init()` at line **766** →
+`init` at **779**), and `admin_init` runs later still, inside `wp-admin/admin.php`. A capability added
+on `admin_init` therefore cannot be seen by `current_user_can()` in that same request — the second
+request works because the grant already happened in the first one.
+
+The four grants moved from `admin_init` to `after_setup_theme` (`otrn-contenido.php:204`,
+`otrn-guias.php:54`, `otrn-iniciativa-pladetur.php:174`, `otrn-autodiagnostico.php:564`). After
+deploying, the same single request returned **200** with the capability still removed, and the eight
+capability sets were listed complete in the role: for each of the four types,
+`edit_<plural>`, `edit_others_<plural>`, `publish_<plural>`, `read_private_<plural>`,
+`delete_<plural>`, `delete_others_<plural>`, `delete_private_<plural>`, `delete_published_<plural>`
+(and `create_<plural>` where the type defines it), plus the type-specific ones. Restoring the
+capability afterwards changed nothing (the grants are self-repairing on any request type). Cache
+purged; admin lists, private routes (`302`) and the front page unchanged; no new line in
+`~/.logs/error_log_observatorioarauco_cl`.
+
+### V26.2 F30 — the public ámbito filter was resolving as a taxonomy archive (fixed)
+
+Measured on both the local site and production (identical before the fix), with a cache-busting
+request:
+
+| URL | Before the fix | After the fix |
+| --- | --- | --- |
+| `/indicadores/?ambito=economico` | parent theme's archive: `<h1>Archivos: </h1>`, **0** `.otrn-card` | `<h1>Indicadores</h1>`, **10** cards |
+| `/buenas-practicas/?ambito=economico` | same generic archive, **0** cards | `<h1>Buenas prácticas</h1>`, **12** cards (of 80) |
+| `/indicadores/?categoria=demanda` | filtered correctly | unchanged |
+| `/ambito/economico/` | 200 (taxonomy archive) | 200, unchanged |
+
+The cause is a name collision, not a template bug: `ambito` is a public taxonomy query var
+(`otrn-autodiagnostico.php:128-144`) **and** the parameter the listings use for their own filter
+(`archive-indicador.php:13,41,78`; `archive-buena_practica.php:12,17,36`). `WP_Query::parse_tax_query()`
+consumes `$taxonomy->query_var`, `is_tax()` wins over `is_post_type_archive()` in `template-loader.php`,
+the child theme ships no `taxonomy-ambito.php`, and the parent theme's generic archive renders.
+
+Fixed with a front-end-only `request` filter, `otrn_ambito_es_filtro_de_listado()`
+(`functions.php:253-259`): it unsets `ambito` from the main query only when a `post_type` is present
+and it is not wp-admin. Local measurements after the fix, with the sibling filter kept alive:
+
+| Filter | `/indicadores/` | `/buenas-practicas/` |
+| --- | --- | --- |
+| none | 45 cards | 80 cards |
+| `ambito=economico` | 10 | 12 |
+| `ambito=gestion` | 7 | — |
+| `ambito=medio-ambiente` | 15 | — |
+| `ambito=sociocultural` | 12 | — |
+
+The `wp-admin` list filter was re-tested in a real browser because the **first** attempt at this fix
+(`query_var => false` on the taxonomy) fixed the front end and broke the admin list silently — the
+list table depends on that query var — so that approach was reverted and is recorded here as
+rejected. With the final fix, the admin lists still filter: indicador 20 → 9 (`economico`) / 11
+(`sociocultural`), buena_practica 20 → 11. The correct option is also rendered as `selected` in the
+form. Production re-measured after deployment plus a LiteSpeed purge.
+
+### V26.3 F31 — the content types had no fields to edit (fixed)
+
+Inventory taken before writing anything, from the stored data itself (names, the ACF reference in
+`_<field>`, and one real value each): the types hold 6–20 meta keys per item, and the reference keys
+that exist (`field_otrn_bp_*`, `field_otrn_ip_*`, `field_otrn_cri_*`, `field_otrn_ind_pdf`) show the
+original project used ACF — but there are **0** `acf-field-group` and **0** `acf-field` rows in the
+local and the production database, no field group is registered in code and the JSON load path
+`docs/acf-json/` does not exist (F4). That is why the edit screens showed only the title.
+
+New mu-plugin **`otrn-campos.php`** registers six groups on `acf/init` (they are skipped cleanly if
+ACF is not active):
+
+| Group | Type | Fields |
+| --- | --- | --- |
+| `group_otrn_buena_practica` | `buena_practica` | descripción, fuente de la información, ubicación, nivel territorial, sitio web, criterio relacionado |
+| `group_otrn_indicador` | `indicador` | descripción, institución responsable, nivel territorial, fuente de datos, fórmula, sitio web, URL del visor, serie de datos (solo lectura), documento PDF, documento Excel, ficha metodológica |
+| `group_otrn_material` | `material_apoyo` | documento, enlace externo |
+| `group_otrn_dato_portada` | `dato_portada` | cifra, año |
+| `group_otrn_iniciativa` | `iniciativa_pladetur` | 10 descriptive fields + `asignado_2024`…`asignado_2033` |
+| `group_otrn_criterio` | `criterio_autodiag` | código, criterio, pregunta, indicador, no aplica, escalas 0–3 |
+
+Field names are the existing meta keys; field keys reproduce the stored references, so ACF finds the
+saved values. Checked with WP-CLI that every field resolves its stored value:
+
+| Check | Result |
+| --- | --- |
+| Groups registered (local and production) | 6 of 6, expected keys and titles |
+| `get_field(…, 378)` for the six `buena_practica` fields | all return the stored values (`descripcion`, `Ilustre Municipalidad de Santiago`, `Santiago`, `Comunal`, `https://www.munistgo.cl/…`, `48.1`) |
+| Edit screens on production (admin session, HTML) | post 378: the six labels present and the saved value `value="Santiago"` in the form; post 411 (`indicador`): **11** `acf-field` blocks; post 66 (`iniciativa_pladetur`): **20** |
+
+The save path was exercised **locally** (the live content was not written to): in a real browser
+session, `Ubicación` on post 378 was changed to a test value, the form submitted normally, and the
+value persisted — `get_post_meta()` returned it, the `_ubicacion` reference stayed
+`field_otrn_bp_ubicacion` and the public detail page rendered the new value. The original value
+(`Santiago`) was then written back the same way and confirmed in the database and on the page again.
+Deployed to production and LiteSpeed purged; the site's PHP error log gained no line.
+
+### V26.4 Regression checks in the same pass
+
+| Check | Result |
+| --- | --- |
+| Front page, `/indicadores/`, `/buenas-practicas/`, `/noticias/`, `/acerca/` (production) | render as `wp-child-theme-otrn`, unchanged |
+| Private routes `/evaluar/`, `/mapa/`, `/autoevaluacion/`, `/criterio/` | **302** for anonymous requests |
+| Public detail pages of the types (`single-buena_practica.php`, `single-indicador.php`) | unchanged — they read `get_post_meta()`; the three `get_field()` calls still resolve |
+| Admin lists (`indicador`, `buena_practica`) | filter correctly (see §V26.2) |
+| PHP error log | no new line from these changes |
+
+### V26.5 NOT VERIFIED / open
+
+- **No content was written on production** to test the save path there: the round-trip was measured on
+  the local copy only. The same ACF code runs in both, but a live save was deliberately not performed.
+- **The field definitions are a reconstruction.** The original labels, instructions, option lists and
+  the deferred file repeater were not available (F4), so they were derived from the stored keys,
+  the stored values and the labels the theme itself prints. The client must review them; nothing here
+  is a copy of the original project's schema.
+- `nivel_territorial` and `fuente_datos` are dropdowns whose option lists were built from the values
+  present in the database (plus the one the theme documents). A value outside those lists would be
+  dropped if that item is saved: confirm the lists before the client edits freely.
+- The client has not re-tested their own two accounts yet, and their *"filtros"* complaint may or may
+  not be F30 — the screenshot they sent was the **wp-admin** URL, and the public filter was found
+  while investigating. Both are fixed; which one they saw is still unconfirmed.
+- Keyboard, device (real phone) and CLS behaviour remain unverified, as in earlier rounds — and the
+  whole visual layer is still pending the client's sign-off.
+

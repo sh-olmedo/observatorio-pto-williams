@@ -1,4 +1,4 @@
-# Issue Register (F1–F28)
+# Issue Register (F1–F31)
 
 Persistent register of every finding from the static audit (commit `5f43933` + working
 tree), **preserving the original finding IDs** (including the F11b sub-finding). Keep these
@@ -22,6 +22,20 @@ onboarding/AI assistant had written `template`/`stylesheet` back to `hostinger-a
 site rendered with the AI theme's block templates. Registered as **F28** (hosting/process, not a
 theme defect) and mitigated the same day; see the F28 entry and
 [VERIFICATION.md](VERIFICATION.md) §V25.9.
+
+**Update 2026-10-18 (the client's editing report — F29, F30, F31):** the client reported that
+administrators *"cannot edit"* and that *"the filters"* misbehave on the live site, with two
+screenshots: one content edit screen with an empty main column, and a filtered wp-admin list
+answering *"You need a higher level of permission."*. Both were reproduced on production and turned
+out to be three separate defects, all pre-existing and all now fixed: **F29** — the custom
+capabilities were granted on `admin_init`, i.e. after WordPress had already built the current user,
+so the *first* admin request of every session was denied; **F30** — `?ambito=<slug>`, the public
+listings' own filter, collided with the `ambito` taxonomy query var and the request resolved as a
+taxonomy archive, so the front-end filters never filtered; **F31** — no field definition existed
+anywhere for the content types, so their edit screens showed only the title and the stored data
+(`descripcion`, `ubicacion`, …) was unreachable through the interface. F29 and F30 were hotfixes on
+the live site; F31 is a new mu-plugin (`otrn-campos.php`) that registers the field groups in code —
+which is also what F4 asked for. Evidence in [VERIFICATION.md](VERIFICATION.md) §V26.
 
 Status values: *Open* (needs work), *Open — verify at runtime* (needs a runtime/browser/DB
 check first), *Open — decision pending* (blocked on a client/team decision).
@@ -95,6 +109,9 @@ login anonymously. Measurements on the host: [VERIFICATION.md](VERIFICATION.md) 
 | F26 | Site locale is `it_IT`: WordPress-generated screens are Italian | P2 | Localization/UX | — |
 | F27 | The only published `guia` item is a WordPress sample placeholder | P3 | Content | — |
 | F28 | Hostinger's assistant can switch the active theme back on production | P1 | Hosting/Process | — |
+| F29 | Custom capabilities granted on `admin_init`: the first admin request denies editing | P1 | Permissions/Admin | — |
+| F30 | `?ambito=<slug>` resolves as a taxonomy archive: the public ámbito filter never filtered | P1 | Front-end/Filters | — |
+| F31 | Content types show no editable fields (no field definition existed anywhere) | P1 | Content model/Admin | — |
 
 ---
 
@@ -816,3 +833,97 @@ explicit UX/UI approval of the visuals**. Files: `header.php`, `functions.php`,
 - **Still open**: the exact caller was not identified — the host exposes no per-site activity log for
   the change — so if the panel re-runs that step by another route, the watchdog is what keeps the
   site standing. Treat "the AI assistant/builder" as off-limits for this site.
+
+### F29 — Custom capabilities granted on `admin_init`: the first admin request denies editing
+
+- **Severity**: P1 · **Status**: **Fixed on production 2026-10-18** ([VERIFICATION.md](VERIFICATION.md)
+  §V26.1) · **Category**: Permissions/Admin. Pre-existing; surfaced by the published site.
+- **How it was raised**: the client reported that administrators *"cannot edit"*, with a screenshot of
+  `/wp-admin/edit.php?ambito=economico&post_type=indicador` showing
+  **"Necesitas un nivel de permisos superior."** and *"Lo siento, no tienes permisos para editar este
+  tipo de entradas."* Both production accounts are `administrator` (IDs 1 and 2).
+- **Evidence**: the four mu-plugins that grant the custom capabilities did it on **`admin_init`**
+  (the same four hooks now on `after_setup_theme`: `otrn-contenido.php:204`, `otrn-guias.php:54`,
+  `otrn-iniciativa-pladetur.php:174`, `otrn-autodiagnostico.php:564`). WordPress builds the current
+  user during
+  `$GLOBALS['wp']->init()`, which `wp-settings.php` runs at line **766** — after `after_setup_theme`
+  (line **757**) but **before** `admin_init`. `WP_User::has_cap()` resolves against the `allcaps`
+  snapshot taken when that object was built, so a capability added later in the same request is
+  invisible to `current_user_can()`. Reproduced on production by removing one capability from the
+  role and requesting the filtered list **once**: `403` with the message above; the **second**
+  request returned `200`.
+- **Impact**: every administrator was denied once per missing capability — the first admin request
+  after a deployment, a role reset or any capability miss — with a message that reads like a
+  permanently broken site. (The client's two accounts "worked" on reload, which is why the report
+  looked intermittent.)
+- **Fix**: the four grants moved to `after_setup_theme` — now `otrn-contenido.php:204`,
+  `otrn-guias.php:54`, `otrn-iniciativa-pladetur.php:174`, `otrn-autodiagnostico.php:564`. Deployed to
+  production; the reproduction sequence now answers `200` on the **first** request.
+- **Verification** (§V26.1): the eight capability sets (4 CPTs × create/edit/read/delete plus the
+  custom ones) were listed complete in the `administrator` role; the filtered admin lists, the
+  private routes (`302`) and the front page were re-checked with no change.
+
+### F30 — `?ambito=<slug>` resolves as a taxonomy archive: the public ámbito filter never filtered
+
+- **Severity**: P1 · **Status**: **Fixed on production 2026-10-18** ([VERIFICATION.md](VERIFICATION.md)
+  §V26.2) · **Category**: Front-end/Filters. Pre-existing; identical locally and on production.
+- **How it was raised**: while chasing F29's *"filtros"* wording. The theme's own listings filter with
+  `?ambito=`-style query strings: `archive-indicador.php:13,41,78`, `archive-buena_practica.php:12,17,36`,
+  `archive-iniciativa_pladetur.php` and `archive-evaluacion.php` read `$_GET['ambito']`/`$_GET['nivel']`
+  and build their own `WP_Query`. But `ambito` is also a **public taxonomy** (`register_taxonomy( 'ambito', … )`,
+  `otrn-autodiagnostico.php:128-144`) with a `query_var`, so WordPress parsed the request as a
+  **taxonomy archive**: `template-loader.php` prefers `is_tax()` over `is_post_type_archive()`, the
+  child theme has no `taxonomy-ambito.php`, and the parent theme rendered its generic archive.
+- **Evidence**: `/indicadores/?ambito=economico` and `/buenas-practicas/?ambito=economico` returned the
+  parent theme's archive — `<h1>Archivos: </h1>` (Italian locale, F26) and **0** `.otrn-card` — while
+  the sibling parameter `?categoria=demanda` filtered correctly (a different taxonomy, no collision).
+  After the fix: `h1` *"Indicadores"* with **10** cards for `economico` (45 unfiltered, 7 `gestion`,
+  15 `medio-ambiente`, 12 `sociocultural`) and **12** vs **80** cards on buenas prácticas.
+- **Rejected first attempt**: registering the taxonomy with `query_var => false` fixed the front end
+  but silently broke the **wp-admin** list filter (the list table is driven by that query var) —
+  tested, reverted.
+- **Fix**: a front-end-only `request` filter in the theme, `otrn_ambito_es_filtro_de_listado()`
+  (`functions.php:253-259`), drops `ambito` from the main query when a `post_type` is also present and
+  it is not wp-admin. The templates keep reading `$_GET['ambito']`, the admin filter is untouched and
+  `/ambito/<slug>/` still resolves with `200`.
+- **Verification** (§V26.2): front listings and the admin list filter measured side by side; the
+  taxonomy archive and the untouched `?categoria=` filter re-checked.
+
+### F31 — Content types show no editable fields (no field definition existed anywhere)
+
+- **Severity**: P1 · **Status**: **Fixed 2026-10-18 — reconstruction pending the client's review**
+  ([VERIFICATION.md](VERIFICATION.md) §V26.3) · **Category**: Content model/Admin.
+- **How it was raised**: the client's screenshot of a `buena_practica` edit screen: title, permalink,
+  featured image and the *Ámbitos* box — an **empty main column**. *"Las buenas prácticas no se pueden
+  editar. Los campos no se muestran."*
+- **Evidence**: the content types declare `supports => title` only (`otrn-contenido.php:41,54,71,82`,
+  `otrn-iniciativa-pladetur.php:60`, `otrn-autodiagnostico.php:51`), and their data lives in post meta
+  — `buena_practica`: `descripcion`, `fuente_de_la_informacion`, `ubicacion`, `nivel_territorial`,
+  `sitio_web`, `criterio_relacionado`; `indicador`: `descripcion`, `institucion_responsable`,
+  `nivel_territorial`, `fuente_datos`, `formula`, `serie_datos`, `embed_url`, `sitio_web`,
+  `documento_pdf`…; and so on per type. But **no field definition existed anywhere**: `acf-field-group`
+  and `acf-field` posts = **0** in both databases, no `acf_add_local_field_group()`, no
+  `register_post_meta`/`add_meta_box`, and the JSON load path `docs/acf-json/` registered by
+  `otrn-contenido.php:160-167` never existed — this **is** F4, now with a visible consequence. The
+  theme reads those keys directly with `get_post_meta()` (55 calls), except three `get_field()` calls in
+  `single-indicador.php` (`documento_pdf`, `documento_excel`, `ficha_metodologica`, read as arrays).
+- **Impact**: the published site could not be maintained by its own administrators — the only way to
+  change a figure, a description or a PDF was the database.
+- **Fix**: new mu-plugin **`otrn-campos.php`**, which registers six ACF field groups on `acf/init` for
+  `buena_practica`, `indicador`, `material_apoyo`, `dato_portada`, `iniciativa_pladetur` and
+  `criterio_autodiag`. Field **names** are the existing meta keys and field **keys** reproduce the
+  stored `_<field>` references (`field_otrn_bp_*`, `field_otrn_ip_*`, `field_otrn_cri_*`,
+  `field_otrn_ind_pdf`), so ACF loads the values that are already saved instead of starting empty. Types
+  were read off the real data, not guessed: text/textarea/URL/number statements and `file` for the three
+  indicator documents, with option lists only where the whole value set was verified
+  (`nivel_territorial`: Comunal/Regional/Nacional/Internacional; `fuente_datos`: Manual/Embed/PDF/Excel).
+  `serie_datos` is shown read-only (chart data, fed from source). Registering them in code is also the
+  answer to F4: the schema is now versioned with the site.
+- **Scope note**: `evaluacion` and `sector` deliberately keep no form — their data is machine-written
+  (`respuestas` JSON, coordinates).
+- **Still open**: the **original** field definitions (labels, instructions, option lists, the file
+  repeater that `single-buena_practica.php:40` records as deferred, "requires ACF PRO") were not
+  available anywhere, so this is a **reconstruction from the stored data** and must be reviewed by the
+  client. Reconstructed from evidence, not reproduced from the original project: nothing here should be
+  presented as the client's own schema.
+

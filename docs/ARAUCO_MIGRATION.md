@@ -123,6 +123,14 @@ step 1 was closed, on the client's own Hostinger account (`observatorioarauco.cl
   (F9), the survey embed (F10) and the logo originals (F13) — the site carries its provisional
   notices in the meantime. Evidence: [VERIFICATION.md](VERIFICATION.md) §V25.
 
+**Hotfixes deployed to the same install after that first pass** (no content written): the `<title>`
+fix (F25, `1b19d5c`), the HTML browser-cache TTL in `.htaccess` (§V25.8), the theme watchdog
+`otrn-vigilante-tema.php` (F28, §V25.9) — and on **2026-10-18**, from the client's editing report,
+the capability grants moved to `after_setup_theme` (F29), the front-end-only `request` filter that
+keeps `?ambito=` a listing filter instead of a taxonomy archive (F30), and the six ACF field groups
+registered **in code** by the new mu-plugin `otrn-campos.php` (F31) so the content is editable again.
+Evidence: §V26.
+
 ## 8. New Arauco requirement — self-assessment location search (F19)
 
 Registered **2026-10-16** — **documentation only: not implemented, not approved**. It must

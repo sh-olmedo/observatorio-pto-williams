@@ -194,4 +194,11 @@ function otrn_contenido_grant_caps() {
 		}
 	}
 }
-add_action( 'admin_init', 'otrn_contenido_grant_caps' );
+/*
+ * Se concede en `after_setup_theme`, que se dispara antes de que el núcleo
+ * construya el usuario actual (`wp-settings.php`: `after_setup_theme` L757,
+ * `$GLOBALS['wp']->init()` L766). En `admin_init` llegaba tarde: `WP_User::allcaps`
+ * ya estaba calculado y la primera pantalla del listado respondía «no tienes
+ * permisos para editar este tipo de entradas» (docs/ISSUES.md F29).
+ */
+add_action( 'after_setup_theme', 'otrn_contenido_grant_caps' );

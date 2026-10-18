@@ -232,6 +232,33 @@ function otrn_redirigir_pagina_mapa() {
 add_action( 'template_redirect', 'otrn_redirigir_pagina_mapa' );
 
 /**
+ * En un listado, `?ambito=<slug>` es un filtro del tema, no un archivo de término.
+ *
+ * Los listados filtran con `?ambito=<slug>` (`archive-indicador.php`,
+ * `archive-buena_practica.php`, `archive-iniciativa_pladetur.php`…), pero `ambito`
+ * es además la variable pública de la taxonomía homónima
+ * (`otrn-autodiagnostico.php`). Sin esta corrección, WordPress resuelve cualquier
+ * `?ambito=<slug>` como archivo de taxonomía: la plantilla del archivo no llega a
+ * usarse y el visitante cae en el listado genérico del tema padre («Archivos: »),
+ * sin filtro y con tipos de contenido mezclados.
+ *
+ * Se retira la variable solo del núcleo de la consulta; las plantillas siguen
+ * leyendo `$_GET['ambito']`, y `/ambito/<slug>/` (que no trae `post_type`) sigue
+ * resolviendo como archivo de término. El filtro del listado de `wp-admin` no pasa
+ * por aquí y queda intacto. Ver docs/ISSUES.md F30.
+ *
+ * @param array $qv Consulta principal ya resuelta.
+ * @return array Consulta principal, sin `ambito` cuando es un filtro de listado.
+ */
+function otrn_ambito_es_filtro_de_listado( $qv ) {
+	if ( ! is_admin() && ! empty( $qv['ambito'] ) && ! empty( $qv['post_type'] ) ) {
+		unset( $qv['ambito'] );
+	}
+	return $qv;
+}
+add_filter( 'request', 'otrn_ambito_es_filtro_de_listado' );
+
+/**
  * La sección de autoevaluación es privada: exige sesión iniciada.
  *
  * Cubre la sección completa — listado `/autoevaluacion/` (con su mapa), ficha
