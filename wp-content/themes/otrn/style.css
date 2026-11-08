@@ -95,11 +95,11 @@ body.otrn > .otrn-footer{flex:0 0 auto;}
    recortaron en `assets/logos/README.md`), así que van sueltos sobre el
    fondo: sin «chapa», sin borde y sin sombras, como en la referencia del
    cliente. La fila iguala la altura, no el ancho. */
-.otrn-footer{margin-top:60px;background:var(--cream);padding:40px 0;}
-.otrn-footer-logos{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:24px;}
+.otrn-footer{margin-top:60px;background:var(--primary);color:#FFFFFF;padding:46px 0 38px;} /* pie azul institucional, como imcabodehornos.cl (bg-blue = #0071BC verificado) */
+.otrn-footer-logos{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:24px;}
 .otrn-footer-logo{display:flex;align-items:center;justify-content:center;}
-.otrn-footer-logo img{display:block;width:auto;height:48px;object-fit:contain;}
-.otrn-footer-copy{text-align:center;color:var(--text2);font-size:12.5px;margin-top:28px;}
+.otrn-footer-logo img{display:block;width:auto;height:64px;object-fit:contain;}
+.otrn-footer-copy{text-align:center;color:rgba(255,255,255,.85);font-size:12.5px;margin-top:26px;}
 
 /* ---- Page head ------------------------------------------------------- */
 .otrn-pagehead{padding:44px 0 24px;}
@@ -549,7 +549,7 @@ body.otrn-sin-scroll{overflow:hidden;}
   .otrn-nav{display:none;}
   .otrn-brand-logo{height:38px;}
   .otrn-footer-logos{justify-content:center;gap:22px;}
-  .otrn-footer-logo img{height:40px;}
+  .otrn-footer-logo img{height:46px;}
   .otrn-pagehead h1{font-size:28px;}
   .otrn-field select,.otrn-field input{min-width:0;width:100%;}
   .otrn-field{width:100%;}

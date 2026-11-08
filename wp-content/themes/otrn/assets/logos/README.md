@@ -15,7 +15,8 @@ referencia visual, pero los assets de abajo provienen de los originales.
 
 | Archivo | Marca | Origen / procedencia | Transparencia |
 |---|---|---|---|
-| `crece-imcabodehornos.png` (1027×537) | «Crece · CABO DE HORNOS — Ilustre Municipalidad» | PNG transparente oficial publicado en `imcabodehornos.cl` (uploads 2024/04); el vector original del cliente vive en `references/logos/logo municipal vector.{pdf,ai,eps}` | ✅ alfa real |
+| `crece-imcabodehornos.png` (1027×537) | «Crece · CABO DE HORNOS — Ilustre Municipalidad» (color) | PNG transparente oficial publicado en `imcabodehornos.cl` (uploads 2024/04); el vector original del cliente vive en `references/logos/logo municipal vector.{pdf,ai,eps}` | ✅ alfa real |
+| `crece-imcabodehornos-blanco.png` (1027×537) | versión blanca para el **pie azul** (`#0071BC`, verificado `bg-blue` en el portal oficial) | `pixelcut-export.png` del footer oficial de `imcabodehornos.cl`; copia de referencia en `references/logos/logo-crece-blanco-sitiooficial.png` | ✅ alfa real |
 
 | Archivo | Institución | Dim. | Peso | Origen | Alfa | Calidad |
 |---|---|---|---|---|---|---|
