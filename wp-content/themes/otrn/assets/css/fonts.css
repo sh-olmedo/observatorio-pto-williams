@@ -9,7 +9,24 @@
  * NO al raíz del tema: el navegador la resuelve contra la ubicación del CSS.
  */
 
-/* ---- Montserrat: tipografía principal (cuerpo, títulos H1–H3) -------- */
+/* ---- Reddit Sans: tipografía institucional de Cabo de Hornos --------
+ * Fuentes variable (pesos 200–900) elegida por el cliente: el material
+ * entregado (references/font/) lista la familia completa de Reddit Sans,
+ * aunque los binarios llegaron como HTML inválidos; se instaló entonces la
+ * copia OFL idéntica publicada en el repositorio google/fonts de GitHub
+ * (RedditSans-wght.ttf · RedditSans-Italic-wght.ttf), licencia OFL en
+ * assets/fonts/redditsans/OFL.txt. Montserrat sigue cargada como respaldo.
+ */
+@font-face{
+  font-family:'Reddit Sans'; font-style:normal; font-weight:200 900; font-display:swap;
+  src:url('../fonts/redditsans/RedditSans-wght.ttf') format('truetype-variations');
+}
+@font-face{
+  font-family:'Reddit Sans'; font-style:italic; font-weight:200 900; font-display:swap;
+  src:url('../fonts/redditsans/RedditSans-Italic-wght.ttf') format('truetype-variations');
+}
+
+/* ---- Montserrat: respaldo tipográfico (pesos 400–800) --------------- */
 @font-face{
   font-family:'Montserrat'; font-style:normal; font-weight:400; font-display:swap;
   src:url('../fonts/montserrat-latin-400.woff2') format('woff2');

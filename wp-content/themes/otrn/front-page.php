@@ -36,11 +36,15 @@ $datos       = otrn_datos_portada();
 $indicadores = get_posts( array( 'post_type' => 'indicador', 'post_status' => 'publish', 'numberposts' => 6 ) );
 $noticias    = get_posts( array( 'post_type' => 'post', 'post_status' => 'publish', 'numberposts' => 6 ) );
 
-// --- Fotografías provisionales heredadas (assets/img/arauco); pendientes los originales de Puerto Williams ----------
-$otrn_img     = get_stylesheet_directory_uri() . '/assets/img/arauco/';
-$img_estuario = $otrn_img . 'estuario.webp';            // 22.08.51 · hero vertical
-$img_bahia    = $otrn_img . 'hero-bahia.webp';         // 22.09.17 · territorio
-$img_costa    = $otrn_img . 'lanchas-atardecer.webp';  // 22.17.07 · costa viva
+// --- Fotografías del cliente (Puerto Williams, entregadas 2026-11-08) ----
+// Originales en references/ (DSC03605 3.jpg · DSC00004k.jpeg, sin EXIF en
+// la copia optimizada; JPEG por falta de encoder WebP en este equipo).
+// La foto del acto 3 «Costa viva» sigue siendo herencia de Arauco hasta
+// que el cliente entregue reemplazo.
+$otrn_img     = get_stylesheet_directory_uri() . '/assets/img/cabo-de-hornos/';
+$img_estuario = $otrn_img . 'hero-semanero-dientes.jpg';    // semanero de yates + Dientes de Navarino · hero
+$img_bahia    = $otrn_img . 'letras-puerto-williams.jpg';   // letras volumétricas de Puerto Williams · territorio
+$img_costa    = get_stylesheet_directory_uri() . '/assets/img/arauco/lanchas-atardecer.webp'; // imagen provisional (pendiente)
 
 // Enlaces funcionales (mismos que la cabecera / portada original).
 $otrn_url_indicadores = get_post_type_archive_link( 'indicador' );
@@ -80,10 +84,10 @@ $otrn_icos = array( $otrn_ico['people'], $otrn_ico['bed'], $otrn_ico['chart'] );
 			<!-- Nivel fotográfico compartido (solo modo inmersivo). -->
 			<div class="otrn-stage__media" aria-hidden="true">
 				<figure class="otrn-layer is-active" data-layer="0">
-					<img src="<?php echo esc_url( $img_estuario ); ?>" alt="Vista aérea del estuario y la boca de río (imagen provisional)" fetchpriority="high" decoding="async">
+					<img src="<?php echo esc_url( $img_estuario ); ?>" alt="Bahía y semanero de Puerto Williams con los Dientes de Navarino al fondo" fetchpriority="high" decoding="async">
 				</figure>
 				<figure class="otrn-layer" data-layer="1">
-					<img src="<?php echo esc_url( $img_bahia ); ?>" alt="Bahía y pueblo costero (imagen provisional)" loading="lazy" decoding="async">
+					<img src="<?php echo esc_url( $img_bahia ); ?>" alt="Letras volumétricas de Puerto Williams con la bandera de Chile y el macizo de los Dientes de Navarino" loading="lazy" decoding="async">
 				</figure>
 				<figure class="otrn-layer" data-layer="2">
 					<img src="<?php echo esc_url( $img_costa ); ?>" alt="Lanchas de pesca en el muelle al atardecer" loading="lazy" decoding="async">

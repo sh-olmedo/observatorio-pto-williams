@@ -106,7 +106,29 @@ Current as of commit `545d8e3`. **Proposal only — do not apply without approva
 | New: `--ribbon` | — | `linear-gradient(90deg,#A9C33A 0 25%,#EC008C 25% 50%,#27AAE1 50% 75%,#F15A29 75% 100%)` | Verified signature band |
 | Status (`success/warning/error`) | unchanged | unchanged | Semantic, not brand |
 
-## 4. Open items for the client (decisions, not design work)
+## 6. Applied (2026-11-08) — client-approved direction
+
+With the client materials delivered (municipal vector logo `references/logos/`,
+Reddit Sans family list, 2 Puert Williams photos), the following was **implemented and
+runtime-verified** (home + inner page + footer, Chrome in-session):
+
+- **Tokens** (`style.css :root`): values per §3 — municipal direction (`--secondary` =
+  amber `#FFB800`), radii 14/8/50, blue-tinted neutral set, canvas `#F9F9F9`,
+  `--text2 #5A6B7B`, `--grey #E7ECF1`. Status tokens unchanged.
+- **Typography**: Reddit Sans variable (200–900, OFL copy from `google/fonts`, since the
+  delivered OneDrive files were unusable HTML) declared in `assets/css/fonts.css`;
+  `--font-title` → `'Reddit Sans','Montserrat'…`. Montserrat/IBM Plex remain as fallbacks.
+- **Chrome**: header brand = `assets/logos/crece-imcabodehornos.png` (transparent PNG the
+  client publishes; vector master in `references/logos/`); multicolor **ribbon** (6px)
+  under the header on every page via `.otrn-header::after` (works with the fixed landing
+  header);footer shows the Crece logo + PW copyright line.
+- **Photos**: 2 of 3 landing scenes now use client photos (`assets/img/cabo-de-hornos/`:
+  semanero/Dientes hero and letras volumétricas). Scene 3 still shows an inherited Arauco
+  photo marked provisional.
+- Not yet applied: deep component pass (buttons/pagination/forms) beyond what tokens
+  already restyle; content localisation of demo data.
+
+## 7. Open items for the client (updated)
 
 1. **Direction**: municipal (amber + ribbon) vs tourism (orange + dark photo headers) vs hybrid.
 2. **Typeface**: provide Gotham Narrow licence/files, or approve free substitutes (Montserrat + Prompt).
@@ -116,7 +138,7 @@ Current as of commit `545d8e3`. **Proposal only — do not apply without approva
 4. **Ribbon**: confirm its use on the observatory (under header / atop hero) or reserve it for municipal portals.
 5. Photography of the territory (Puerto Williams / Isla Navarino) to replace inherited Arauco images.
 
-## 5. Suggested implementation plan (after approval)
+## 8. Suggested implementation plan (remaining)
 
 - **Phase A — tokens only:** replace `:root` values per §3 (fonts pending §4.2); no component changes.
 - **Phase B — chrome:** header (logo swap + nav affordances), footer (contact block, partner row),

@@ -18,10 +18,10 @@
 		<a class="otrn-brand" href="<?php echo esc_url( home_url( '/' ) ); ?>">
 			<img
 				class="otrn-brand-logo"
-				src="<?php echo esc_url( otrn_asset( 'assets/logos/oficina-turismo-arauco.webp' ) ); ?>"
-				width="800"
-				height="284"
-				alt="Logotipo provisional: Oficina de Turismo · Municipalidad de Arauco (pendiente el de Cabo de Hornos y Antártica)"
+				src="<?php echo esc_url( otrn_asset( 'assets/logos/crece-imcabodehornos.png' ) ); ?>"
+				width="1027"
+				height="537"
+				alt="Crece · CABO DE HORNOS — Ilustre Municipalidad de Cabo de Hornos y Antártica · Observatorio Turístico de Puerto Williams"
 			>
 		</a>
 		<?php

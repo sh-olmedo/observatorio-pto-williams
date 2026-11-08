@@ -23,12 +23,15 @@ Text Domain: otrn
    auto-hospedadas en assets/fonts/fonts.css. Poppins (familia secundaria
    municipal) no se aplica: el tema no la incluye todavía. */
 :root{
-  /* ---- Marca ---- */
-  --primary:#0070FF; --primary-dark:#0050B8; --primary-soft:#E7F1FF; --primary-tint:#BBD8FF;
-  --secondary:#DE232B; --accent:#41BCFF; --blue-dark:#304A83;
+  /* ---- Marca — Municipalidad de Cabo de Hornos y Antártica ----------
+   * Verificado desde imcabodehornos.cl / visitacabodehornos.cl
+   * (docs/CABO_DE_HORNOS_IDENTITY.md); dirección municipal aprobada.   */
+  --primary:#0071BC; --primary-dark:#00518A; --primary-soft:#EAF2F9; --primary-tint:#D6E3EE;
+  --secondary:#FFB800; --accent:#27AAE1; --blue-dark:#014A94;
+  --ribbon:linear-gradient(90deg,#A9C33A 0 25%,#EC008C 25% 50%,#27AAE1 50% 75%,#F15A29 75% 100%);
   /* ---- Neutros ---- */
-  --dark:#000000; --text2:#707070;
-  --grey:#E0E0E0; --cream:#F8F8F8; --lgrey:#F6F6F6; --paper:#FFFFFF;
+  --dark:#000000; --text2:#5A6B7B;
+  --grey:#E7ECF1; --cream:#F9F9F9; --lgrey:#F6F6F6; --paper:#FFFFFF;
   /* ---- Estado (semántico) ---- */
   --success:#0F7B4E; --success-soft:#E4F5EC;
   --warning:#8A5A00; --warning-soft:#FCF1DC;
@@ -36,9 +39,9 @@ Text Domain: otrn
   --neutral:#52525B; --neutral-soft:var(--lgrey);
   /* ---- Ritmo y geometría ---- */
   --space-section:clamp(48px,8vw,120px);
-  --radius:10px; --radius-sm:6px; --radius-pill:30px;
+  --radius:14px; --radius-sm:8px; --radius-pill:50px;
   /* ---- Tipografía ---- */
-  --font-title:'Montserrat',system-ui,sans-serif;
+  --font-title:'Reddit Sans','Montserrat',system-ui,sans-serif;
   --font-mono:'IBM Plex Mono',monospace;
 }
 
@@ -71,7 +74,13 @@ body.otrn > .otrn-footer{flex:0 0 auto;}
 }
 
 /* ---- Header ---------------------------------------------------------- */
-.otrn-header{border-bottom:1px solid var(--grey);}
+.otrn-header{position:relative;}
+/* Cinta institucional multicolor: firma de la marca de la Municipalidad de
+   Cabo de Hornos y Antártica (banda de 6px bajo el encabezado en todo el
+   sitio, equivalente a la del portal imcabodehornos.cl). Va en ::after para
+   seguir al header tanto en posición fija (portada) como estática. */
+.otrn-ribbon{height:6px;background:var(--ribbon);}
+.otrn-header::after{content:"";position:absolute;left:0;right:0;top:100%;height:6px;background:var(--ribbon);pointer-events:none;}
 .otrn-header .wrap{display:flex;align-items:center;justify-content:space-between;height:72px;}
 .otrn-brand{display:flex;align-items:center;gap:14px;font-weight:800;font-size:17px;}
 .otrn-brand-logo{height:46px;width:auto;display:block;}
