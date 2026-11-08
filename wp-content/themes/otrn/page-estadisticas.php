@@ -81,7 +81,7 @@ $prio_tot = max( 1, $prio_si + $prio_no );
 <div class="wrap otrn-pagehead">
 	<span class="eyebrow">Plan de Desarrollo Turístico</span>
 	<h1>Estadísticas Pladetur</h1>
-	<p>Iniciativas, financiamiento y prioridad del Pladetur de Rapa Nui, agregados por lineamiento y filtrables por año de asignación.</p>
+	<p>Iniciativas, financiamiento y prioridad del Pladetur de Cabo de Hornos, agregados por lineamiento y filtrables por año de asignación.</p>
 	<?php // Sin ítem de nav propio: se llega desde Planificación, y se vuelve por aquí. ?>
 	<p><a href="<?php echo esc_url( get_post_type_archive_link( 'iniciativa_pladetur' ) ); ?>">← Volver a Planificación</a></p>
 </div>

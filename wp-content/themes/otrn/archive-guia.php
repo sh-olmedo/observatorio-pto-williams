@@ -58,7 +58,7 @@ $otrn_pinta_indice = static function ( $temas, $anexos ) {
 <div class="wrap otrn-pagehead" id="otrn-guia-inicio">
 	<span class="eyebrow">Ayuda</span>
 	<h1>Guía de usuario</h1>
-	<p>Instrucciones para usar el Observatorio Turístico de Arauco: navegación y cuenta, indicadores, geoportal, buenas prácticas, planificación, autoevaluación y material de apoyo. Es una página privada: solo se ve con la sesión iniciada.</p>
+	<p>Instrucciones para usar el Observatorio Turístico de Puerto Williams: navegación y cuenta, indicadores, geoportal, buenas prácticas, planificación, autoevaluación y material de apoyo. Es una página privada: solo se ve con la sesión iniciada.</p>
 </div>
 
 <div class="wrap otrn-guia">

@@ -6,6 +6,16 @@ If this site has a `DESIGN.md`, follow it for any design or content work.
 
 > **Customising this file:** Feel free to edit, extend, or replace the contents below.
 
+> **Clone provenance (2026-11-08):** this repository is a provisional clone of
+> `sh-olmedo/observatorio-arauco` (theme `otrn`, Rapa Nui heritage), rebranded
+> provisionally toward the **Observatorio Turístico de Puerto Williams**
+> (Municipalidad de Cabo de Hornos y Antártica). Visible copy was swapped to
+> Puerto Williams; identity graphics (logos), photos, palette and database demo
+> content remain inherited and pending client decisions — see
+> `docs/PW_CLONE.md`. The inherited Arauco audit docs (`docs/`) describe the
+> progenitor project: treat them as reference, not as this site's status. The
+> remote to the Arauco repository was detached (local history only).
+
 ## Project
 
 **Observatorio Turístico de Arauco** — WordPress Studio site. All custom code lives in the

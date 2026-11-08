@@ -22,7 +22,7 @@ if ( $f_q ) {
 get_template_part( 'template-parts/material-lista', null, array(
 	'eyebrow' => 'Recursos',
 	'titulo'  => 'Material de apoyo',
-	'intro'   => 'Documentación técnica, antecedentes estadísticos y enlaces de interés para operadores, gestores y comunidad turística de Rapa Nui.',
+	'intro'   => 'Documentación técnica, antecedentes estadísticos y enlaces de interés para operadores, gestores y comunidad turística de Puerto Williams.',
 	'base'    => get_post_type_archive_link( 'material_apoyo' ),
 	'query'   => new WP_Query( $args ),
 	'q'       => $f_q,

@@ -21,7 +21,7 @@
 				src="<?php echo esc_url( otrn_asset( 'assets/logos/oficina-turismo-arauco.webp' ) ); ?>"
 				width="800"
 				height="284"
-				alt="Observatorio Turístico de Arauco — Oficina de Turismo, Municipalidad de Arauco"
+				alt="Logotipo provisional: Oficina de Turismo · Municipalidad de Arauco (pendiente el de Cabo de Hornos y Antártica)"
 			>
 		</a>
 		<?php

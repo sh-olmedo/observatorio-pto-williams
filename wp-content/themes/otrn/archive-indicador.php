@@ -15,14 +15,15 @@ $f_q   = isset( $_GET['q'] ) ? sanitize_text_field( wp_unslash( $_GET['q'] ) ) :
 
 // Nivel territorial (docs/02 §3): campo ACF `nivel_territorial`, no taxonomía.
 // "Local" es la etiqueta visible del valor real "Comunal" (no se toca el dato).
-// Por defecto, si no viene el parámetro en la URL, se filtra por "Comunal".
+// Por defecto se muestran todos los niveles: el listado reúne las fichas
+// editoriales y las generadas por el Engine, que pueden ser de otro nivel.
 $niveles_labels = array(
 	'Comunal'       => 'Local',
 	'Regional'      => 'Regional',
 	'Nacional'      => 'Nacional',
 	'Internacional' => 'Internacional',
 );
-$f_nivel = isset( $_GET['nivel'] ) ? sanitize_text_field( wp_unslash( $_GET['nivel'] ) ) : 'Comunal';
+$f_nivel = isset( $_GET['nivel'] ) ? sanitize_text_field( wp_unslash( $_GET['nivel'] ) ) : '';
 
 $args = array(
 	'post_type'      => 'indicador',
@@ -59,7 +60,7 @@ $ambitos = get_terms( array( 'taxonomy' => 'ambito', 'hide_empty' => false ) );
 <div class="wrap otrn-pagehead">
 	<span class="eyebrow">Monitoreo</span>
 	<h1>Indicadores</h1>
-	<p>Indicadores para monitorear el comportamiento del turismo en Rapa Nui a lo largo del tiempo, en cuatro categorías.</p>
+	<p>Indicadores para monitorear el comportamiento del turismo en Puerto Williams a lo largo del tiempo, en cuatro categorías.</p>
 </div>
 
 <div class="wrap" style="padding-bottom:60px;">
@@ -96,7 +97,7 @@ $ambitos = get_terms( array( 'taxonomy' => 'ambito', 'hide_empty' => false ) );
 			<input id="f-q" type="search" name="q" value="<?php echo esc_attr( $f_q ); ?>" placeholder="Nombre del indicador">
 		</div>
 		<button class="otrn-btn" type="submit">Filtrar</button>
-		<?php if ( $f_cat || $f_amb || $f_q || 'Comunal' !== $f_nivel ) : ?><a class="otrn-btn ghost" href="<?php echo esc_url( get_post_type_archive_link( 'indicador' ) ); ?>">Limpiar</a><?php endif; ?>
+		<?php if ( $f_cat || $f_amb || $f_q || '' !== $f_nivel ) : ?><a class="otrn-btn ghost" href="<?php echo esc_url( get_post_type_archive_link( 'indicador' ) ); ?>">Limpiar</a><?php endif; ?>
 	</form>
 
 	<?php if ( ! $q->have_posts() ) : ?>

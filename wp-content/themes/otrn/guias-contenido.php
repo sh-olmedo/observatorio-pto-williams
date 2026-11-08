@@ -42,7 +42,7 @@ function otrn_guia_temas() {
 			'bloques' => array(
 				array(
 					'tipo'  => 'parrafo',
-					'texto' => 'El Observatorio Turístico de Arauco reúne en un solo sitio los datos, las buenas prácticas y las herramientas de planificación del turismo del territorio. Esta guía explica, paso a paso, cómo usar cada sección con lo que el sitio ofrece hoy.',
+					'texto' => 'El Observatorio Turístico de Puerto Williams reúne en un solo sitio los datos, las buenas prácticas y las herramientas de planificación del turismo del territorio. Esta guía explica, paso a paso, cómo usar cada sección con lo que el sitio ofrece hoy.',
 				),
 				array(
 					'tipo'  => 'subtitulo',
@@ -615,7 +615,7 @@ function otrn_guia_temas() {
 						),
 						array(
 							'q' => 'La portada dice que las cifras son provisionales.',
-							'a' => 'El Observatorio está migrando su base de datos al territorio de Arauco, y lo avisa en la portada. Mientras esa carga no termine, las cifras corresponden a la base anterior; el propio sitio avisará cuando se actualicen.',
+							'a' => 'El Observatorio está migrando su base de datos al territorio de Cabo de Hornos y Antártica, y lo avisa en la portada. Mientras esa carga no termine, las cifras corresponden a la base anterior; el propio sitio avisará cuando se actualicen.',
 						),
 						array(
 							'q' => 'No encuentro lo que busco en esta guía.',

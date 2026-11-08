@@ -26,7 +26,7 @@ $ambs = get_terms( array( 'taxonomy' => 'ambito', 'hide_empty' => false ) );
 <div class="wrap otrn-pagehead">
 	<span class="eyebrow">Aprendizajes</span>
 	<h1>Buenas prácticas</h1>
-	<p>Iniciativas de la municipalidad, instituciones, comunidad y operadores para avanzar hacia un turismo más sostenible y respetuoso del patrimonio Rapa Nui.</p>
+	<p>Iniciativas de la municipalidad, instituciones, comunidad y operadores para avanzar hacia un turismo más sostenible y respetuoso del patrimonio de Puerto Williams.</p>
 </div>
 
 <div class="wrap" style="padding-bottom:60px;">

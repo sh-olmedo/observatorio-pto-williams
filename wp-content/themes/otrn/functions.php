@@ -343,7 +343,7 @@ function otrn_setup_theme() {
 	// F25: el tema trae su propio header.php/footer.php y las plantillas del tema
 	// padre no se usan en estas rutas, así que sin esta declaración WordPress no
 	// renderiza nunca `<title>` y la pestaña cae a la URL. El nombre del sitio sale
-	// de `blogname` (en producción ya es «Observatorio Turístico de Arauco»).
+	// de `blogname` (en este clon provisional: «Observatorio Turístico de Puerto Williams»).
 	add_theme_support( 'title-tag' );
 	add_image_size( 'otrn-noticia', 1120, 560, true );      // Cabecera del detalle.
 	add_image_size( 'otrn-noticia-card', 640, 400, true );  // Tarjeta del listado.
@@ -740,9 +740,9 @@ function otrn_material_secciones() {
  *                  está colapsada (ver `assets/css/otrn-menu.css`).
  *   - `activo`:    la página actual es ese destino (marca `active` + aria-current).
  *
- * El grupo privado de autoevaluación se incluye solo con sesión iniciada, igual
- * que antes de este cambio: el gate real lo aplica
- * `otrn_seccion_autoevaluacion_privada()` en este mismo archivo.
+ * La autoevaluación no se anuncia en la navegación (ni con sesión iniciada):
+ * el gate real de la sección lo aplica `otrn_seccion_autoevaluacion_privada()`
+ * en este mismo archivo y su acceso queda en wp-admin o por enlace directo.
  *
  * @return array<int,array<string,mixed>> Destinos primarios en orden.
  */
@@ -868,32 +868,11 @@ function otrn_nav_estructura() {
 		'hijos'     => $material_hijos,
 	);
 
-	if ( is_user_logged_in() ) {
-		$items[] = array(
-			'tipo'      => 'grupo',
-			'id'        => 'autoevaluacion',
-			'etiqueta'  => 'Autoevaluación',
-			'prioridad' => 6,
-			'activo'    => is_post_type_archive( 'evaluacion' ) || is_singular( 'evaluacion' ) || is_page( 'evaluar' ) || is_page( 'mapa' ),
-			'hijos'     => array(
-				array(
-					'etiqueta' => 'Autoevaluaciones',
-					'url'      => get_post_type_archive_link( 'evaluacion' ),
-					'activo'   => is_post_type_archive( 'evaluacion' ) || is_singular( 'evaluacion' ),
-				),
-				array(
-					'etiqueta' => 'Mapa',
-					'url'      => home_url( '/mapa/' ),
-					'activo'   => is_page( 'mapa' ),
-				),
-				array(
-					'etiqueta' => 'Nueva autoevaluación',
-					'url'      => home_url( '/evaluar/' ),
-					'activo'   => is_page( 'evaluar' ),
-				),
-			),
-		);
-	}
+	// La sección de autoevaluación y sus estadísticas (listado, mapa y
+	// formulario) no se anuncia en la navegación pública: ni siquiera con
+	// sesión iniciada. La sección sigue existiendo y protegida por
+	// `otrn_seccion_autoevaluacion_privada()`; se gestiona desde wp-admin y
+	// solo se alcanza por enlace directo.
 
 	/**
 	 * Permite ajustar la navegación principal sin editar este archivo.

@@ -1,9 +1,12 @@
-# Observatorio Turístico de Arauco
+# Observatorio Turístico de Puerto Williams (clon provisional)
 
-Repositorio del proyecto **Observatorio Turístico de Arauco**, un sitio WordPress
-(tema hijo `otrn`) que hereda y reencuadra la estructura editorial S0–S6 del
-Observatorio Turístico de Rapa Nui hacia la identidad visual de la
-**Municipalidad de Arauco / GORE Región de Biobío**.
+Repositorio del proyecto **Observatorio Turístico de Puerto Williams**: clon provisional
+del sitio **Observatorio Turístico de Arauco** (que a su vez hereda y reencuadra la
+estructura editorial S0–S6 del Observatorio Turístico de Rapa Nui). La identidad visible
+está rebrandada provisionariamente hacia **Puerto Williams / Municipalidad de Cabo de
+Hornos y Antártica**; los logos, las fotos, la paleta y los contenidos (cifras, sectores)
+siguen siendo herencia del proyecto original y quedan pendientes de material y decisiones
+del cliente. Inventario del clon: [`docs/PW_CLONE.md`](docs/PW_CLONE.md).
 
 Gestionado localmente con
 [WordPress Studio](https://developer.wordpress.com/studio/).

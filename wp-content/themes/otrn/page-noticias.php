@@ -33,7 +33,7 @@ $base = get_permalink();
 <div class="wrap otrn-pagehead">
 	<span class="eyebrow">Actualidad</span>
 	<h1><?php the_title(); ?></h1>
-	<p>Novedades del Observatorio: nuevos indicadores, talleres, avances del Pladetur y actividades del turismo en Rapa Nui.</p>
+	<p>Novedades del Observatorio: nuevos indicadores, talleres, avances del Pladetur y actividades del turismo en Puerto Williams.</p>
 </div>
 
 <div class="wrap" style="padding-bottom:60px;">

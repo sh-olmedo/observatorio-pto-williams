@@ -1,6 +1,7 @@
 <?php
 /**
- * Portada del Observatorio Turístico de Arauco — experiencia inmersiva.
+ * Portada del Observatorio Turístico de Puerto Williams (clon provisional; hereda
+ * la maqueta de Arauco) — experiencia inmersiva.
  *
  * Scrollytelling en 5 escenas (storyboard aprobado · segunda propuesta, ETAPA B):
  *   1. Hero editorial asimétrico (fondo claro + fotografía aérea vertical del
@@ -21,7 +22,7 @@
  *
  * Los datos funcionales (cifras, indicadores y noticias) salen del CMS. Las
  * cifras son herencia del Observatorio de Rapa Nui y se etiquetan como
- * provisionales mientras se migran a la comuna de Arauco.
+ * provisionales mientras se migran a la comuna de Cabo de Hornos y Antártica.
  *
  * @package otrn
  */
@@ -35,7 +36,7 @@ $datos       = otrn_datos_portada();
 $indicadores = get_posts( array( 'post_type' => 'indicador', 'post_status' => 'publish', 'numberposts' => 6 ) );
 $noticias    = get_posts( array( 'post_type' => 'post', 'post_status' => 'publish', 'numberposts' => 6 ) );
 
-// --- Fotografías aprobadas (references/web → assets/img/arauco) ----------
+// --- Fotografías provisionales heredadas (assets/img/arauco); pendientes los originales de Puerto Williams ----------
 $otrn_img     = get_stylesheet_directory_uri() . '/assets/img/arauco/';
 $img_estuario = $otrn_img . 'estuario.webp';            // 22.08.51 · hero vertical
 $img_bahia    = $otrn_img . 'hero-bahia.webp';         // 22.09.17 · territorio
@@ -73,16 +74,16 @@ $otrn_icos = array( $otrn_ico['people'], $otrn_ico['bed'], $otrn_ico['chart'] );
 	     En modo estático las tres <article class="otrn-act"> se apilan a sangre;
 	     en modo inmersivo se convierten en capas de texto sobre el nivel
 	     fotográfico compartido que pinnea y crossfade. -->
-	<section class="otrn-stage" data-otrn-stage aria-label="Narrativa territorial de Arauco">
+	<section class="otrn-stage" data-otrn-stage aria-label="Narrativa territorial de Puerto Williams">
 		<div class="otrn-stage__viewport">
 
 			<!-- Nivel fotográfico compartido (solo modo inmersivo). -->
 			<div class="otrn-stage__media" aria-hidden="true">
 				<figure class="otrn-layer is-active" data-layer="0">
-					<img src="<?php echo esc_url( $img_estuario ); ?>" alt="Vista aérea del estuario y la boca de río de Arauco" fetchpriority="high" decoding="async">
+					<img src="<?php echo esc_url( $img_estuario ); ?>" alt="Vista aérea del estuario y la boca de río (imagen provisional)" fetchpriority="high" decoding="async">
 				</figure>
 				<figure class="otrn-layer" data-layer="1">
-					<img src="<?php echo esc_url( $img_bahia ); ?>" alt="Bahía y pueblo costero de Arauco" loading="lazy" decoding="async">
+					<img src="<?php echo esc_url( $img_bahia ); ?>" alt="Bahía y pueblo costero (imagen provisional)" loading="lazy" decoding="async">
 				</figure>
 				<figure class="otrn-layer" data-layer="2">
 					<img src="<?php echo esc_url( $img_costa ); ?>" alt="Lanchas de pesca en el muelle al atardecer" loading="lazy" decoding="async">
@@ -94,8 +95,8 @@ $otrn_icos = array( $otrn_ico['people'], $otrn_ico['bed'], $otrn_ico['chart'] );
 				<div class="otrn-act__grad"></div>
 				<div class="wrap otrn-act__inner">
 					<p class="otrn-act__eyebrow">Observatorio Turístico</p>
-					<h1 class="otrn-act__titulo">Arauco, territorio que inspira</h1>
-					<p class="otrn-act__lead">Conectamos datos, territorio y personas para un turismo más sostenible en la costa y los valles de Arauco.</p>
+					<h1 class="otrn-act__titulo">Puerto Williams, territorio que inspira</h1>
+					<p class="otrn-act__lead">Conectamos datos, territorio y personas para un turismo más sostenible en la costa y los bosques de Puerto Williams.</p>
 					<a class="otrn-act__cta" href="<?php echo esc_url( $otrn_url_indicadores ); ?>">Explorar indicadores <span class="otrn-act__arrow" aria-hidden="true">→</span></a>
 				</div>
 				<p class="otrn-stage__cue"><span class="otrn-stage__cue-ico" aria-hidden="true"></span>Desliza para descubrir</p>
@@ -107,8 +108,8 @@ $otrn_icos = array( $otrn_ico['people'], $otrn_ico['bed'], $otrn_ico['chart'] );
 				<div class="wrap otrn-act__inner">
 					<p class="otrn-act__eyebrow">Nuestro territorio</p>
 					<h2 class="otrn-act__titulo">Mar, ríos y comunidades</h2>
-					<p class="otrn-act__lead">Arauco es un territorio costero y rural, donde el mar, los ríos, los bosques y sus comunidades dan forma a una rica identidad cultural, gastronómica y natural.</p>
-					<a class="otrn-act__cta otrn-act__cta--outline" href="<?php echo esc_url( $otrn_url_acerca ); ?>">Conoce más sobre Arauco <span class="otrn-act__arrow" aria-hidden="true">→</span></a>
+					<p class="otrn-act__lead">Puerto Williams es un territorio austral, donde el mar, los fiordos, los bosques y sus comunidades dan forma a una rica identidad cultural, gastronómica y natural.</p>
+					<a class="otrn-act__cta otrn-act__cta--outline" href="<?php echo esc_url( $otrn_url_acerca ); ?>">Conoce más sobre Puerto Williams <span class="otrn-act__arrow" aria-hidden="true">→</span></a>
 				</div>
 			</article>
 
@@ -127,7 +128,7 @@ $otrn_icos = array( $otrn_ico['people'], $otrn_ico['bed'], $otrn_ico['chart'] );
 	</section>
 	<?php if ( $datos ) : ?>
 	<!-- 4 · DATOS «Un territorio con oportunidades» (superficie clara).
-	     Cifras provisionales: herencia de Rapa Nui, migrando a Arauco. -->
+	     Cifras provisionales: herencia de Rapa Nui, migrando a Cabo de Hornos y Antártica. -->
 	<section class="otrn-landing-seccion otrn-landing-datos" id="otrn-datos" data-scene="4" aria-labelledby="otrn-datos-titulo">
 		<div class="wrap">
 			<div class="otrn-datos-head">
@@ -135,11 +136,11 @@ $otrn_icos = array( $otrn_ico['people'], $otrn_ico['bed'], $otrn_ico['chart'] );
 					<p class="otrn-act__eyebrow">En cifras</p>
 					<h2 class="otrn-act__titulo" id="otrn-datos-titulo">Un territorio con oportunidades</h2>
 				</div>
-				<p class="otrn-datos-head__der">El turismo es un motor de desarrollo para las comunidades de Arauco. Conoce las principales cifras del territorio y su evolución en los últimos años.</p>
+				<p class="otrn-datos-head__der">El turismo es un motor de desarrollo para las comunidades de Puerto Williams. Conoce las principales cifras del territorio y su evolución en los últimos años.</p>
 			</div>
 			<div class="otrn-provisional" role="note">
 				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 11v5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="7.5" r="1.1" fill="currentColor"/></svg>
-				<p><strong>Datos provisionales.</strong> Las cifras actuales corresponden a la herencia del Observatorio de Rapa Nui y se están migrando a la comuna de Arauco. Se actualizarán con la base local.</p>
+				<p><strong>Datos provisionales.</strong> Las cifras actuales corresponden a la herencia del Observatorio de Rapa Nui y se están migrando a la comuna de Cabo de Hornos y Antártica. Se actualizarán con la base local.</p>
 			</div>
 			<div class="otrn-datos">
 				<?php
@@ -170,7 +171,7 @@ $otrn_icos = array( $otrn_ico['people'], $otrn_ico['bed'], $otrn_ico['chart'] );
 				<div class="otrn-explora-head__izq">
 					<p class="otrn-act__eyebrow">Explora el observatorio</p>
 					<h2 class="otrn-act__titulo" id="otrn-explora-titulo">Datos para un turismo más sostenible</h2>
-					<p class="otrn-act__lead">Accede a indicadores, análisis y recursos sobre el turismo en Arauco.</p>
+					<p class="otrn-act__lead">Accede a indicadores, análisis y recursos sobre el turismo en Puerto Williams.</p>
 					<a class="otrn-act__cta otrn-act__cta--outline" href="<?php echo esc_url( $otrn_url_indicadores ); ?>">Ver todos los indicadores <span class="otrn-act__arrow" aria-hidden="true">→</span></a>
 				</div>
 				<div class="otrn-indexpanel">
@@ -207,7 +208,7 @@ $otrn_icos = array( $otrn_ico['people'], $otrn_ico['bed'], $otrn_ico['chart'] );
 			<div class="otrn-sectionhead grande teal">
 				<div>
 					<p class="otrn-act__eyebrow">Últimas noticias</p>
-					<h2 class="otrn-act__titulo" id="otrn-not-titulo">Actualidad turística en Arauco</h2>
+					<h2 class="otrn-act__titulo" id="otrn-not-titulo">Actualidad turística en Puerto Williams</h2>
 				</div>
 				<a class="otrn-btn teal" href="<?php echo esc_url( $otrn_url_noticias ); ?>">Ver todas las noticias →</a>
 			</div>

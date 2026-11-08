@@ -58,7 +58,7 @@ $lineamientos_terms = get_terms( array( 'taxonomy' => 'lineamiento', 'hide_empty
 <div class="wrap otrn-pagehead">
 	<span class="eyebrow">Plan de Desarrollo Turístico</span>
 	<h1>Seguimiento Pladetur</h1>
-	<p>Estado de avance, financiamiento y prioridad de las iniciativas del Pladetur de Rapa Nui, agregado por lineamiento estratégico.</p>
+	<p>Estado de avance, financiamiento y prioridad de las iniciativas del Pladetur de Cabo de Hornos, agregado por lineamiento estratégico.</p>
 </div>
 
 <div class="wrap">
