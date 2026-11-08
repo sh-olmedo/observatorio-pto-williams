@@ -7,8 +7,7 @@ tema para eliminar la dependencia de `fonts.googleapis.com`. **Sin modificar aú
 | Archivo | Familia | Peso | Uso |
 |---|---|---|---|
 | `montserrat-latin-400.woff2` | Montserrat | 400 | Cuerpo / texto |
-| `montserrat-latin-500.woff2` | Montserrat | 500 | Énfasis suave |
-| `montserrat-latin-600.woff2` | Montserrat | 600 | Subtítulos |
+| `montserrat-latin-500.woff2` | Montserrat | 500 | Énfasis suave || `montserrat-latin-600.woff2` | Montserrat | 600 | Subtítulos |
 | `montserrat-latin-700.woff2` | Montserrat | 700 | Encabezados |
 | `montserrat-latin-800.woff2` | Montserrat | 800 | Títulos H1/H2 (800) |
 | `ibm-plex-mono-latin-400.woff2` | IBM Plex Mono | 400 | Cifras / datos |
@@ -20,6 +19,23 @@ tema para eliminar la dependencia de `fonts.googleapis.com`. **Sin modificar aú
 > IBM Plex Mono 400–700 = cifras, indicadores y módulos de datos (se conserva la
 > identidad "observatorio"). Sin Poppins por ahora.
 > Tamaño total: ~180 KB (9 archivos), cada woff2 14–19 KB.
+
+## 2026-11-08 · Reddit Sans (familia variable) — tipografía del proyecto Cabo de Hornos
+
+El cliente entregó la lista de la familia completa **Reddit Sans** (16 estilos, TTF en
+`references/font/`) como fuente institucional del proyecto, aunque los binarios llegaron
+como HTML inválido (descarga de OneDrive mal guardada). Al ser tipografía libre **SIL OFL**,
+se instaló la copia idéntica publicada en el repositorio `google/fonts` de GitHub:
+
+| Archivo | Familia | Rango | Uso |
+|---|---|---|---|
+| `redditsans/RedditSans-wght.ttf` | Reddit Sans | variable 200–900 | Títulos y cuerpo (`--font-title`) |
+| `redditsans/RedditSans-Italic-wght.ttf` | Reddit Sans Italic | variable 200–900 | Itálicas |
+| `redditsans/OFL.txt` | — | — | Licencia |
+
+Declaradas en `assets/css/fonts.css`; Montserrat queda como respaldo en la cadena
+`--font-title`. Pendiente: cuando el cliente confirme/renueve los binarios enviados,
+comparar los pesos disponibles (su lista incluye ExtraLight y Black).
 
 ## Reglas `@font-face` para la Etapa 2 (referencia, no aplicadas)
 

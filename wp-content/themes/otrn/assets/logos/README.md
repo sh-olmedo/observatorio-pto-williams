@@ -11,6 +11,12 @@ referencia visual, pero los assets de abajo provienen de los originales.
 
 ## Inventario
 
+### 2026-11-08 · Cabo de Hornos (cliente del clon Pto. Williams)
+
+| Archivo | Marca | Origen / procedencia | Transparencia |
+|---|---|---|---|
+| `crece-imcabodehornos.png` (1027×537) | «Crece · CABO DE HORNOS — Ilustre Municipalidad» | PNG transparente oficial publicado en `imcabodehornos.cl` (uploads 2024/04); el vector original del cliente vive en `references/logos/logo municipal vector.{pdf,ai,eps}` | ✅ alfa real |
+
 | Archivo | Institución | Dim. | Peso | Origen | Alfa | Calidad |
 |---|---|---|---|---|---|---|
 | `municipalidad-arauco.webp` | Municipalidad de Arauco (escudo + texto) | 800×309 | 32 KB | `references/logos/municipalidad-arauco.jpg` (5333×3000) | ✅ | ✅ Alta |
