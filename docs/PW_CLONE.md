@@ -41,6 +41,27 @@ Cabo de Hornos identity and local data.
      remaining case-sensitive "Arauco" strings on the front page are the deliberate
      provisional logo `alt`s and inherited file paths.
 
+## Content withdrawal (2026-11-08)
+
+The inherited demo content of the previous project was retired from this local DB
+(every item moved to **draft**, nothing deleted; backup first):
+
+- `respaldo-antes-retiro-contenido-20261108.zip` (Studio export, 34.5 MB)
+  taken before the change.
+- Drafted: the 3 `dato_portada` cifras (385/387/389 — Rapa Nui figures), the 4 notices
+  (`post` 1/158/159/160 incl. "Hello world!" and the Rapa Nui Pladetur notice), the
+  local-monitoring indicators 145–148/411/414 (Rapa Nui and 1 test), and all 64
+  `iniciativa_pladetur` items (Pladetur 2026–2034 de Rapa Nui programme).
+- Kept published: the **national reference datasets** (INE/CEPAL/ODS/SERNATUR
+  indicators 184–222+, buenas_practica library incl. a Cabo de Hornos entry) — platform
+  reference data, not former-site identity content.
+- Front-end effects (committed): landing sections Datos/Noticias auto-hide with the
+  existing guards; scene 03 «Costa viva» disabled (inherited Arauco photo) with a PHP
+  guard; front-page rail renders items conditionally; `otrn-landing.js` pin/rail
+  choreography now adapts to 2 or 3 scenes.
+- Landing now shows only: header + ribbon, hero (semanero/Dientes), territory (letras),
+  the national-indicators EXPLORA section, and the blue footer.
+
 ## Deliberately left unchanged (inherited)
 
 - **Asset directories and slugs** (`assets/img/arauco/`, `assets/logos/*arauco.webp`,

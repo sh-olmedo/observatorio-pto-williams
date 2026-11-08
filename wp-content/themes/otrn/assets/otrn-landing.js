@@ -87,13 +87,24 @@ document.addEventListener( 'DOMContentLoaded', function () {
 
 		ctx = window.gsap.context( function () {
 			// --expand (0→1) controla el crecimiento del panel vía clip-path.
+			// El pin y el riel se adaptan al número de escenas activas:
+			// 2 escenas (acto 3 desactivado: falta fotografía del cliente) o 3.
+			var dosEscenas = ! root.querySelector( '.otrn-act--costa' );
+			var railItems = root.querySelectorAll( '.otrn-rail__item' );
+			var railIndex = function ( id ) {
+				for ( var i = 0; i < railItems.length; i++ ) {
+					var a = railItems[ i ].querySelector( 'a' );
+					if ( a && a.getAttribute( 'href' ) === '#' + id ) { return i + 1; }
+				}
+				return 1;
+			};
 			var expand = { v: 0 };
 			var tl = window.gsap.timeline( {
 				defaults: { ease: 'none' },
 				scrollTrigger: {
 					trigger: stage,
 					start: 'top top',
-					end: '+=280%',
+					end: dosEscenas ? '+=200%' : '+=280%',
 					pin: true,
 					scrub: 1,
 				},
@@ -101,16 +112,18 @@ document.addEventListener( 'DOMContentLoaded', function () {
 
 			// 1→2: el panel crece a sangre mientras el hero se retira.
 			tl.to( expand, {
-				v: 1, duration: 2,
+				v: 1, duration: dosEscenas ? 1.4 : 2,
 				onUpdate: function () { stage.style.setProperty( '--expand', expand.v ); },
 			}, 1.4 );
 
 			// Crossfades del nivel fotográfico compartido.
 			tl.set( '.otrn-layer[data-layer="0"]', { opacity: 1 }, 0 );
-			tl.to( '.otrn-layer[data-layer="0"]', { opacity: 0, duration: 1.4 }, 2.0 );
-			tl.fromTo( '.otrn-layer[data-layer="1"]', { opacity: 0 }, { opacity: 1, duration: 1.4 }, 2.4 );
+			tl.to( '.otrn-layer[data-layer="0"]', { opacity: 0, duration: dosEscenas ? 1.2 : 1.4 }, dosEscenas ? 1.8 : 2.0 );
+			tl.fromTo( '.otrn-layer[data-layer="1"]', { opacity: 0 }, { opacity: 1, duration: dosEscenas ? 1.2 : 1.4 }, dosEscenas ? 2.0 : 2.4 );
+			if ( ! dosEscenas ) {
 			tl.to( '.otrn-layer[data-layer="1"]', { opacity: 0, duration: 1.4 }, 5.4 );
 			tl.fromTo( '.otrn-layer[data-layer="2"]', { opacity: 0 }, { opacity: 1, duration: 1.4 }, 5.6 );
+			}
 
 			// Velo de legibilidad de las escenas 2 y 3 (texto claro sobre foto):
 			// entra antes de que aparezca el texto de la escena 2 y se queda.
@@ -119,17 +132,22 @@ document.addEventListener( 'DOMContentLoaded', function () {
 			// Aparición / retiro del texto de cada escena.
 			tl.to( '.otrn-act--hero .otrn-act__inner', { opacity: 0, duration: 1.0 }, 1.4 );
 			tl.to( '.otrn-stage__cue', { opacity: 0, duration: 0.6 }, 0.5 );
-			tl.fromTo( '.otrn-act--territorio .otrn-act__inner', { opacity: 0, yPercent: 6 }, { opacity: 1, yPercent: 0, duration: 1.2 }, 3.0 );
+			tl.fromTo( '.otrn-act--territorio .otrn-act__inner', { opacity: 0, yPercent: 6 }, { opacity: 1, yPercent: 0, duration: 1.2 }, dosEscenas ? 2.6 : 3.0 );
+			if ( ! dosEscenas ) {
 			tl.to( '.otrn-act--territorio .otrn-act__inner', { opacity: 0, duration: 1.0 }, 5.4 );
 			tl.fromTo( '.otrn-act--costa .otrn-act__inner', { opacity: 0, yPercent: 6 }, { opacity: 1, yPercent: 0, duration: 1.2 }, 6.0 );
+			}
 			// Sostiene la escena costera hasta el fin del pin.
-			tl.to( expand, { v: 1, duration: 1.8 }, 7.2 );
+			if ( ! dosEscenas ) { tl.to( expand, { v: 1, duration: 1.8 }, 7.2 ); }
 
 			// Riel 01–03 según el progreso del pin.
 			window.ScrollTrigger.create( {
-				trigger: stage, start: 'top top', end: '+=280%',
+				trigger: stage, start: 'top top', end: dosEscenas ? '+=200%' : '+=280%',
 				onUpdate: function ( self ) {
-					setRail( self.progress < 0.34 ? 1 : ( self.progress < 0.7 ? 2 : 3 ) );
+					var marca = dosEscenas
+						? ( self.progress < 0.5 ? 1 : railIndex( 'otrn-territorio' ) )
+						: ( self.progress < 0.34 ? 1 : ( self.progress < 0.7 ? 2 : railIndex( 'otrn-costa' ) ) );
+					setRail( marca );
 				},
 			} );
 
@@ -139,15 +157,15 @@ document.addEventListener( 'DOMContentLoaded', function () {
 			if ( datos ) {
 				window.ScrollTrigger.create( {
 					trigger: datos, start: 'top 60%',
-					onEnter: function () { setRail( 4 ); },
-					onEnterBack: function () { setRail( 3 ); },
+					onEnter: function () { setRail( railIndex( 'otrn-datos' ) ); },
+					onEnterBack: function () { setRail( dosEscenas ? railIndex( 'otrn-territorio' ) : railIndex( 'otrn-costa' ) ); },
 				} );
 			}
 			if ( explora ) {
 				window.ScrollTrigger.create( {
 					trigger: explora, start: 'top 60%',
-					onEnter: function () { setRail( 5 ); },
-					onEnterBack: function () { setRail( 4 ); },
+					onEnter: function () { setRail( railIndex( 'otrn-explora' ) ); },
+					onEnterBack: function () { setRail( railIndex( 'otrn-datos' ) ); },
 				} );
 			}
 		}, root );

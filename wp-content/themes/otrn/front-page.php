@@ -68,9 +68,13 @@ $otrn_icos = array( $otrn_ico['people'], $otrn_ico['bed'], $otrn_ico['chart'] );
 		<ol class="otrn-rail__lista">
 			<li class="otrn-rail__item is-active"><a href="#otrn-hero"><span class="otrn-rail__n">01</span><span class="otrn-rail__d" aria-hidden="true"></span></a></li>
 			<li class="otrn-rail__item"><a href="#otrn-territorio"><span class="otrn-rail__n">02</span><span class="otrn-rail__d" aria-hidden="true"></span></a></li>
-			<li class="otrn-rail__item"><a href="#otrn-costa"><span class="otrn-rail__n">03</span><span class="otrn-rail__d" aria-hidden="true"></span></a></li>
+			<?php // Acto 03 inactivo mientras no haya fotografía del cliente (front-page guard). ?>
+			<?php if ( $datos ) : // el ítem solo existe si su sección existe. ?>
 			<li class="otrn-rail__item"><a href="#otrn-datos"><span class="otrn-rail__n">04</span><span class="otrn-rail__d" aria-hidden="true"></span></a></li>
+			<?php endif; ?>
+			<?php if ( $indicadores ) : ?>
 			<li class="otrn-rail__item"><a href="#otrn-explora"><span class="otrn-rail__n">05</span><span class="otrn-rail__d" aria-hidden="true"></span></a></li>
+			<?php endif; ?>
 		</ol>
 	</nav>
 
@@ -117,7 +121,13 @@ $otrn_icos = array( $otrn_ico['people'], $otrn_ico['bed'], $otrn_ico['chart'] );
 				</div>
 			</article>
 
-			<!-- Acto 3 · Costa viva. -->
+			<?php
+			// Acto 3 «Costa viva»: desactivado hasta que el cliente entregue una
+			// fotografía del territorio (la imagen heredada de Arauco salió del
+			// sitio). El riel y el scrollytelling se re-armen para 2 escenas; al
+			// restaurar el bloque basta con dejar sólo este guard en true.
+			$otrn_acto3_visible = false; // pendiente fotografía del cliente
+			if ( $otrn_acto3_visible ) : ?>
 			<article class="otrn-act otrn-act--costa" id="otrn-costa" data-scene="3" style="--scene:url('<?php echo esc_url( $img_costa ); ?>')">
 				<div class="otrn-act__grad"></div>
 				<div class="wrap otrn-act__inner">
@@ -127,6 +137,7 @@ $otrn_icos = array( $otrn_ico['people'], $otrn_ico['bed'], $otrn_ico['chart'] );
 					<a class="otrn-act__cta otrn-act__cta--link" href="<?php echo esc_url( $otrn_url_noticias ); ?>">Explorar historias <span class="otrn-act__arrow" aria-hidden="true">→</span></a>
 				</div>
 			</article>
+			<?php endif; ?>
 
 		</div>
 	</section>
